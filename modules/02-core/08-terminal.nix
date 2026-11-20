@@ -42,6 +42,8 @@
           bat
           ripgrep
           fd
+          rmtrash
+          trash-cli
           tldr
           yt-dlp
           try
@@ -104,6 +106,11 @@
           "l." = {
             enable = true;
             value = "eza -a | grep -e '^\\.'";
+          };
+          # @table-item label = "rm";
+          rm = {
+            enable = true;
+            value = "rmtrash";
           };
           # @table-item label = "reloaddux";
           reloaddux = {

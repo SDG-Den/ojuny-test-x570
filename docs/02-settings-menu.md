@@ -101,7 +101,10 @@ current working set for review.
   Applications page and point at dux-files.
 - `07-git.nix` `[menu]`. Git and version control defaults.
 - `08-terminal.nix` `[menu]`. Terminal emulator, zsh, aliases, command line
-  tools and the btop, lazygit and yazi TUIs.
+  tools and the btop, lazygit and yazi TUIs. `rmtrash` and `trash-cli` are
+  installed, and the `rm` alias points at `rmtrash`, so an interactive `rm`
+  moves files to the freedesktop trash. `trash-list`, `trash-restore` and
+  `trash-empty` manage the trash.
 - `09-autostart.nix` `[menu]`. Commands run at login and on reload.
 - `10-updates.nix` `[menu]`. Update tooling, the repo-sync checker and a disabled updater.
 - `11-nixsettings.nix` `[menu]`. Nix tooling, `nix-shell-gui`, `nix-regedit`
