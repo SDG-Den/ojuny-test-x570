@@ -56,6 +56,7 @@ case "$1 $2" in
     ;;
 esac
 MOCK
+sed -i "1s|^#!.*|#!${BASH:?}|" "$tmp/bin/mmsg"
 chmod +x "$tmp/bin/mmsg"
 
 export PATH="$tmp/bin:$PATH"
