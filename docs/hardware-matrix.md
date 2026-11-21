@@ -12,8 +12,12 @@ from the nixos-facter report. The key is optional, so a machine without a
 classifiable PCI display controller resolves to `unknown` and then to `none`.
 A selected nixos-hardware profile that ships GPU settings owns the drivers,
 PRIME bus IDs and VA-API packages; the profile page marks them managed and the
-concrete targets below are ignored. The concrete target names remain manual
-overrides when no profile owns the GPU.
+concrete targets below are ignored. The template emits its non-managed graphics
+settings at default priority, so a profile definition wins even when
+`gpuProfiles` has no entry for the model. Intel GPUs with a pre-Broadwell PCI
+device ID select the legacy i965 path and software GL automatically, with or
+without a matching profile. The concrete target names remain manual overrides
+when no profile owns the GPU.
 
 ## CPU support
 
@@ -39,7 +43,7 @@ Ojuny support contract, not a test report.
 | Target | Hardware | GUI selection | Notes |
 |---|---|---|---|
 | Intel integrated | Broadwell and newer | `intel` | iHD VA-API and the Xe/Arc media packages. |
-| Intel integrated, legacy | Haswell and older | `intel` with **Legacy Intel configuration** | i965 VA-API. Display works through modesetting. |
+| Intel integrated, legacy | Haswell and older | `intel` with **Legacy Intel configuration** | i965 VA-API. Display works through modesetting. i965 does not provide OpenGL 3.3, so the session uses software GL. |
 | Intel discrete | Arc Alchemist and Battlemage, Arc Pro | `intel` | Modesetting plus the Intel media stack. |
 | AMD integrated | GCN 3.0 and newer, Ryzen Vega and RDNA | `amd` | amdgpu and radeonsi. |
 | AMD integrated, GCN 1.0 and 2.0 | SI and CIK APUs | `amd` with **GCN 1.0 and 2.0 support** | amdgpu with the SI/CIK module parameters. |
@@ -50,7 +54,7 @@ Ojuny support contract, not a test report.
 | NVIDIA latest | Turing and newer | `nvidia`, branch `latest` | 615 driver. May break on new hardware. |
 | NVIDIA legacy 580 | Maxwell, Pascal and Volta, including the GTX 750 Ti | `nvidia`, branch `legacy_580` | Native Wayland. Recommended for these cards. |
 | NVIDIA Nouveau | Kepler and newer | `nvidia`, branch `nouveau` | Mesa and NVK. See the limits below. |
-| Software rendering | No usable GPU, VM | `none` | Desktop only. Not a gaming path. |
+| Software rendering | No usable GPU, VM | `none` | Desktop only. Not a gaming path. The session forces Mesa software GL, the Cairo GTK renderer and the lavapipe Vulkan driver. |
 
 ## Hybrid targets
 

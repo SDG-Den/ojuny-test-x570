@@ -290,6 +290,40 @@ def main():
         "empty graphics_card must produce an unknown layout",
     )
 
+    ironlake = {
+        "smbios": {"system": {"manufacturer": "LENOVO", "product": "25372Q6"}},
+        "hardware": {
+            "graphics_card": [
+                {
+                    "vendor": {"name": "Intel Corporation", "hex": "8086"},
+                    "device": {"hex": "0046"},
+                    "sysfs_bus_id": "0000:00:02.0",
+                }
+            ]
+        },
+    }
+    check(
+        module.detect_profile(ironlake)["gpu"]["legacyIntel"],
+        "Ironlake must be detected as legacy Intel",
+    )
+
+    broadwell = {
+        "smbios": {"system": {"manufacturer": "LENOVO", "product": "25372Q6"}},
+        "hardware": {
+            "graphics_card": [
+                {
+                    "vendor": {"name": "Intel Corporation", "hex": "8086"},
+                    "device": {"hex": "1616"},
+                    "sysfs_bus_id": "0000:00:02.0",
+                }
+            ]
+        },
+    }
+    check(
+        not module.detect_profile(broadwell)["gpu"]["legacyIntel"],
+        "Broadwell must not be detected as legacy Intel",
+    )
+
     dell_hybrid = {
         "smbios": {"system": {"manufacturer": "Dell Inc.", "product": "XPS 15 9520"}},
         "hardware": {

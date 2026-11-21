@@ -55,7 +55,7 @@ category; the `@menu` `category` string is authoritative.
 | `04-GUI` | bar, dock, launcher, dashboard, controlcenter, menu, dot and floating island |
 | `05-Applications` | applist, screenshot, multimedia, office, vesktop, steam, kdeconnect, app format compatibility |
 | `06-Utility` | dux-tools, webapps, plugins |
-| `07-System` | configuration, networking, bluetooth, graphics, plymouth |
+| `07-System` | configuration, networking, bluetooth, graphics, plymouth, mounts |
 | `Patches` | pre-included: patch-development, patch-docker, patch-flatpak, patch-nixshell, patch-remote-desktop, patch-virtualization; installed patches add more |
 
 Pages marked "(proposed)" below are additions to the scaffold and are the
@@ -158,6 +158,11 @@ current working set for review.
   The shell plays its bundled cues unless "Use system sound theme" is on; the
   Audio page installs the freedesktop theme that switch selects.
 - `11-screensaver.nix` `[menu]`. Configurable ASCII screensaver command and idle timeout.
+- `12-nightlight.nix` `[menu]`. Night mode on a fixed schedule or sunrise and
+  sunset, the colour temperatures, the fullscreen pause and excluded
+  applications.
+- `13-monocle-deck.nix` `[menu]`. Monocle and deck tabbing, borders, gaps and
+  corner radius, and the title message bar.
 
 ### 04-gui
 
@@ -278,6 +283,8 @@ current working set for review.
   profile page marks them managed and the manual driver, PRIME and bus ID
   controls do not take effect. The supported combinations are listed in
   `hardware-matrix.md`.
+- `08-accessibility.nix` `[menu]`. Orca screen reader, braille, the on-screen
+  keyboard, colour profiles and the keyboard and mouse accessibility binds.
 - `09-facter.nix` `[menu]`. Hardware profile selection through the `facter`
   widget, which reads `facter.json` and shows the detected model, profile,
   coverage state, effective GPU layout and its source. `auto` uses
@@ -285,6 +292,12 @@ current working set for review.
   Applying a change rewrites the discovered `system-hardware-quirks` module
   with `nix run .#regenerate-hardware -- --profile-only`.
 - `07-plymouth.nix` `[menu]`. Stylix-coloured Plymouth boot splash with the Ojuny logo.
+- `10-mounts.nix` `[menu]`. Additional internal mounts, external media and
+  filesystem maintenance. devmon, udisks2 and gvfs automount removable media,
+  and mounting is passwordless for active local sessions. Two switches make a
+  USB copy safe to unplug: synchronous writes and the drive write-cache
+  disable. See [13-external-media.md](13-external-media.md) for the guarantee
+  and its limits.
 
 ### backend
 

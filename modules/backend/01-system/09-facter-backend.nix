@@ -68,6 +68,11 @@
           default = "unknown";
           description = "Where the effective GPU layout came from.";
         };
+        legacyIntel = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          description = "Whether the detected Intel graphics needs the legacy i965 and software GL path.";
+        };
         busIds = {
           intel = lib.mkOption { type = lib.types.str; default = "PCI:0:2:0"; };
           amd = lib.mkOption { type = lib.types.str; default = "PCI:5:0:0"; };
@@ -84,6 +89,7 @@
         ojuny.hardware.gpu.detected = layout;
         ojuny.hardware.gpu.managed = managed;
         ojuny.hardware.gpu.source = source;
+        ojuny.hardware.gpu.legacyIntel = detection.gpu.legacyIntel;
 
         ojuny.hardware.gpu.busIds = detection.gpu.busIds;
 

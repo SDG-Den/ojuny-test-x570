@@ -174,6 +174,14 @@ with `owns = true` imports its own video drivers, PRIME bus IDs and VA-API
 packages. The Graphics page then stops emitting those definitions, so the
 upstream module owns them without a priority conflict.
 
+The template also emits its non-managed graphics settings at default priority.
+A profile that defines the same option at normal priority wins, so a device
+whose profile is missing from `gpuProfiles` still cannot collide with the
+template package list. The table selects the GPU layout and the managed state
+shown in the UI; it is not a correctness requirement for package ownership.
+Intel GPUs with a pre-Broadwell PCI device ID are classified from the facter
+report and select the legacy i965 and software GL path automatically.
+
 The Graphics page target `auto` reads `hardware.graphics_card` from the
 facter report. The key is optional: `nixos-facter` omits it on machines
 with no classifiable PCI display controller. When it is absent, `auto`

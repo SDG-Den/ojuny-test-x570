@@ -17,6 +17,13 @@ jobs:
       - name: Fail when docs/module-tree.md is stale
         run: git diff --exit-code -- docs/module-tree.md
 
+  pages:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Fail when a settings page is missing from docs/02
+        run: python3 tests/check-menu-pages.py --root .
+
   docs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-24.04

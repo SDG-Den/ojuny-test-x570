@@ -260,7 +260,37 @@ let
   cardHex = card: (card.vendor or { }).hex or "";
 
   isIntel = card: lib.hasInfix "intel" (cardVendor card) || cardHex card == "8086";
-  isAmd = card:
+
+  legacyIntelPrefixes = [
+    "004"
+    "010"
+    "011"
+    "012"
+    "015"
+    "016"
+    "040"
+    "041"
+    "042"
+    "0a0"
+    "0a1"
+    "0a2"
+    "0a3"
+    "0d0"
+    "0d1"
+    "0d2"
+    "0d3"
+    "0f3"
+  ];
+
+  isLegacyIntel =
+    card:
+    let
+      device = (card.device or { }).hex or "";
+    in
+    lib.any (prefix: lib.hasPrefix prefix (lib.toLower device)) legacyIntelPrefixes;
+
+  isAmd =
+    card:
     lib.elem (cardHex card) [ "1002" "1022" ]
     || lib.hasInfix "advanced micro devices" (cardVendor card)
     || lib.hasInfix "ati " (cardVendor card)
@@ -295,6 +325,7 @@ let
       hasIntel = intel != [ ];
       hasAmd = amd != [ ];
       hasNvidia = nvidia != [ ];
+      legacyIntel = hasIntel && lib.any isLegacyIntel intel;
       layout =
         if !hasIntel && !hasAmd && !hasNvidia then
           "unknown"
@@ -328,7 +359,7 @@ let
       };
     in
     {
-      inherit layout busIds;
+      inherit layout busIds legacyIntel;
       source = if builtins.hasAttr "graphics_card" hardware then "facter" else "unknown";
     };
 
@@ -344,7 +375,7 @@ let
       profile = if chosen != null && chosen ? profile then chosen.profile else baseProfile;
       managed = if meta == null then false else (meta.owns or false);
       layout = if chosen != null then chosen.layout else gpu.layout;
-      inherit (gpu) busIds source;
+      inherit (gpu) busIds source legacyIntel;
     };
 
   rawDetect =
@@ -394,7 +425,7 @@ let
     // {
       profile = resolved.profile;
       gpu = {
-        inherit (resolved) layout managed busIds source;
+        inherit (resolved) layout managed busIds source legacyIntel;
       };
     };
 
@@ -424,6 +455,7 @@ let
           layout = "unknown";
           managed = false;
           source = "unknown";
+          legacyIntel = false;
           busIds = {
             intel = "PCI:0:2:0";
             amd = "PCI:5:0:0";

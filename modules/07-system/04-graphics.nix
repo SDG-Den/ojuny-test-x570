@@ -49,7 +49,7 @@
         # @option widget = "switch"; label = "NVIDIA open kernel modules"; group = "NVIDIA"; groupOrder = 40; order = 20; visibleWhen.path = "ojuny.gpu"; visibleWhen.equals = [ "nvidia" "hybrid-intel-nvidia" "hybrid-amd-nvidia" ]; description = "Use the open kernel modules for Turing and newer. Ignored for legacy 580 and Nouveau.";
         ojuny.gpuNvidia.open = false;
 
-        # @option widget = "switch"; label = "Legacy Intel configuration"; group = "Intel"; groupOrder = 20; order = 10; visibleWhen.path = "ojuny.gpu"; visibleWhen.equals = [ "intel" "hybrid-intel-nvidia" "hybrid-intel-amd" ]; description = "Use the i965 VA-API stack for Haswell and older Intel graphics instead of iHD.";
+        # @option widget = "switch"; label = "Legacy Intel configuration"; group = "Intel"; groupOrder = 20; order = 10; visibleWhen.path = "ojuny.gpu"; visibleWhen.equals = [ "intel" "hybrid-intel-nvidia" "hybrid-intel-amd" ]; description = "Use the i965 VA-API stack and software GL. Enabled automatically on pre-Broadwell Intel. Turn on to force it on other models.";
         ojuny.gpuIntel.legacy = false;
 
         # @option widget = "switch"; label = "Legacy AMD configuration"; group = "AMD"; groupOrder = 30; order = 10; visibleWhen.path = "ojuny.gpu"; visibleWhen.equals = [ "amd" "hybrid-amd-nvidia" "hybrid-intel-amd" ]; description = "Use the radeon driver and r600 VA-API for pre-GCN AMD graphics.";
@@ -68,13 +68,13 @@
         ojuny.gpuCompute = "none";
 
         # @option widget = "switch"; label = "Graphics acceleration"; group = "Graphics"; groupOrder = 10; order = 20;
-        hardware.graphics.enable = true;
+        hardware.graphics.enable = lib.mkDefault true;
 
         # @option widget = "switch"; label = "32-bit graphics"; group = "Graphics"; groupOrder = 10; order = 30; description = "Install 32-bit graphics libraries for 32-bit games and Wine. A hardware profile that owns the GPU settings supplies its own value.";
         ojuny.gpu32Bit = false;
 
         # @option widget = "switch"; label = "Redistributable firmware"; group = "Graphics"; groupOrder = 10; order = 40; description = "Firmware blobs for Wi-Fi, GPUs and other devices.";
-        hardware.enableRedistributableFirmware = true;
+        hardware.enableRedistributableFirmware = lib.mkDefault true;
 
         # AMD
         # @option widget = "switch"; label = "AMDGPU in initrd"; group = "AMD"; groupOrder = 30; order = 30; visibleWhen.path = "ojuny.gpu"; visibleWhen.equals = [ "amd" "hybrid-amd-nvidia" "hybrid-intel-amd" ];

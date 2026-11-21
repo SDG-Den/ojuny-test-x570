@@ -438,6 +438,34 @@ def is_intel(card):
     return "intel" in name or hex_id == "8086"
 
 
+LEGACY_INTEL_PREFIXES = (
+    "004",
+    "010",
+    "011",
+    "012",
+    "015",
+    "016",
+    "040",
+    "041",
+    "042",
+    "0a0",
+    "0a1",
+    "0a2",
+    "0a3",
+    "0d0",
+    "0d1",
+    "0d2",
+    "0d3",
+    "0f3",
+)
+
+
+def is_legacy_intel(card):
+    device = card.get("device") or {}
+    device_hex = str(device.get("hex", "")).lower()
+    return any(device_hex.startswith(prefix) for prefix in LEGACY_INTEL_PREFIXES)
+
+
 def is_amd(card):
     name, hex_id = card_vendor(card)
     return hex_id in ("1002", "1022") or "advanced micro devices" in name or "ati " in name or name == "ati"
@@ -494,6 +522,7 @@ def detect_gpu(report):
     return {
         "layout": layout,
         "source": "facter" if present else "unknown",
+        "legacyIntel": any(is_legacy_intel(card) for card in intel),
         "busIds": {
             "intel": bus_or_default(intel, "PCI:0:2:0"),
             "amd": bus_or_default(amd, "PCI:5:0:0"),
@@ -512,6 +541,7 @@ def resolve_gpu_profile(base_profile, gpu):
             "layout": gpu["layout"],
             "busIds": gpu["busIds"],
             "source": gpu["source"],
+            "legacyIntel": gpu["legacyIntel"],
         }
 
     variants = meta["variants"]
@@ -529,6 +559,7 @@ def resolve_gpu_profile(base_profile, gpu):
         "layout": chosen["layout"] if chosen else gpu["layout"],
         "busIds": gpu["busIds"],
         "source": gpu["source"],
+        "legacyIntel": gpu["legacyIntel"],
     }
 
 
@@ -576,6 +607,7 @@ def detect_profile(report):
         "managed": resolved["managed"],
         "busIds": resolved["busIds"],
         "source": resolved["source"],
+        "legacyIntel": resolved["legacyIntel"],
     }
     return base
 

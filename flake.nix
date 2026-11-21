@@ -415,6 +415,10 @@
                 python3 ${./tests/check-hardware-profile.py} --root ${source}
                 touch $out
               '';
+          checks.graphics-defaults = import ./tests/check-graphics-defaults.nix {
+            inherit pkgs;
+            nixpkgs = inputs.nixpkgs;
+          };
           checks.bind-args =
             let
               source = pkgs.lib.cleanSource ./.;
@@ -527,6 +531,7 @@
 
           checks.default = pkgs.runCommand "check-default" { } ''
             echo ${self.checks.${system}.hardware-profile} >/dev/null
+            echo ${self.checks.${system}.graphics-defaults} >/dev/null
             echo ${self.checks.${system}.bind-args} >/dev/null
             echo ${self.checks.${system}.settings-options} >/dev/null
             echo ${self.checks.${system}.overflow-layout} >/dev/null

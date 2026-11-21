@@ -10,6 +10,7 @@
     let
       gpuTarget = config.ojuny.gpu;
       managed = config.ojuny.hardware.gpu.managed;
+      legacyIntel = config.ojuny.gpuIntel.legacy || config.ojuny.hardware.gpu.legacyIntel;
       resolvedGpu =
         if gpuTarget == "auto" then config.ojuny.hardware.gpu.detected else gpuTarget;
       gpu = if resolvedGpu == "auto" || resolvedGpu == "unknown" then "none" else resolvedGpu;
@@ -97,6 +98,17 @@
           ''}
           exec "$@"
         '';
+      };
+
+      softwareRenderingEnv = {
+        LIBGL_ALWAYS_SOFTWARE = "1";
+        GALLIUM_DRIVER = "llvmpipe";
+        MESA_LOADER_DRIVER_OVERRIDE = "llvmpipe";
+        GSK_RENDERER = "cairo";
+        WEBKIT_DISABLE_COMPOSITING_MODE = "1";
+        VK_DRIVER_FILES = "${pkgs.mesa}/share/vulkan/icd.d/lvp_icd.x86_64.json";
+        WLR_RENDERER_ALLOW_SOFTWARE = "1";
+        QSG_RENDER_LOOP = "basic";
       };
 
       drivers =
@@ -243,18 +255,20 @@
 
         # Intel media packages are derived from the Intel legacy switch.
         hardware.graphics.extraPackages = lib.mkIf (!managed && intelSelected) (
-          if config.ojuny.gpuIntel.legacy then
-            [ pkgs.intel-vaapi-driver ]
-          else
-            [
-              pkgs.intel-media-driver
-              pkgs.vpl-gpu-rt
-              pkgs.intel-compute-runtime
-            ]
+          lib.mkDefault (
+            if legacyIntel then
+              [ pkgs.intel-vaapi-driver ]
+            else
+              [
+                pkgs.intel-media-driver
+                pkgs.vpl-gpu-rt
+                pkgs.intel-compute-runtime
+              ]
+          )
         );
 
         # Intel GuC is derived from the selected Intel path and the legacy switch.
-        boot.kernelParams = lib.mkIf (!managed && intelSelected && !config.ojuny.gpuIntel.legacy) [ "i915.enable_guc=3" ];
+        boot.kernelParams = lib.mkIf (!managed && intelSelected && !legacyIntel && config.ojuny.hardware.detectedProfile == "unmatched") [ "i915.enable_guc=3" ];
 
         boot.extraModprobeConfig = lib.mkIf (!managed && amdSelected && config.ojuny.gpuAmd.siCik && !config.ojuny.gpuAmd.legacy) ''
           options amdgpu si_support=1 cik_support=1
@@ -275,18 +289,16 @@
         hardware.nvidia.prime.intelBusId = lib.mkIf (!managed && nvidiaHybrid && nvidiaProprietary && gpu == "hybrid-intel-nvidia") effectiveBusIds.intel;
         hardware.nvidia.prime.amdgpuBusId = lib.mkIf (!managed && nvidiaHybrid && nvidiaProprietary && gpu == "hybrid-amd-nvidia") effectiveBusIds.amd;
 
-        services.xserver.videoDrivers = lib.mkIf (!managed) drivers;
+        services.xserver.videoDrivers = lib.mkIf (!managed) (lib.mkDefault drivers);
 
         environment.sessionVariables = lib.mkMerge [
-          (lib.mkIf (gpu == "none") {
-            WLR_RENDERER_ALLOW_SOFTWARE = "1";
-            QSG_RENDER_LOOP = "basic";
-          })
-          (lib.mkIf (gpu != "none") {
+          (lib.mkIf (gpu == "none") softwareRenderingEnv)
+          (lib.mkIf (intelSelected && legacyIntel) softwareRenderingEnv)
+          (lib.mkIf (gpu != "none" && !(intelSelected && legacyIntel)) {
             QSG_RENDER_LOOP = "threaded";
           })
           (lib.mkIf intelSelected {
-            LIBVA_DRIVER_NAME = if config.ojuny.gpuIntel.legacy then "i965" else "iHD";
+            LIBVA_DRIVER_NAME = if legacyIntel then "i965" else "iHD";
           })
           (lib.mkIf (!intelSelected && amdSelected) {
             LIBVA_DRIVER_NAME = if config.ojuny.gpuAmd.legacy then "r600" else "radeonsi";
