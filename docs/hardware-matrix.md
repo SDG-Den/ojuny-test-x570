@@ -19,6 +19,12 @@ device ID select the legacy i965 path and software GL automatically, with or
 without a matching profile. The concrete target names remain manual overrides
 when no profile owns the GPU.
 
+The Performance group on the Graphics page has independent **Disable Visual
+Effects** and **Disable Animations** switches for low-end devices. Visual
+Effects forces off mango and DMS blur, shadows, transparency and elevation.
+Animations forces off mango animations and DMS animation durations. Border
+rounding and gaps are not changed.
+
 ## CPU support
 
 Intel and AMD microcode updates are both enabled. CPU support follows the

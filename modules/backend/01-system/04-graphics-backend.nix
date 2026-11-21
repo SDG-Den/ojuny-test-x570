@@ -11,8 +11,7 @@
       gpuTarget = config.ojuny.gpu;
       managed = config.ojuny.hardware.gpu.managed;
       legacyIntel = config.ojuny.gpuIntel.legacy || config.ojuny.hardware.gpu.legacyIntel;
-      resolvedGpu =
-        if gpuTarget == "auto" then config.ojuny.hardware.gpu.detected else gpuTarget;
+      resolvedGpu = if gpuTarget == "auto" then config.ojuny.hardware.gpu.detected else gpuTarget;
       gpu = if resolvedGpu == "auto" || resolvedGpu == "unknown" then "none" else resolvedGpu;
       effectiveBusIds =
         if gpuTarget == "auto" then config.ojuny.hardware.gpu.busIds else config.ojuny.gpuBusIds;
@@ -64,7 +63,13 @@
         !managed
         && (
           (config.ojuny.gpuOffload.enable && lib.hasPrefix "hybrid-" gpu)
-          || (config.ojuny.gpuMesaOffload.enable && lib.elem gpu [ "intel" "amd" ])
+          || (
+            config.ojuny.gpuMesaOffload.enable
+            && lib.elem gpu [
+              "intel"
+              "amd"
+            ]
+          )
         );
       offloadNvidia = nvidiaProprietary && config.ojuny.gpuOffload.enable;
       offloadBus =
@@ -119,11 +124,30 @@
         else if gpu == "nvidia" then
           (if nouveau then [ "modesetting" ] else [ "nvidia" ])
         else if gpu == "hybrid-intel-nvidia" then
-          (if nouveau then [ "modesetting" ] else [ "modesetting" "nvidia" ])
+          (
+            if nouveau then
+              [ "modesetting" ]
+            else
+              [
+                "modesetting"
+                "nvidia"
+              ]
+          )
         else if gpu == "hybrid-amd-nvidia" then
-          (if nouveau then [ amdDriver ] else [ amdDriver "nvidia" ])
+          (
+            if nouveau then
+              [ amdDriver ]
+            else
+              [
+                amdDriver
+                "nvidia"
+              ]
+          )
         else if gpu == "hybrid-intel-amd" then
-          [ "modesetting" amdDriver ]
+          [
+            "modesetting"
+            amdDriver
+          ]
         else
           [ "modesetting" ];
     in
@@ -147,6 +171,18 @@
         type = lib.types.bool;
         default = false;
         description = "Whether the manual GPU controls are editable. False when the target is auto or a hardware profile owns the GPU settings.";
+      };
+
+      options.ojuny.disableVisualEffects = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Force off blur, shadows, transparency and elevation in mango and DMS.";
+      };
+
+      options.ojuny.disableAnimations = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Force off mango animations and DMS animation durations.";
       };
 
       options.ojuny.gpu32Bit = lib.mkOption {
@@ -268,26 +304,39 @@
         );
 
         # Intel GuC is derived from the selected Intel path and the legacy switch.
-        boot.kernelParams = lib.mkIf (!managed && intelSelected && !legacyIntel && config.ojuny.hardware.detectedProfile == "unmatched") [ "i915.enable_guc=3" ];
+        boot.kernelParams = lib.mkIf (
+          !managed && intelSelected && !legacyIntel && config.ojuny.hardware.detectedProfile == "unmatched"
+        ) [ "i915.enable_guc=3" ];
 
-        boot.extraModprobeConfig = lib.mkIf (!managed && amdSelected && config.ojuny.gpuAmd.siCik && !config.ojuny.gpuAmd.legacy) ''
-          options amdgpu si_support=1 cik_support=1
-          options radeon si_support=0 cik_support=0
-        '';
+        boot.extraModprobeConfig =
+          lib.mkIf (!managed && amdSelected && config.ojuny.gpuAmd.siCik && !config.ojuny.gpuAmd.legacy)
+            ''
+              options amdgpu si_support=1 cik_support=1
+              options radeon si_support=0 cik_support=0
+            '';
 
         # NVIDIA
-        hardware.nvidia.package = lib.mkIf (!managed && (nvidiaProprietary || (config.ojuny.gpuCompute == "nvidia-datacenter" && !nvidiaSelected))) (
-          if nvidiaProprietary then nvidiaPackage else config.boot.kernelPackages.nvidiaPackages.dc
-        );
+        hardware.nvidia.package = lib.mkIf (
+          !managed
+          && (nvidiaProprietary || (config.ojuny.gpuCompute == "nvidia-datacenter" && !nvidiaSelected))
+        ) (if nvidiaProprietary then nvidiaPackage else config.boot.kernelPackages.nvidiaPackages.dc);
         hardware.nvidia.open = lib.mkIf (!managed && nvidiaProprietary) (
           config.ojuny.gpuNvidia.open && config.ojuny.gpuNvidia.branch != "legacy_580"
         );
         hardware.nvidia.modesetting.enable = lib.mkIf (!managed && nvidiaProprietary) true;
 
-        hardware.nvidia.prime.offload.enable = lib.mkIf (!managed && nvidiaHybrid && nvidiaProprietary) config.ojuny.gpuOffload.enable;
-        hardware.nvidia.prime.nvidiaBusId = lib.mkIf (!managed && nvidiaHybrid && nvidiaProprietary) effectiveBusIds.nvidia;
-        hardware.nvidia.prime.intelBusId = lib.mkIf (!managed && nvidiaHybrid && nvidiaProprietary && gpu == "hybrid-intel-nvidia") effectiveBusIds.intel;
-        hardware.nvidia.prime.amdgpuBusId = lib.mkIf (!managed && nvidiaHybrid && nvidiaProprietary && gpu == "hybrid-amd-nvidia") effectiveBusIds.amd;
+        hardware.nvidia.prime.offload.enable = lib.mkIf (
+          !managed && nvidiaHybrid && nvidiaProprietary
+        ) config.ojuny.gpuOffload.enable;
+        hardware.nvidia.prime.nvidiaBusId = lib.mkIf (
+          !managed && nvidiaHybrid && nvidiaProprietary
+        ) effectiveBusIds.nvidia;
+        hardware.nvidia.prime.intelBusId = lib.mkIf (
+          !managed && nvidiaHybrid && nvidiaProprietary && gpu == "hybrid-intel-nvidia"
+        ) effectiveBusIds.intel;
+        hardware.nvidia.prime.amdgpuBusId = lib.mkIf (
+          !managed && nvidiaHybrid && nvidiaProprietary && gpu == "hybrid-amd-nvidia"
+        ) effectiveBusIds.amd;
 
         services.xserver.videoDrivers = lib.mkIf (!managed) (lib.mkDefault drivers);
 

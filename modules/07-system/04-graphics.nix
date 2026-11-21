@@ -14,8 +14,7 @@
     let
       gpuTarget = config.ojuny.gpu;
       managed = config.ojuny.hardware.gpu.managed;
-      resolvedGpu =
-        if gpuTarget == "auto" then config.ojuny.hardware.gpu.detected else gpuTarget;
+      resolvedGpu = if gpuTarget == "auto" then config.ojuny.hardware.gpu.detected else gpuTarget;
       gpu = if resolvedGpu == "auto" || resolvedGpu == "unknown" then "none" else resolvedGpu;
       amdSelected = lib.elem gpu [
         "amd"
@@ -76,9 +75,17 @@
         # @option widget = "switch"; label = "Redistributable firmware"; group = "Graphics"; groupOrder = 10; order = 40; description = "Firmware blobs for Wi-Fi, GPUs and other devices.";
         hardware.enableRedistributableFirmware = lib.mkDefault true;
 
+        # @option widget = "switch"; label = "Disable Visual Effects"; group = "Performance"; groupOrder = 90; order = 10; description = "Force off blur, shadows, transparency and elevation in mango and DMS. Overrides the individual effect switches. Border rounding and gaps stay."; applyCommand = "ojuny-display-tweaks effects %%val%%";
+        ojuny.disableVisualEffects = false;
+
+        # @option widget = "switch"; label = "Disable Animations"; group = "Performance"; groupOrder = 90; order = 20; description = "Force off mango animations and DMS animation durations. Overrides the individual animation switches."; applyCommand = "ojuny-display-tweaks animations %%val%%";
+        ojuny.disableAnimations = false;
+
         # AMD
         # @option widget = "switch"; label = "AMDGPU in initrd"; group = "AMD"; groupOrder = 30; order = 30; visibleWhen.path = "ojuny.gpu"; visibleWhen.equals = [ "amd" "hybrid-amd-nvidia" "hybrid-intel-amd" ];
-        hardware.amdgpu.initrd.enable = lib.mkIf (!managed && amdSelected && !config.ojuny.gpuAmd.legacy) true;
+        hardware.amdgpu.initrd.enable = lib.mkIf (
+          !managed && amdSelected && !config.ojuny.gpuAmd.legacy
+        ) true;
 
       };
 

@@ -278,11 +278,14 @@ current working set for review.
 - `03-bluetooth.nix` `[menu]`. Bluetooth pairing and services.
 - `04-graphics.nix` `[menu]`. Graphics drivers, NVIDIA branches, hybrid
   PRIME and Mesa offload, compute accelerators and hardware acceleration.
-  The GPU vendor target `auto` reads the facter report; the other targets are
-  manual overrides. When a nixos-hardware profile owns the GPU settings, the
-  profile page marks them managed and the manual driver, PRIME and bus ID
-  controls do not take effect. The supported combinations are listed in
-  `hardware-matrix.md`.
+  The Performance group has two independent switches. **Disable Visual
+  Effects** forces off mango and DMS blur, shadows, transparency and
+  elevation. **Disable Animations** forces off mango animations and DMS
+  animation durations. Border rounding and gaps stay. The GPU vendor target
+  `auto` reads the facter report; the other targets are manual overrides.
+  When a nixos-hardware profile owns the GPU settings, the profile page marks
+  them managed and the manual driver, PRIME and bus ID controls do not take
+  effect. The supported combinations are listed in `hardware-matrix.md`.
 - `08-accessibility.nix` `[menu]`. Orca screen reader, braille, the on-screen
   keyboard, colour profiles and the keyboard and mouse accessibility binds.
 - `09-facter.nix` `[menu]`. Hardware profile selection through the `facter`
