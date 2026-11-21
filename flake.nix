@@ -144,7 +144,7 @@
             name = "prepare-repo";
             runtimeInputs = [ pkgs.python3 ];
             text = ''
-              export PYTHONPATH=${./scripts}:$PYTHONPATH
+              export PYTHONPATH=${./scripts}''${PYTHONPATH:+:$PYTHONPATH}
               exec python3 ${./scripts/prepare-repo.py} "$@"
             '';
           };
@@ -161,7 +161,7 @@
               pkgs.gnugrep
             ];
             text = ''
-              export PYTHONPATH=${./scripts}:$PYTHONPATH
+              export PYTHONPATH=${./scripts}''${PYTHONPATH:+:$PYTHONPATH}
               exec python3 ${./scripts/regenerate-hardware.py} "$@"
             '';
           };

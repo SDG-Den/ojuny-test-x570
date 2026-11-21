@@ -7,6 +7,11 @@
       pkgs,
       ...
     }:
+    let
+      rmShim = pkgs.writeShellScriptBin "rm" ''
+        exec ${pkgs.rmtrash}/bin/rmtrash "$@"
+      '';
+    in
     {
       options.ojuny.apps.terminal = {
         enable = lib.mkEnableOption "the terminal application set";
@@ -35,6 +40,12 @@
           type = lib.types.bool;
           default = true;
           description = "Load the powerlevel10k prompt theme.";
+        };
+
+        safeRm = lib.mkOption {
+          type = lib.types.bool;
+          default = true;
+          description = "Move deletions to the freedesktop trash and route path-based rm calls through rmtrash.";
         };
 
         fastfetch = {
@@ -93,7 +104,14 @@
               name = "nixupdate.sh";
               path = ./terminal/nixupdate.sh;
             }}";
+          }
+          // lib.optionalAttrs config.ojuny.apps.terminal.safeRm {
+            rm = "rmtrash";
           };
+
+        environment.sessionVariables = lib.mkIf config.ojuny.apps.terminal.safeRm {
+          PATH = lib.mkBefore [ "${rmShim}/bin" ];
+        };
       };
     };
 

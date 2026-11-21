@@ -79,6 +79,10 @@
 
         # @option widget = "spin"; label = "History size"; group = "Shell"; order = 60; step = 1000; unit = "lines"; visibleWhen.path = "programs.zsh.enable"; visibleWhen.equals = true;
         programs.zsh.histSize = 10000;
+
+        # @option widget = "switch"; label = "Safe rm"; group = "Aliases"; groupOrder = 50; order = 1; description = "Move deletions to the freedesktop trash. The rm alias and a session PATH shim send external rm calls from user sessions to rmtrash, including scripts started from a terminal.";
+        ojuny.apps.terminal.safeRm = true;
+
         # Aliases
         # @option widget = "table-attrset"; label = "Aliases"; group = "Aliases"; groupOrder = 50; columns = [ "enable" "value" ]; columnTypes = [ "bool" "str" ];
         ojuny.apps.terminal.aliases = {
@@ -106,11 +110,6 @@
           "l." = {
             enable = true;
             value = "eza -a | grep -e '^\\.'";
-          };
-          # @table-item label = "rm";
-          rm = {
-            enable = true;
-            value = "rmtrash";
           };
           # @table-item label = "reloaddux";
           reloaddux = {

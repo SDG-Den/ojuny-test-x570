@@ -90,6 +90,7 @@ differs from the generator output.
 - `modules/07-system/07-plymouth.nix`
 - `modules/07-system/08-accessibility.nix`
 - `modules/07-system/09-facter.nix`
+- `modules/07-system/10-mounts.nix`
 - `modules/07-system/_00-ssh-test.nix`
 - `modules/07-system/plymouth/_theme.nix`
 - `modules/07-system/plymouth/ojuny-logo.png`

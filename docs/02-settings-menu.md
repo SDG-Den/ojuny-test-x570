@@ -102,9 +102,12 @@ current working set for review.
 - `07-git.nix` `[menu]`. Git and version control defaults.
 - `08-terminal.nix` `[menu]`. Terminal emulator, zsh, aliases, command line
   tools and the btop, lazygit and yazi TUIs. `rmtrash` and `trash-cli` are
-  installed, and the `rm` alias points at `rmtrash`, so an interactive `rm`
-  moves files to the freedesktop trash. `trash-list`, `trash-restore` and
-  `trash-empty` manage the trash.
+  installed. The Safe rm switch aliases `rm` to `rmtrash` and prepends an `rm`
+  shim to the session PATH, so external `rm` calls in scripts started from a
+  user session also move files to the freedesktop trash. `trash-list`,
+  `trash-restore` and `trash-empty` manage the trash. The shim does not cover
+  system services, `sudo` commands, absolute-path `rm`, or direct deletion
+  APIs such as `os.remove` and `find -delete`.
 - `09-autostart.nix` `[menu]`. Commands run at login and on reload.
 - `10-updates.nix` `[menu]`. Update tooling, the repo-sync checker and a disabled updater.
 - `11-nixsettings.nix` `[menu]`. Nix tooling, `nix-shell-gui`, `nix-regedit`
