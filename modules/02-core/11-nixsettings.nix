@@ -3,7 +3,7 @@
   displayname = "Nix settings";
   icon = "package-x-generic-symbolic";
   order = 110;
-  description = "Nix tooling, the settings GUIs and the LAN cache";
+  description = "Nix tooling, the settings GUIs, the LAN cache and remote builders";
   category = "02-Core";
 */
 
@@ -15,6 +15,7 @@
       inputs.nix-shell-gui.nixosModules.default
       inputs.nix-regedit.nixosModules.default
       inputs.nix-cache-discovery.nixosModules.default
+      inputs.nix-builder-discovery.nixosModules.default
       inputs.nix-cleaner.nixosModules.default
     ];
 
@@ -49,6 +50,30 @@
 
     # @option widget = "list"; label = "LAN cache ranges"; group = "LAN cache"; groupOrder = 35; order = 40; itemLabel = "range"; addLabel = "Add range"; visibleWhen.path = "services.nix-cache-discovery.discovery.auto"; visibleWhen.equals = false; description = "Fixed ranges used when automatic detection is off.";
     services.nix-cache-discovery.discovery.ranges = [ "192.168.0.0/16" ];
+
+    # @option widget = "switch"; label = "LAN remote builders"; group = "Remote builders"; groupOrder = 36; order = 10; description = "Discover and pair with other devices for remote builds. The first build opens an approval on both machines.";
+    services.nix-builder-discovery.enable = false;
+
+    # @option widget = "dropdown"; label = "Act as a builder for others"; group = "Remote builders"; groupOrder = 36; order = 20; choices = [ "ask" "allow" "deny" ]; visibleWhen.path = "services.nix-builder-discovery.enable"; visibleWhen.equals = true; description = "ask opens a prompt on this device, allow trusts new devices automatically, deny makes this device client only.";
+    services.nix-builder-discovery.defaults.incoming = "ask";
+
+    # @option widget = "dropdown"; label = "Use other devices as builders"; group = "Remote builders"; groupOrder = 36; order = 30; choices = [ "ask" "allow" "deny" ]; visibleWhen.path = "services.nix-builder-discovery.enable"; visibleWhen.equals = true; description = "ask opens a prompt, allow trusts new builders automatically, deny makes this device builder only.";
+    services.nix-builder-discovery.defaults.outgoing = "ask";
+
+    # @option widget = "switch"; label = "Detect LAN automatically"; group = "Remote builders"; groupOrder = 36; order = 40; visibleWhen.path = "services.nix-builder-discovery.enable"; visibleWhen.equals = true; description = "Use the subnet this device is connected to. Fixed ranges below are ignored while enabled.";
+    services.nix-builder-discovery.discovery.auto = true;
+
+    # @option widget = "list"; label = "Builder discovery ranges"; group = "Remote builders"; groupOrder = 36; order = 50; itemLabel = "range"; addLabel = "Add range"; visibleWhen.path = "services.nix-builder-discovery.discovery.auto"; visibleWhen.equals = false; description = "Fixed ranges used when automatic detection is off.";
+    services.nix-builder-discovery.discovery.ranges = [ "192.168.0.0/16" ];
+
+    # @option widget = "switch"; label = "Wait for a busy builder"; group = "Remote builders"; groupOrder = 36; order = 60; advanced = true; visibleWhen.path = "services.nix-builder-discovery.enable"; visibleWhen.equals = true; description = "Wait for a remote slot instead of building locally when every eligible builder is busy.";
+    services.nix-builder-discovery.waitForBuilders = false;
+
+    # @option widget = "spin"; label = "Concurrent remote job count"; group = "Remote builders"; groupOrder = 36; order = 70; advanced = true; min = 1; max = 16; visibleWhen.path = "services.nix-builder-discovery.enable"; visibleWhen.equals = true; description = "Jobs this device accepts when acting as a builder.";
+    services.nix-builder-discovery.maxConnections = 1;
+
+    # @option widget = "text"; label = "Builder cache URL"; group = "Remote builders"; groupOrder = 36; order = 80; advanced = true; visibleWhen.path = "services.nix-builder-discovery.enable"; visibleWhen.equals = true; description = "Optional LAN cache URL for inputs and outputs. Empty uses direct transfer.";
+    services.nix-builder-discovery.cacheURL = "";
 
     # @option widget = "list"; label = "Substituters"; group = "Substituters"; groupOrder = 40; description = "Binary caches to pull prebuilt paths from. Hidden while the LAN cache is the only substituter."; order = 100; visibleWhen.path = "services.nix-cache-discovery.exclusive"; visibleWhen.equals = false;
     nix.settings.substituters = [ "https://cache.nixos.org/" ];

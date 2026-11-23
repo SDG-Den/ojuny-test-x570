@@ -158,6 +158,23 @@
         description = "Release tag for nix-cache-discovery when its package source is tag.";
       };
 
+      options.ojuny.binaries.builderDiscovery = lib.mkOption {
+        type = lib.types.enum [
+          "auto"
+          "source"
+          "latest"
+          "tag"
+        ];
+        default = "source";
+        description = "Package source for nix-builder-discovery.";
+      };
+
+      options.ojuny.binaries.builderDiscoveryTag = lib.mkOption {
+        type = lib.types.str;
+        default = "";
+        description = "Release tag for nix-builder-discovery when its package source is tag.";
+      };
+
       options.ojuny.binaries.regedit = lib.mkOption {
         type = lib.types.enum [
           "auto"
@@ -303,6 +320,13 @@
         services.nix-cache-discovery.package =
           pick "cacheDiscovery" inputs.nix-cache-discovery.packages.${system}.default "nix-cache-discovery"
             "nix-cache-discovery";
+
+        services.nix-builder-discovery.package =
+          pick "builderDiscovery" inputs.nix-builder-discovery.packages.${system}.default "nix-builder-discovery"
+            "nix-builder-discovery";
+
+        services.nix-builder-discovery.controlUsers =
+          lib.optional (primaryUser != null) primaryUser.name;
 
         services.nix-regedit.package =
           pick "regedit" inputs.nix-regedit.packages.${system}.default "nix-regedit"

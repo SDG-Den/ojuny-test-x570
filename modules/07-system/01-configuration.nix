@@ -48,6 +48,12 @@
         # @option widget = "text"; label = "Cache discovery release tag"; group = "Binaries"; groupOrder = 60; order = 41; advanced = true; description = "Release tag for nix-cache-discovery when its package source is tag.";
         ojuny.binaries.cacheDiscoveryTag = "";
 
+        # @option widget = "dropdown"; label = "Builder discovery"; group = "Binaries"; groupOrder = 60; order = 42; advanced = true; choices = [ "auto" "source" "latest" "tag" ]; description = "Override the package source for nix-builder-discovery. Keep source until the first release.";
+        ojuny.binaries.builderDiscovery = "source";
+
+        # @option widget = "text"; label = "Builder discovery release tag"; group = "Binaries"; groupOrder = 60; order = 43; advanced = true; description = "Release tag for nix-builder-discovery when its package source is tag.";
+        ojuny.binaries.builderDiscoveryTag = "";
+
         # @option widget = "dropdown"; label = "Registry editor"; group = "Binaries"; groupOrder = 60; order = 50; advanced = true; choices = [ "auto" "source" "latest" "tag" ]; description = "Override the package source for nix-regedit.";
         ojuny.binaries.regedit = "auto";
 
