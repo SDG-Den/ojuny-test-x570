@@ -94,10 +94,13 @@ rolling repository.
 - Six patches are pre-included in `modules/patches`: development, docker,
   flatpak, nixshell, remote desktop and virtualization. More can be installed
   with `ojuny-patches`; impermanence is available from the registry.
-- The System page selects the kernel. LTS, latest and Zen come from nixpkgs.
-  CachyOS latest and LTS use the `nix-cachyos-kernel` input and its binary
-  cache. A patch or host can override the choice with a normal
-  `boot.kernelPackages` assignment.
+- The System page selects the kernel. LTS is the default and comes from
+  nixpkgs; latest and Zen also come from nixpkgs. CachyOS latest and LTS use
+  the `nix-cachyos-kernel` input and its binary cache. Facter uses the kernel
+  supplied by the detected nixos-hardware profile and falls back to LTS when
+  the profile supplies none. The selector overrides a kernel set by the
+  profile; choose Facter to use it. A host can override the selector with
+  `lib.mkForce boot.kernelPackages`.
 
 ## Documentation
 

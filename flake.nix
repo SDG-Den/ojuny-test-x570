@@ -113,6 +113,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nix-connect = {
+      url = "github:ojuny-project/nix-connect";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";

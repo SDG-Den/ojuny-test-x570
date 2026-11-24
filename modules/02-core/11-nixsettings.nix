@@ -17,6 +17,7 @@
       inputs.nix-cache-discovery.nixosModules.default
       inputs.nix-builder-discovery.nixosModules.default
       inputs.nix-cleaner.nixosModules.default
+      inputs.nix-connect.nixosModules.default
     ];
 
     nixpkgs.overlays = [ inputs.nom-cache-discovery.overlays.default ];
@@ -74,6 +75,27 @@
 
     # @option widget = "text"; label = "Builder cache URL"; group = "Remote builders"; groupOrder = 36; order = 80; advanced = true; visibleWhen.path = "services.nix-builder-discovery.enable"; visibleWhen.equals = true; description = "Optional LAN cache URL for inputs and outputs. Empty uses direct transfer.";
     services.nix-builder-discovery.cacheURL = "";
+
+    # @option widget = "switch"; label = "Device management"; group = "Device management"; groupOrder = 37; order = 10; description = "Discover and manage NixOS devices on the LAN. Disabled by default.";
+    services.nix-connect.enable = false;
+
+    # @option widget = "spin"; label = "Information port"; group = "Device management"; groupOrder = 37; order = 20; min = 1; max = 65535; visibleWhen.path = "services.nix-connect.enable"; visibleWhen.equals = true; description = "Public, signed device information port.";
+    services.nix-connect.infoPort = 5060;
+
+    # @option widget = "spin"; label = "Control port"; group = "Device management"; groupOrder = 37; order = 30; min = 1; max = 65535; visibleWhen.path = "services.nix-connect.enable"; visibleWhen.equals = true; description = "mTLS control port for paired devices.";
+    services.nix-connect.controlPort = 5061;
+
+    # @option widget = "switch"; label = "Open firewall"; group = "Device management"; groupOrder = 37; order = 40; visibleWhen.path = "services.nix-connect.enable"; visibleWhen.equals = true; description = "Open the information and control ports on the LAN.";
+    services.nix-connect.openFirewall = true;
+
+    # @option widget = "switch"; label = "Detect LAN automatically"; group = "Device management"; groupOrder = 37; order = 50; visibleWhen.path = "services.nix-connect.enable"; visibleWhen.equals = true; description = "Use the current subnet for discovery.";
+    services.nix-connect.discovery.auto = true;
+
+    # @option widget = "list"; label = "Discovery ranges"; group = "Device management"; groupOrder = 37; order = 60; itemLabel = "range"; addLabel = "Add range"; visibleWhen.path = "services.nix-connect.discovery.auto"; visibleWhen.equals = false; description = "Fixed ranges used when automatic detection is off.";
+    services.nix-connect.discovery.ranges = [ "192.168.0.0/16" ];
+
+    # @option widget = "spin"; label = "Discovery interval"; group = "Device management"; groupOrder = 37; order = 70; min = 10; max = 3600; unit = "s"; visibleWhen.path = "services.nix-connect.enable"; visibleWhen.equals = true; description = "Seconds between discovery scans.";
+    services.nix-connect.discovery.interval = 600;
 
     # @option widget = "list"; label = "Substituters"; group = "Substituters"; groupOrder = 40; description = "Binary caches to pull prebuilt paths from. Hidden while the LAN cache is the only substituter."; order = 100; visibleWhen.path = "services.nix-cache-discovery.exclusive"; visibleWhen.equals = false;
     nix.settings.substituters = [ "https://cache.nixos.org/" ];

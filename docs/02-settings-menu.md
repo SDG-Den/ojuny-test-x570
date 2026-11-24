@@ -263,10 +263,12 @@ current working set for review.
 - `01-configuration.nix` `[menu]`. Kernel selection, hostname, time zone,
   locale, console keymap, the patches switch, the systemd-boot generation
   limit, and the package source controls. Kernel choices are LTS, latest, Zen,
-  CachyOS latest and CachyOS LTS. The package
-  source group selects source, the newest release, or a named release from each
-  repository's `binary-url.json`; the manual has its own selector and defaults
-  to source. Options marked advanced are per-tool overrides and release tags.
+  CachyOS latest, CachyOS LTS and Facter. LTS is the default; Facter uses the
+  kernel from the detected nixos-hardware profile and falls back to LTS. The
+  package source group selects source, the newest release, or a named release
+  from each repository's `binary-url.json`; the manual has its own selector and
+  defaults to source. Options marked advanced are per-tool overrides and
+  release tags.
   `system.stateVersion` present but never
   exposed (D15).
 - `02-networking.nix` `[menu]`. NetworkManager, firewall, hosts, DNS and the

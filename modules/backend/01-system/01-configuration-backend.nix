@@ -283,9 +283,10 @@
           "zen"
           "cachyos-latest"
           "cachyos-lts"
+          "facter"
         ];
         default = "lts";
-        description = "Linux kernel package set. LTS uses the nixpkgs default LTS kernel, latest follows nixpkgs unstable, Zen is the nixpkgs Zen kernel, and the CachyOS choices come from the nix-cachyos-kernel input.";
+        description = "Linux kernel package set. LTS uses the nixpkgs default LTS kernel and is the default. Latest follows nixpkgs unstable. Zen is the nixpkgs Zen kernel. CachyOS latest and LTS use the nix-cachyos-kernel input. Facter uses the kernel supplied by the detected nixos-hardware profile, or LTS when the profile supplies none.";
       };
 
       config = {
@@ -300,18 +301,23 @@
           ];
         };
 
-        boot.kernelPackages = lib.mkDefault (
-          if config.ojuny.kernel == "latest" then
-            pkgs.linuxPackages_latest
-          else if config.ojuny.kernel == "zen" then
-            pkgs.linuxPackages_zen
-          else if config.ojuny.kernel == "cachyos-latest" then
-            pkgs.cachyosKernels.linuxPackages-cachyos-latest
-          else if config.ojuny.kernel == "cachyos-lts" then
-            pkgs.cachyosKernels.linuxPackages-cachyos-lts-lto
+        boot.kernelPackages =
+          if config.ojuny.kernel == "facter" then
+            lib.mkDefault pkgs.linuxPackages
           else
-            pkgs.linuxPackages
-        );
+            # Above a plain profile assignment, below a host lib.mkForce.
+            lib.mkOverride 99 (
+              if config.ojuny.kernel == "latest" then
+                pkgs.linuxPackages_latest
+              else if config.ojuny.kernel == "zen" then
+                pkgs.linuxPackages_zen
+              else if config.ojuny.kernel == "cachyos-latest" then
+                pkgs.cachyosKernels.linuxPackages-cachyos-latest
+              else if config.ojuny.kernel == "cachyos-lts" then
+                pkgs.cachyosKernels.linuxPackages-cachyos-lts-lto
+              else
+                pkgs.linuxPackages
+            );
 
         programs.nix-cleaner.package =
           pick "cleaner" inputs.nix-cleaner.packages.${system}.default "nix-cleaner"
@@ -327,6 +333,9 @@
 
         services.nix-builder-discovery.controlUsers =
           lib.optional (primaryUser != null) primaryUser.name;
+
+        services.nix-connect.initialAccount =
+          if primaryUser != null then primaryUser.name else "user";
 
         services.nix-regedit.package =
           pick "regedit" inputs.nix-regedit.packages.${system}.default "nix-regedit"
