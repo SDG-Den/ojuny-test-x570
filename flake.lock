@@ -1475,11 +1475,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1795487568,
-        "narHash": "sha256-IfC+lAkbry6dxRDxfFryxlGRKclrdtYf1meE2E7nRMw=",
+        "lastModified": 1795506700,
+        "narHash": "sha256-cavOQI02r786RqsQLkcxM8XB0JqAvQorAOEXwxFeTrk=",
         "owner": "ojuny-project",
         "repo": "nom-cache-discovery",
-        "rev": "7b8c3dbad1ecf63ed954e5225401f800fa89c360",
+        "rev": "e7b010e6974263f2a6e64be6602ab0f8d635cf30",
         "type": "github"
       },
       "original": {
