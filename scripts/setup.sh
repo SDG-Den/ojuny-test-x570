@@ -110,10 +110,10 @@ if [ "$upgrade" -eq 1 ]; then
   fi
 
   # 2. The running NixOS configuration, when nixos-option can evaluate it.
-  if [ -z "$system_state_version" ]; then
+  if [ -z "$system_state_version" ] && [ -e /etc/nixos/configuration.nix ]; then
     system_state_version="$(nixos-option system.stateVersion | tr -d '"[:space:]' || true)"
   fi
-  if [ -z "$home_state_version" ]; then
+  if [ -z "$home_state_version" ] && [ -e /etc/nixos/configuration.nix ]; then
     home_state_version="$(
       nixos-option "home-manager.users.$user_hint.home.stateVersion" | tr -d '"[:space:]' || true
     )"
