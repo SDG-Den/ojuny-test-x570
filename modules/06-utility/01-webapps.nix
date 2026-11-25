@@ -57,20 +57,25 @@
 
         # @option widget = "table-attrset"; label = "Apps"; group = "Web apps"; columns = [ "enable" "name" "url" "icon" ]; columnTypes = [ "bool" "str" "str" "icon" ]; iconDir = "./icons";
         ojuny.webapps = {
-          /* @table-item label = "YouTube"; */
+          # @table-item label = "YouTube";
           youtube = {
             enable = true;
             name = "YouTube";
             url = "https://www.youtube.com";
             icon = null;
           };
+          row = {
+            enable = true;
+            name = "Whatsapp";
+            url = "https://web.whatsapp.com";
+            icon = null;
+          };
         };
 
         # Derived list; no @option.
-        programs.chromium-webapps.webApps =
-          lib.mapAttrsToList
-            (_: app: { inherit (app) name url; } // lib.optionalAttrs (app.icon != null) { inherit (app) icon; })
-            (lib.filterAttrs (_: app: app.enable) config.ojuny.webapps);
+        programs.chromium-webapps.webApps = lib.mapAttrsToList (
+          _: app: { inherit (app) name url; } // lib.optionalAttrs (app.icon != null) { inherit (app) icon; }
+        ) (lib.filterAttrs (_: app: app.enable) config.ojuny.webapps);
       };
     };
 
