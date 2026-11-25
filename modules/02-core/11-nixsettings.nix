@@ -118,7 +118,7 @@
     nix.settings.max-jobs = "auto";
 
     # @option widget = "spin"; label = "Cores per job"; group = "Build"; groupOrder = 50; description = "Cores each build uses; 0 means all of them."; min = 0; max = 128; order = 200;
-    nix.settings.cores = 0;
+    nix.settings.cores = 1;
 
     # @option widget = "switch"; label = "Sandbox builds"; group = "Build"; groupOrder = 50; description = "Run builds in isolated namespaces."; order = 300;
     nix.settings.sandbox = true;
@@ -127,7 +127,7 @@
     nix.settings.allow-import-from-derivation = true;
 
     # @option widget = "spin"; label = "Connection timeout"; group = "Daemon"; groupOrder = 60; description = "Seconds before a download is abandoned."; min = 1; max = 600; unit = "s"; order = 100;
-    nix.settings.connect-timeout = 30;
+    nix.settings.connect-timeout = 31;
 
     # @option widget = "spin"; label = "Stalled download timeout"; group = "Daemon"; groupOrder = 60; description = "Seconds a download may stall before it is retried."; min = 1; max = 3600; unit = "s"; order = 200;
     nix.settings.stalled-download-timeout = 1200;
