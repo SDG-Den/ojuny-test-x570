@@ -6,6 +6,7 @@ cd "$repo_root"
 
 nix flake check --no-build
 nix build .#nixosConfigurations.fixture.config.system.build.toplevel --no-link
+nix build .#checks.x86_64-linux.derived-kernel --no-link
 nix build .#prepare-repo .#regenerate-hardware --no-link
 nix build .#ojuny-cli .#ojuny-patches-cli --no-link
 

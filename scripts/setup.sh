@@ -234,7 +234,7 @@ cat >"$nix_settings_gui_dir/config.json" <<EOF
 {
   "flake_path": "$CLONE_DIR",
   "terminal_command": "ghostty -e $terminal_shell -c",
-  "rebuild_command": "sudo echo \"starting rebuild\"; sudo nixos-rebuild switch --flake $CLONE_DIR#$host |& nom; echo \"finished build, press any button to close the window\"; read -n 1",
+  "rebuild_command": "sudo echo \"starting rebuild\"; sudo rm -f /boot/loader/loader.tmp; sudo df -Pk /boot | awk 'NR==2 && \$4 < 65536 { print \"boot partition has \" \$4 \" KiB free; clean old generations first\"; exit 1 }' || exit 1; sudo nixos-rebuild switch --flake $CLONE_DIR#$host |& nom; echo \"finished build, press any button to close the window\"; read -n 1",
   "reload_dms_on_rebuild": true
 }
 EOF

@@ -18,8 +18,38 @@
       ];
 
       config = {
-        # @option widget = "dropdown"; label = "Kernel"; group = "Kernel"; groupOrder = 5; order = 10; choices = [ "lts" "latest" "zen" "cachyos-latest" "cachyos-lts" "facter" ]; description = "LTS is the nixpkgs default LTS kernel and the default. Latest follows nixpkgs unstable. Zen is the nixpkgs Zen kernel. CachyOS latest and LTS use the nix-cachyos-kernel input. Facter uses the kernel supplied by the detected nixos-hardware profile, or LTS when the profile supplies none. The other choices override a profile kernel.";
+        # @option widget = "dropdown"; label = "Kernel"; group = "Kernel"; groupOrder = 5; order = 10; choices = [ "lts" "latest" "zen" "cachyos-latest" "cachyos-lts" "facter" "Derived Minimal (Experimental)" ]; description = "LTS is the nixpkgs default LTS kernel and the default. Latest follows nixpkgs unstable. Zen is the nixpkgs Zen kernel. CachyOS latest and LTS use the nix-cachyos-kernel input. Facter uses the kernel supplied by the detected nixos-hardware profile, or LTS when the profile supplies none. The other choices override a profile kernel. Derived Minimal (Experimental) builds a custom latest kernel from the detected hardware and the enabled features; it is built locally, is not cached, and can omit hardware support.";
         ojuny.kernel = "cachyos-latest";
+
+        # @option widget = "switch"; label = "Wi-Fi support"; group = "Derived Minimal"; groupOrder = 6; order = 10; visibleWhen.path = "ojuny.kernel"; visibleWhen.equals = "Derived Minimal (Experimental)"; description = "Include the Wi-Fi stack and drivers even when no wireless adapter is detected. Use this for a USB Wi-Fi dongle. A detected adapter includes it automatically.";
+        ojuny.derivedKernel.wifi = false;
+
+        # @option widget = "switch"; label = "USB networking support"; group = "Derived Minimal"; groupOrder = 6; order = 20; visibleWhen.path = "ojuny.kernel"; visibleWhen.equals = "Derived Minimal (Experimental)"; description = "Include USB tethering and USB Ethernet drivers even when no USB network device is detected. Use this for phone tethering or a USB dock.";
+        ojuny.derivedKernel.usbNetworking = false;
+
+        # @option widget = "switch"; label = "Webcam support"; group = "Derived Minimal"; groupOrder = 6; order = 30; visibleWhen.path = "ojuny.kernel"; visibleWhen.equals = "Derived Minimal (Experimental)"; description = "Include USB and media camera drivers even when no camera is detected. Use this for a USB webcam.";
+        ojuny.derivedKernel.webcam = false;
+
+        # @option widget = "switch"; label = "Gamepad support"; group = "Derived Minimal"; groupOrder = 6; order = 40; visibleWhen.path = "ojuny.kernel"; visibleWhen.equals = "Derived Minimal (Experimental)"; description = "Include gamepad drivers even when no controller is detected. Steam and the xpadneo switch already include this.";
+        ojuny.derivedKernel.gamepad = false;
+
+        # @option widget = "switch"; label = "Bluetooth support"; group = "Derived Minimal"; groupOrder = 6; order = 50; visibleWhen.path = "ojuny.kernel"; visibleWhen.equals = "Derived Minimal (Experimental)"; description = "Include the Bluetooth stack even when the Bluetooth page is disabled or no adapter is detected. Use this for a USB Bluetooth dongle.";
+        ojuny.derivedKernel.bluetooth = false;
+
+        # @option widget = "switch"; label = "Printing support"; group = "Derived Minimal"; groupOrder = 6; order = 60; visibleWhen.path = "ojuny.kernel"; visibleWhen.equals = "Derived Minimal (Experimental)"; description = "Include USB and parallel printer drivers even when printing is disabled or no printer is detected.";
+        ojuny.derivedKernel.printing = false;
+
+        # @option widget = "switch"; label = "LUKS support"; group = "Derived Minimal"; groupOrder = 6; order = 70; visibleWhen.path = "ojuny.kernel"; visibleWhen.equals = "Derived Minimal (Experimental)"; description = "Include dm-crypt and the common cipher modules even when no initrd LUKS device is configured. Use this for an encrypted data volume that is not opened before root.";
+        ojuny.derivedKernel.luks = false;
+
+        # @option widget = "switch"; label = "Network filesystem support"; group = "Derived Minimal"; groupOrder = 6; order = 80; visibleWhen.path = "ojuny.kernel"; visibleWhen.equals = "Derived Minimal (Experimental)"; description = "Include NFS, CIFS and 9P client support. Declared fileSystems already include the matching filesystem.";
+        ojuny.derivedKernel.networkFilesystems = false;
+
+        # @option widget = "switch"; label = "Legacy and rare hardware"; group = "Derived Minimal"; groupOrder = 6; order = 90; visibleWhen.path = "ojuny.kernel"; visibleWhen.equals = "Derived Minimal (Experimental)"; description = "Include FireWire, PCMCIA, ISDN, DSL, ham radio, DVB, TV, floppy, tape, Zip, chip card and braille support. Detected hardware includes its own driver automatically.";
+        ojuny.derivedKernel.legacyHardware = false;
+
+        # @option widget = "switch"; label = "Kernel debug and tracing"; group = "Derived Minimal"; groupOrder = 6; order = 100; visibleWhen.path = "ojuny.kernel"; visibleWhen.equals = "Derived Minimal (Experimental)"; description = "Include kernel debug information, ftrace and kprobes. Disabled by default to reduce build time; the hardening options stay enabled either way.";
+        ojuny.derivedKernel.debugTracing = false;
 
         # @option widget = "switch"; label = "Enable patches"; group = "Patches"; description = "Automatically import patch- modules placed in the repository.";
         ojuny.patches = true;
