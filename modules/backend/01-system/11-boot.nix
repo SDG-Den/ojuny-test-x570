@@ -170,7 +170,7 @@
       recoveryEnabled = config.ojuny.recovery.enable;
       recoveryFile = "${bootMountPoint}/EFI/ojuny/recovery/ojuny-recovery.efi";
 
-      bootorder = self.packages.${pkgs.system}.ojuny-bootorder;
+      bootorder = self.packages.${pkgs.stdenv.hostPlatform.system}.ojuny-bootorder;
     in
     {
       environment.systemPackages = [ pkgs.efibootmgr ];

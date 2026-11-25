@@ -15,7 +15,7 @@
       recoveryFile = "${recoveryDir}/ojuny-recovery.efi";
       manifest = "/var/lib/ojuny/recovery.json";
 
-      ukify = self.packages.${pkgs.system}.ojuny-ukify;
+      ukify = self.packages.${pkgs.stdenv.hostPlatform.system}.ojuny-ukify;
 
       recovery = pkgs.writeShellApplication {
         name = "ojuny-recovery";
