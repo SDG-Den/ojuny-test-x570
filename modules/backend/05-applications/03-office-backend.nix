@@ -66,7 +66,7 @@
     }:
     {
       environment.systemPackages =
-        lib.optionals config.ojuny.apps.office.enable [ pkgs.libreoffice-fresh ]
+        lib.optionals config.ojuny.apps.office.enable [ pkgs.libreoffice ]
         ++ lib.optionals config.ojuny.apps.office.enable (with pkgs.hunspellDicts; [
           en_US
           de_DE

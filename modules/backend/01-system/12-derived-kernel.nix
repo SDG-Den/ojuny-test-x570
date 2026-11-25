@@ -15,8 +15,6 @@ let
         "PROC_FS"
         "SYSFS"
         "TMPFS"
-        "DEVPTS_FS"
-        "RAMFS"
         "VT"
         "FRAMEBUFFER_CONSOLE"
         "SERIAL_8250"
@@ -110,8 +108,10 @@ let
         "NETFILTER_XTABLES"
         "NF_TABLES"
         "NF_CONNTRACK"
-        "IP_NF_FILTER"
-        "IP6_NF_FILTER"
+        "NF_TABLES_IPV4"
+        "NF_TABLES_IPV6"
+        "NF_TABLES_INET"
+        "NF_TABLES_ARP"
         "NET_SCHED"
       ];
     };
@@ -161,7 +161,15 @@ let
         "INTEGRITY_PLATFORM_KEYRING"
         "INTEGRITY_MACHINE_KEYRING"
         "CRYPTO_ECDSA"
+        "TCG_TPM"
+        "TCG_CRB"
+        "TCG_TIS"
       ];
+      enableSymbols = {
+        TCG_TPM = "y";
+        TCG_CRB = "m";
+        TCG_TIS = "m";
+      };
     };
 
     usb = {
@@ -198,7 +206,13 @@ let
         "USB_HIDDEV"
         "USB_STORAGE"
         "USB_UAS"
+        "USB_XHCI_PCI_PROM21"
       ];
+      enableSymbols = {
+        USB_OHCI_HCD = "m";
+        USB_OHCI_PCI = "m";
+        USB_XHCI_PCI_PROM21 = "m";
+      };
     };
 
     ps2 = {
@@ -213,6 +227,10 @@ let
         "MOUSE_PS2_SYNAPTICS"
         "MOUSE_PS2_VMMOUSE"
       ];
+      enableSymbols = {
+        SERIO = "y";
+        SERIO_PS2 = "y";
+      };
     };
 
     storageSata = {
@@ -263,8 +281,9 @@ let
 
     filesystemsCommon = {
       default = true;
-      drivers = [ "ext4" "vfat" "fat" "exfat" "ntfs3" "f2fs" "xfs" "btrfs" "squashfs" "isofs" "udf" "fuse" "nls_cp437" "nls_iso8859_1" "nls_utf8" ];
+      drivers = [ "ext2" "ext4" "vfat" "fat" "exfat" "ntfs3" "f2fs" "xfs" "btrfs" "squashfs" "isofs" "udf" "fuse" "autofs" "nls_cp437" "nls_iso8859_1" "nls_utf8" ];
       symbols = [
+        "EXT2_FS"
         "EXT4_FS"
         "VFAT_FS"
         "FAT_FS"
@@ -277,6 +296,7 @@ let
         "ISO9660_FS"
         "UDF_FS"
         "FUSE_FS"
+        "AUTOFS_FS"
         "NLS_CODEPAGE_437"
         "NLS_ISO8859_1"
         "NLS_UTF8"
@@ -293,7 +313,6 @@ let
         "SND_HDA_CODEC_HDMI"
         "SND_HDA_CODEC_REALTEK"
         "SND_HDA_CODEC_ANALOG"
-        "SND_HDA_CODEC_GENERIC"
         "SND_HDA_PATCH_LOADER"
         "SND_HDA_INPUT_BEEP"
         "SND_HDA_RECONFIG"
@@ -359,8 +378,9 @@ let
     };
 
     ethernetBroadcom = {
-      drivers = [ "tg3" "bnx2" "bnx2x" ];
-      symbols = [ "TG3" "BNX2" "BNX2X" ];
+      drivers = [ "tg3" "bnx2" "bnx2x" "cnic" ];
+      symbols = [ "NET_VENDOR_BROADCOM" "TG3" "BNX2" "BNX2X" "CNIC" ];
+      keepSymbols = [ "BNX2" "BNX2X" "CNIC" ];
     };
 
     ethernetAquantia = {
@@ -573,6 +593,8 @@ let
       drivers = [ "btusb" "btbcm" "btintel" "btrtl" "btmtk" "hci_uart" "hci_vhci" "rfcomm" ];
       symbols = [
         "BT"
+        "RFKILL"
+        "RFKILL_INPUT"
         "BT_HCIBTUSB"
         "BT_HCIBTUSB_AUTOSUSPEND"
         "BT_HCIBTUSB_MTK"
@@ -649,10 +671,25 @@ let
         "CRYPTO_USER_API_SKCIPHER"
         "CRYPTO_USER_API_HASH"
       ];
+      keepSymbols = [
+        "CRYPTO_AES"
+        "CRYPTO_XTS"
+        "CRYPTO_CBC"
+        "CRYPTO_LRW"
+        "CRYPTO_SHA1"
+        "CRYPTO_SHA256"
+        "CRYPTO_SHA512"
+        "CRYPTO_BLOWFISH"
+        "CRYPTO_TWOFISH"
+        "CRYPTO_SERPENT"
+        "CRYPTO_USER_API_SKCIPHER"
+        "CRYPTO_USER_API_HASH"
+      ];
     };
 
     lvm = {
       drivers = [ "dm_snapshot" "dm_mirror" "dm_raid" ];
+      implies = [ "raid" ];
       symbols = [
         "DM_SNAPSHOT"
         "DM_MIRROR"
@@ -698,6 +735,12 @@ let
         "VHOST_VSOCK"
         "TUN"
       ];
+      enableSymbols = {
+        VIRTUALIZATION = "y";
+        KVM = "m";
+        KVM_AMD = "m";
+        KVM_INTEL = "m";
+      };
     };
 
     containers = {
@@ -721,6 +764,10 @@ let
         "SCSI_VIRTIO"
         "DRM_VIRTIO_GPU"
       ];
+      enableSymbols = {
+        VIRTIO = "y";
+        VIRTIO_RNG = "m";
+      };
     };
 
     ninep = {
@@ -733,6 +780,12 @@ let
         "9P_NET"
         "9P_VIRTIO"
       ];
+      enableSymbols = {
+        NET_9P = "y";
+        "9P_FSCACHE" = "y";
+        "9P_NET" = "y";
+        "9P_VIRTIO" = "m";
+      };
     };
 
     nfs = {
@@ -747,7 +800,12 @@ let
         "NFS_ACL_SUPPORT"
         "SUNRPC"
         "LOCKD"
+        "NFSD"
+        "NFSD_V3_ACL"
+        "NFSD_V4"
+        "NFSD_V4_SECURITY_LABEL"
       ];
+      keepSymbols = [ "SUNRPC" ];
     };
 
     cifs = {
@@ -759,6 +817,9 @@ let
         "CIFS_FSCACHE"
         "CIFS_UPCALL"
         "CIFS_DFS_UPCALL"
+        "SMB_SERVER"
+        "SMB_SERVER_SMBDIRECT"
+        "SMB_SERVER_KERBEROS5"
       ];
     };
 
@@ -988,14 +1049,19 @@ let
     "9pnet_virtio" = "9P_VIRTIO";
     ahci = "SATA_AHCI";
     atkbd = "KEYBOARD_ATKBD";
+    autofs = "AUTOFS_FS";
     btrfs = "BTRFS_FS";
     ccp = "CRYPTO_DEV_CCP";
     cifs = "CIFS";
+    cnic = "CNIC";
+    ctr = "CRYPTO_CTR";
     coretemp = "SENSORS_CORETEMP";
     dm_mod = "BLK_DEV_DM";
     ehci_hcd = "USB_EHCI_HCD";
     ehci_pci = "USB_EHCI_PCI";
+    efivarfs = "EFIVAR_FS";
     exfat = "EXFAT_FS";
+    ext2 = "EXT2_FS";
     ext4 = "EXT4_FS";
     f2fs = "F2FS_FS";
     fuse = "FUSE_FS";
@@ -1020,7 +1086,10 @@ let
     sd_mod = "BLK_DEV_SD";
     sr_mod = "BLK_DEV_SR";
     squashfs = "SQUASHFS";
+    "tpm-crb" = "TCG_CRB";
+    "tpm-tis" = "TCG_TIS";
     udf = "UDF_FS";
+    uinput = "INPUT_UINPUT";
     uhci_hcd = "USB_UHCI_HCD";
     usb_storage = "USB_STORAGE";
     usbhid = "USB_HID";
@@ -1029,6 +1098,7 @@ let
     xfs = "XFS_FS";
     xhci_hcd = "USB_XHCI_HCD";
     xhci_pci = "USB_XHCI_PCI";
+    xhci_pci_prom21 = "USB_XHCI_PCI_PROM21";
     nvidia = null;
     nvidia_drm = null;
     nvidia_modeset = null;
@@ -1322,7 +1392,13 @@ in
         lib.concatMap (name: components.${name}.symbols or [ ]) (lib.attrNames components)
       );
 
-      disabledSymbols = lib.filter (symbol: !(lib.elem symbol activeSymbols)) allSymbols;
+      keepSymbols = lib.unique (
+        lib.concatMap (name: components.${name}.keepSymbols or [ ]) (lib.attrNames components)
+      );
+
+      disabledSymbols = lib.filter (
+        symbol: !(lib.elem symbol activeSymbols) && !(lib.elem symbol keepSymbols)
+      ) allSymbols;
 
       inactiveComponents = lib.filter (name: !(lib.elem name activeComponents)) (lib.attrNames components);
 
@@ -1358,6 +1434,7 @@ in
 
       customKernel = pkgs.linux_latest.override {
         structuredExtraConfig = structuredExtraConfig;
+        ignoreConfigErrors = true;
       };
 
       kernelPackages = pkgs.linuxPackagesFor customKernel;

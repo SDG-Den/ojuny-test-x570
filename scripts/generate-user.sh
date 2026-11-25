@@ -105,6 +105,7 @@ fi
           shell = pkgs.$shell;
         };
       };
+      ojuny.primaryUser = "$username";
 
       home-manager.users = {
         $username = {
