@@ -534,6 +534,35 @@
                 touch $out
               '';
 
+          checks.derived-kernel =
+            let
+              fixture = self.nixosConfigurations.fixture.extendModules {
+                modules = [
+                  {
+                    ojuny.kernel = inputs.nixpkgs.lib.mkOverride 49 "Derived Minimal (Experimental)";
+                  }
+                ];
+              };
+              cfg = fixture.config;
+              payload = pkgs.writeText "derived-kernel-check.json" (builtins.toJSON {
+                coreSymbols = cfg.ojuny.derivedKernel.coreSymbols;
+                activeSymbols = cfg.ojuny.derivedKernel.activeSymbols;
+                moduleSymbols = cfg.ojuny.derivedKernel.moduleSymbols;
+                initrdModules = cfg.boot.initrd.availableKernelModules;
+                kernelModules = cfg.boot.kernelModules;
+              });
+            in
+            pkgs.runCommand "check-derived-kernel"
+              {
+                nativeBuildInputs = [ pkgs.python3 ];
+              }
+              ''
+                python3 ${./tests/check-derived-kernel.py} \
+                  --config ${cfg.boot.kernelPackages.kernel.configfile} \
+                  --payload ${payload}
+                touch $out
+              '';
+
           checks.module-tree-current =
             let
               source = pkgs.lib.cleanSource ./.;
@@ -551,6 +580,30 @@
                 touch $out
               '';
 
+          checks.mount-image =
+            let
+              source = pkgs.lib.cleanSource ./.;
+            in
+            pkgs.runCommand "check-mount-image"
+              {
+                nativeBuildInputs = [
+                  pkgs.e2fsprogs
+                  pkgs.file
+                  pkgs.python3
+                  pkgs.util-linux
+                  pkgs.xorriso
+                ];
+              }
+              ''
+                python3 ${
+                  builtins.path {
+                    path = ./tests/check-mount-image.py;
+                    name = "check-mount-image.py";
+                  }
+                } ${source}
+                touch $out
+              '';
+
           checks.default = pkgs.runCommand "check-default" { } ''
             echo ${self.checks.${system}.hardware-profile} >/dev/null
             echo ${self.checks.${system}.graphics-defaults} >/dev/null
@@ -561,6 +614,8 @@
             echo ${self.checks.${system}.bootorder} >/dev/null
             echo ${self.checks.${system}.flake-structure} >/dev/null
             echo ${self.checks.${system}.fixed-paths} >/dev/null
+            echo ${self.checks.${system}.mount-image} >/dev/null
+            echo ${self.checks.${system}.derived-kernel} >/dev/null
             echo ${self.checks.${system}.module-tree-current} >/dev/null
             touch $out
           '';

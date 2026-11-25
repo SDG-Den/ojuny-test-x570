@@ -263,8 +263,16 @@ current working set for review.
 - `01-configuration.nix` `[menu]`. Kernel selection, hostname, time zone,
   locale, console keymap, the patches switch, the systemd-boot generation
   limit, and the package source controls. Kernel choices are LTS, latest, Zen,
-  CachyOS latest, CachyOS LTS and Facter. LTS is the default; Facter uses the
-  kernel from the detected nixos-hardware profile and falls back to LTS. The
+  CachyOS latest, CachyOS LTS, Facter and Derived Minimal (Experimental). LTS
+  is the default; Facter uses the
+  kernel from the detected nixos-hardware profile and falls back to LTS.
+  Derived Minimal (Experimental) builds a local, uncached latest kernel from
+  the detected hardware and the enabled features. Its group exposes static
+  switches for Wi-Fi, USB networking, webcam, gamepad, Bluetooth, printing,
+  LUKS, network filesystems, legacy hardware, and debug and tracing support.
+  A switch forces its component in; detected hardware and declared features
+  include theirs automatically.
+  The
   package source group selects source, the newest release, or a named release
   from each repository's `binary-url.json`; the manual has its own selector and
   defaults to source. Options marked advanced are per-tool overrides and

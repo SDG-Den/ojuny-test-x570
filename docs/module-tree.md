@@ -109,6 +109,7 @@ differs from the generator output.
 - `modules/backend/01-system/09-facter-backend.nix`
 - `modules/backend/01-system/10-hardware-profile.nix`
 - `modules/backend/01-system/11-boot.nix`
+- `modules/backend/01-system/12-derived-kernel.nix`
 - `modules/backend/01-system/13-recovery-backend.nix`
 - `modules/backend/01-system/14-deploy-rs.nix`
 - `modules/backend/01-system/bootorder.sh`

@@ -100,7 +100,11 @@ rolling repository.
   supplied by the detected nixos-hardware profile and falls back to LTS when
   the profile supplies none. The selector overrides a kernel set by the
   profile; choose Facter to use it. A host can override the selector with
-  `lib.mkForce boot.kernelPackages`.
+  `lib.mkForce boot.kernelPackages`. Derived Minimal (Experimental) builds a
+  custom latest kernel from the detected hardware, the declared filesystems
+  and the enabled features. It is built locally, is not cached, and can omit
+  hardware support; enable the matching switch on the System page for
+  hardware that is not detected.
 
 ## Documentation
 

@@ -17,8 +17,10 @@
         name = "ojuny-mount-image";
         runtimeInputs = with pkgs; [
           coreutils
+          gnome-disk-utility
           gnused
           libnotify
+          systemd
           udisks2
           util-linux
           xdg-utils

@@ -17,6 +17,7 @@
       ({ lib, ... }: {
         services.simple-nix-update-gui.flakeUri = lib.mkDefault "path:.";
         networking.hostName = lib.mkDefault "ojuny-fixture";
+        ojuny.kernel = lib.mkForce "lts";
         fileSystems = lib.mkForce {
           "/" = {
             device = "/dev/vda1";
