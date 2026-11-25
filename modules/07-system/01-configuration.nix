@@ -22,7 +22,7 @@
         ojuny.patches = false;
 
         # @option widget = "text"; label = "Repository path"; group = "Paths"; groupOrder = 50; order = 10; description = "Absolute path, or a path relative to the primary user's home.";
-        ojuny.repoPath = "repos/nix-flake";
+        ojuny.repoPath = "/home/den/repos/nix-flake";
 
         # @option widget = "dropdown"; label = "Package source"; group = "Binaries"; groupOrder = 60; order = 10; choices = [ "source" "latest" "tag" ]; description = "Build release tools from the flake, install the newest release recorded in binary-url.json, or install a named release from that file.";
         ojuny.binaries.mode = "source";
@@ -109,7 +109,7 @@
         console.keyMap = "us";
 
         # DO NOT CHANGE, this value is for the *initial* state and should not be changed.
-        system.stateVersion = "26.11";
+        system.stateVersion = "25.11";
       };
 
     };
