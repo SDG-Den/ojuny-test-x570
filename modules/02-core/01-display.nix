@@ -24,7 +24,7 @@
             width = 1920;
             height = 1080;
             refresh = 60;
-            xPos = 0;
+            xPos = 3840;
             yPos = 0;
             scale = 1.00;
             transform = "normal";
@@ -33,7 +33,7 @@
             width = 1920;
             height = 1080;
             refresh = 60;
-            xPos = 3840;
+            xPos = 0;
             yPos = 0;
             scale = 1.00;
             transform = "normal";

@@ -34,13 +34,13 @@
         ojuny.steam.dxvkSarek = false;
 
         # @option widget = "switch"; label = "Steam Input on Wayland"; group = "Steam"; description = "Load the extest library into Steam so Steam Input works on Wayland by translating X11 input events to uinput events. Leave off unless Steam Input misbehaves on Wayland; it is unnecessary on X11."; visibleWhen.path = "programs.steam.enable"; visibleWhen.equals = true;
-        ojuny.steam.extest = false;
+        ojuny.steam.extest = true;
 
         # @option widget = "switch"; label = "Gamescope session"; group = "Steam"; description = "Add a sessions entry that boots straight into Steam Big Picture through gamescope."; visibleWhen.path = "programs.steam.enable"; visibleWhen.equals = true;
         ojuny.steam.gamescopeSession = false;
 
         # @option widget = "switch"; label = "Xbox wireless controller driver"; group = "Controllers"; groupOrder = 20; order = 10; description = "Install the xpadneo kernel driver for Xbox One and Xbox Series controllers over Bluetooth. It only adds quirks for those controllers; wired USB and most other Bluetooth controllers work without it.";
-        ojuny.hardware.xpadneo = false;
+        ojuny.hardware.xpadneo = true;
 
         # @option widget = "slider"; label = "Rumble attenuation"; group = "Controllers"; groupOrder = 20; order = 20; min = 0; max = 100; step = 1; unit = "%"; visibleWhen.path = "ojuny.hardware.xpadneo"; visibleWhen.equals = true; description = "Reduce main and trigger rumble together. 0 keeps full rumble and 100 disables it.";
         hardware.xpadneo.rumbleAttenuation.overall = 0;

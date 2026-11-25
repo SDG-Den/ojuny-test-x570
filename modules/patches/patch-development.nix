@@ -27,48 +27,37 @@
           # @table-item label = "Nix";
           nix = {
             enable = true;
-          };
-          # @table-item label = "Python";
+          }; # @table-item label = "Python";
           python = {
             enable = true;
-          };
-          # @table-item label = "Rust";
+          }; # @table-item label = "Rust";
           rust = {
             enable = true;
-          };
-          # @table-item label = "C";
+          }; # @table-item label = "C";
           c = {
             enable = true;
-          };
-          # @table-item label = "C++";
+          }; # @table-item label = "C++";
           cpp = {
             enable = true;
-          };
-          # @table-item label = "Go";
+          }; # @table-item label = "Go";
           go = {
-            enable = false;
-          };
-          # @table-item label = "TypeScript";
+            enable = true;
+          }; # @table-item label = "TypeScript";
           typescript = {
             enable = false;
-          };
-          # @table-item label = "Lua";
+          }; # @table-item label = "Lua";
           lua = {
             enable = false;
-          };
-          # @table-item label = "Bash";
+          }; # @table-item label = "Bash";
           bash = {
             enable = true;
-          };
-          # @table-item label = "YAML";
+          }; # @table-item label = "YAML";
           yaml = {
-            enable = false;
-          };
-          # @table-item label = "JSON";
+            enable = true;
+          }; # @table-item label = "JSON";
           json = {
-            enable = false;
-          };
-          # @table-item label = "Markdown";
+            enable = true;
+          }; # @table-item label = "Markdown";
           markdown = {
             enable = false;
           };

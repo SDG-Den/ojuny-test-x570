@@ -70,7 +70,7 @@
         hardware.graphics.enable = lib.mkDefault true;
 
         # @option widget = "switch"; label = "32-bit graphics"; group = "Graphics"; groupOrder = 10; order = 30; description = "Install 32-bit graphics libraries for 32-bit games and Wine. A hardware profile that owns the GPU settings supplies its own value.";
-        ojuny.gpu32Bit = false;
+        ojuny.gpu32Bit = true;
 
         # @option widget = "switch"; label = "Redistributable firmware"; group = "Graphics"; groupOrder = 10; order = 40; description = "Firmware blobs for Wi-Fi, GPUs and other devices.";
         hardware.enableRedistributableFirmware = lib.mkDefault true;

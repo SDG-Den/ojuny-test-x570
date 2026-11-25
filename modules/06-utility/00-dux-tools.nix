@@ -36,7 +36,7 @@
         # @option widget = "switch"; label = "HTTP API"; group = "Search"; groupOrder = 10; order = 70; description = "The HTTP API has no authentication. Leave off unless another client needs it.";
         ojuny.tools.dsearch.httpEnabled = false;
 
-        # @option widget = "spin"; label = "Max file size"; group = "Search"; groupOrder = 10; order = 80; min = 1024; max = 1073741824; step = 1024; unit = "B"; 
+        # @option widget = "spin"; label = "Max file size"; group = "Search"; groupOrder = 10; order = 80; min = 1024; max = 1073741824; step = 1024; unit = "B";
         ojuny.tools.dsearch.maxFileBytes = 2097152;
 
         # @option widget = "dropdown"; label = "Theme"; group = "Files"; groupOrder = 20; order = 10; choices = [ "auto" "dark" "light" ];
@@ -49,7 +49,7 @@
         ojuny.tools.duxFiles.defaultView = "list";
 
         # @option widget = "switch"; label = "Show hidden files"; group = "Files"; groupOrder = 20; order = 30;
-        ojuny.tools.duxFiles.showHidden = false;
+        ojuny.tools.duxFiles.showHidden = true;
 
         # @option widget = "switch"; label = "Folders first"; group = "Files"; groupOrder = 20; order = 40;
         ojuny.tools.duxFiles.foldersFirst = true;
@@ -58,7 +58,7 @@
         ojuny.tools.duxFiles.confirmTrash = false;
 
         # @option widget = "text"; label = "Terminal"; group = "Files"; groupOrder = 20; order = 60; description = "Leave empty to auto-detect a terminal.";
-        ojuny.tools.duxFiles.terminal = "";
+        ojuny.tools.duxFiles.terminal = "ghostty";
 
         # @option widget = "switch"; label = "Register file manager"; group = "Files"; groupOrder = 20; order = 70;
         ojuny.tools.duxFiles.registerFileManager = true;
@@ -70,10 +70,10 @@
         ojuny.tools.duxFiles.searchExcludes = [ ];
 
         # @option widget = "dropdown"; label = "Sort by"; group = "Files"; groupOrder = 20; order = 100; choices = [ "name" "size" "mtime" "type" ];
-        ojuny.tools.duxFiles.defaultSort = "name";
+        ojuny.tools.duxFiles.defaultSort = "size";
 
         # @option widget = "switch"; label = "Sort descending"; group = "Files"; groupOrder = 20; order = 110;
-        ojuny.tools.duxFiles.defaultSortDescending = false;
+        ojuny.tools.duxFiles.defaultSortDescending = true;
 
         # @option widget = "dropdown"; label = "Density"; group = "Files"; groupOrder = 20; order = 120; choices = [ "spacious" "comfortable" "compact" "dense" ];
         ojuny.tools.duxFiles.density = "comfortable";

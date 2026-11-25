@@ -19,7 +19,7 @@
 
       config = {
         # @option widget = "dropdown"; label = "Kernel"; group = "Kernel"; groupOrder = 5; order = 10; choices = [ "lts" "latest" "zen" "cachyos-latest" "cachyos-lts" "facter" ]; description = "LTS is the nixpkgs default LTS kernel and the default. Latest follows nixpkgs unstable. Zen is the nixpkgs Zen kernel. CachyOS latest and LTS use the nix-cachyos-kernel input. Facter uses the kernel supplied by the detected nixos-hardware profile, or LTS when the profile supplies none. The other choices override a profile kernel.";
-        ojuny.kernel = "lts";
+        ojuny.kernel = "cachyos-latest";
 
         # @option widget = "switch"; label = "Enable patches"; group = "Patches"; description = "Automatically import patch- modules placed in the repository.";
         ojuny.patches = true;
