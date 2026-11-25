@@ -13,6 +13,8 @@
     imports = [ inputs.home-manager.nixosModules.home-manager self.modules.nixos.system-ssh-test ];
 
     config = {
+      ojuny.primaryUser = "den";
+
       /* @option widget = "users"; label = "Accounts"; homeManager = true; */
       users.users = {
         den = {

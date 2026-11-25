@@ -9,8 +9,11 @@
     }:
     let
       userHome = user: user.home or null;
+      primaryUserName = config.ojuny.primaryUser;
       primaryUser =
-        if config.users.users ? user && userHome config.users.users.user != null then
+        if primaryUserName != "" then
+          config.users.users.${primaryUserName}
+        else if config.users.users ? user && userHome config.users.users.user != null then
           config.users.users.user
         else
           lib.findFirst (entry: userHome entry != null) null (lib.attrValues config.users.users);
@@ -66,6 +69,12 @@
       imports = [ self.modules.nixos.system-derived-kernel ];
 
       options.ojuny.patches = lib.mkEnableOption "automatic import of patch- modules placed in the repository";
+
+      options.ojuny.primaryUser = lib.mkOption {
+        type = lib.types.str;
+        default = "";
+        description = "Primary interactive user name. Empty detects the first user with a home directory.";
+      };
 
       options.ojuny.time.auto = lib.mkOption {
         type = lib.types.bool;
@@ -293,6 +302,13 @@
       };
 
       config = {
+        assertions = [
+          {
+            assertion = !(config.services.nix-connect.enable or false) || primaryUserName != "";
+            message = "Set ojuny.primaryUser to the primary account name when nix-connect is enabled.";
+          }
+        ];
+
         nixpkgs.overlays = lib.mkIf (lib.hasPrefix "cachyos" config.ojuny.kernel) [
           inputs.nix-cachyos-kernel.overlays.pinned
         ];
@@ -340,7 +356,7 @@
           lib.optional (primaryUser != null) primaryUser.name;
 
         services.nix-connect.initialAccount =
-          if primaryUser != null then primaryUser.name else "user";
+          if primaryUserName != "" then primaryUserName else "user";
 
         services.nix-regedit.package =
           pick "regedit" inputs.nix-regedit.packages.${system}.default "nix-regedit"
