@@ -172,6 +172,11 @@ in
       );
     in
     {
+      # nixpkgs sets environment.variables.EDITOR = mkOverride 1000 "nano".
+      # Graphical sessions never source hm-session-vars.sh, so the system
+      # value is the one they see. Override it at normal priority.
+      environment.variables.EDITOR = "micro";
+
       assertions = [
         {
           assertion = builtins.length enabledEditors <= 1;
