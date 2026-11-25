@@ -37,3 +37,10 @@ automatic disk mount does not work for all ISO's, nixos iso worked, mint iso did
 
 
 
+
+round 2:
+
+nix-cleaner: view resets whenever an item is checked, making checking large amounts of items extremely tedious. 
+
+nix-cleaner: clean failed because of a link in /tmp "outside permitted locations"
+
