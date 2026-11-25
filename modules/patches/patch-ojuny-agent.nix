@@ -27,10 +27,10 @@
 
       config = {
         # @option widget = "switch"; label = "Ojuny agent"; group = "Agents"; description = "Install the approval-gated maintenance agent, the read-only assistant, and the flake-safe CLI. Requires the development patch and its OpenCode agent.";
-        ojuny.patch.ojuny-agent.enable = false;
+        ojuny.patch.ojuny-agent.enable = true;
 
         # @option widget = "switch"; label = "Allow runtime actions"; group = "Agents"; visibleWhen.path = "ojuny.patch.ojuny-agent.enable"; visibleWhen.equals = true; description = "Allow the maintenance agent to ask for mutating ojuny commands. Every request still needs approval, and sudo, rebuilds, and package changes stay denied.";
-        ojuny.patch.ojuny-agent.runtimeActions = false;
+        ojuny.patch.ojuny-agent.runtimeActions = true;
 
         home-manager.sharedModules = lib.mkIf (
           config.ojuny.patch.ojuny-agent.enable && (config.ojuny.patches or true)
