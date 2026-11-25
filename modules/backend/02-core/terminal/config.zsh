@@ -188,8 +188,9 @@
   # OS identifier color.
   typeset -g POWERLEVEL9K_OS_ICON_FOREGROUND=232
   typeset -g POWERLEVEL9K_OS_ICON_BACKGROUND=7
-  # Custom icon.
-  # typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='⭐'
+  # Custom icon: p10k reads /etc/os-release, which ojuny renames, so it sees a
+  # generic Linux and falls back to the penguin. Force the NixOS glyph.
+  typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='\uF313'
 
   ################################[ prompt_char: prompt symbol ]################################
   # Transparent background.
