@@ -50,7 +50,7 @@
 
       config = {
         # @option widget = "switch"; label = "Raven for Windows files (experimental)"; group = "Windows applications"; groupOrder = 20; order = 10; description = "Optional and experimental. Opens .exe, .msi and .bat files with Raven instead of Wine. Raven is not guaranteed to run a given program, and some installers and games will fail. .bat files are best-effort and interactive scripts need a terminal. This does not affect Steam or Proton.";
-        ojuny.raven.enable = false;
+        ojuny.raven.enable = true;
       };
     };
 

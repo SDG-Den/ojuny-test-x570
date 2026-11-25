@@ -31,7 +31,7 @@
     {
       options.ojuny.patch.virt.enable = lib.mkEnableOption "the virtualization patch";
       # @option widget = "switch"; label = "Virtualization patch"; group = "Patches"; description = "Enable the virtualization patch.";
-      config.ojuny.patch.virt.enable = false;
+      config.ojuny.patch.virt.enable = true;
 
       imports = [ self.modules.nixos.virt-backend ];
     };

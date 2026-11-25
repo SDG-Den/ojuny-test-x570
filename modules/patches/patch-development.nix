@@ -20,7 +20,7 @@
 
       config = {
         # @option widget = "switch"; label = "Development patch"; group = "Patches"; description = "Install VSCodium, the selected language servers, optional coding agents, and project tooling.";
-        ojuny.patch.development.enable = false;
+        ojuny.patch.development.enable = true;
 
         # @option widget = "table-attrset"; label = "Languages"; group = "Languages"; columns = [ "enable" ]; columnTypes = [ "bool" ]; visibleWhen.path = "ojuny.patch.development.enable"; visibleWhen.equals = true; description = "Languages whose LSP server, formatter, and editor extension are installed.";
         ojuny.patch.development.languages = {

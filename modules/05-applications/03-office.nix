@@ -30,7 +30,7 @@
 
       config = {
         # @option widget = "switch"; label = "LibreOffice"; group = "Office suite"; groupOrder = 10; order = 1;
-        ojuny.apps.office.enable = false;
+        ojuny.apps.office.enable = true;
 
         # Craft apps (ArtCraft suite). The core enable is derived from the app
         # switches below, so it never appears as a control of its own.
@@ -131,16 +131,14 @@
     {
       config = {
         # @option widget = "switch"; label = "Obsidian"; group = "Obsidian"; groupOrder = 10; order = 10; description = "Install Obsidian. Off by default because it is proprietary.";
-        ojuny.apps.obsidian.enable = false;
+        ojuny.apps.obsidian.enable = true;
 
         # @option widget = "list"; label = "Vault names"; group = "Obsidian"; groupOrder = 10; order = 20; visibleWhen.path = "ojuny.apps.obsidian.enable"; visibleWhen.equals = true; description = "Exact vault names to theme. A vault created after the last rebuild is not themed until its name is added.";
         ojuny.apps.obsidian.vaults = [ ];
 
-        environment.systemPackages =
-          lib.optionals config.ojuny.apps.obsidian.enable [ pkgs.obsidian ];
+        environment.systemPackages = lib.optionals config.ojuny.apps.obsidian.enable [ pkgs.obsidian ];
 
-        desktop.ojuny.defaultApps =
-          lib.optionals config.ojuny.apps.obsidian.enable [ pkgs.obsidian ];
+        desktop.ojuny.defaultApps = lib.optionals config.ojuny.apps.obsidian.enable [ pkgs.obsidian ];
       };
     };
 

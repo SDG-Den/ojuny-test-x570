@@ -30,7 +30,7 @@
 	  fileSystems."/home" = 
 	  	{
 	  		device = "/dev/disk/by-uuid/f66b4148-6f23-4ecb-9e64-afc8131a3498";
-	  		fstype = "ext4";
+	  		fsType = "ext4";
 	  		neededForBoot = true;
 	  	};
       swapDevices =

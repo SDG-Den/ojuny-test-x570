@@ -22,7 +22,7 @@
 
       config = {
         # @option widget = "switch"; label = "Steam"; group = "Steam"; groupOrder = 10; order = 1;
-        programs.steam.enable = false;
+        programs.steam.enable = true;
 
         # @option widget = "switch"; label = "Windows compatibility tools"; group = "Steam"; description = "Install Wine, winetricks, protontricks and gamescope so non-Steam Windows games and launchers can run."; visibleWhen.path = "programs.steam.enable"; visibleWhen.equals = true;
         ojuny.steam.compat = true;
