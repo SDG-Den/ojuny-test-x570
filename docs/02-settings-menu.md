@@ -266,8 +266,9 @@ current working set for review.
   CachyOS latest, CachyOS LTS, Facter and Derived Minimal (Experimental). LTS
   is the default; Facter uses the
   kernel from the detected nixos-hardware profile and falls back to LTS.
-  Derived Minimal (Experimental) builds a local, uncached latest kernel from
-  the detected hardware and the enabled features. Its group exposes static
+  Derived Minimal (Experimental) builds a local, uncached kernel from a
+  pinned 7.3 base, the detected hardware and the enabled features. Its group
+  exposes static
   switches for Wi-Fi, USB networking, webcam, gamepad, Bluetooth, printing,
   LUKS, network filesystems, legacy hardware, and debug and tracing support.
   A switch forces its component in; detected hardware and declared features

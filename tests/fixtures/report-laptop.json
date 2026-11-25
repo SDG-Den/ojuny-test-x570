@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "system": "x86_64-linux",
+  "virtualisation": "none",
+  "uefi": {
+    "supported": true,
+    "platform_size": 64
+  },
+  "hardware": {
+    "cpu": [
+      {
+        "architecture": "x86_64",
+        "vendor_name": "GenuineIntel",
+        "model_name": "Intel Core i7-1260P",
+        "cores": 12
+      }
+    ],
+    "graphics_card": [
+      {
+        "class_list": ["graphics_card", "pci"],
+        "driver": "i915",
+        "driver_modules": ["i915"]
+      }
+    ],
+    "network_controller": [
+      {
+        "class_list": ["network_controller", "pci"],
+        "driver": "iwlwifi",
+        "driver_modules": ["iwlwifi", "iwlmvm"]
+      }
+    ],
+    "disk": [
+      {
+        "class_list": ["disk", "block_device", "nvme"],
+        "driver": "nvme",
+        "driver_modules": ["nvme"]
+      }
+    ],
+    "pci": [
+      {
+        "class_list": ["pci"],
+        "driver": "coretemp",
+        "driver_modules": ["coretemp"]
+      }
+    ],
+    "usb": [
+      {
+        "class_list": ["usb"],
+        "driver": "uvcvideo",
+        "driver_modules": ["uvcvideo"]
+      },
+      {
+        "class_list": ["usb"],
+        "driver": "btusb",
+        "driver_modules": ["btusb", "btintel"]
+      }
+    ],
+    "usb_controller": [
+      {
+        "class_list": ["usb_controller", "pci"],
+        "driver": "xhci_hcd",
+        "driver_modules": ["xhci_pci", "xhci_hcd"]
+      }
+    ],
+    "sound": [
+      {
+        "class_list": ["sound", "pci"],
+        "driver": "snd_hda_intel",
+        "driver_modules": ["snd_hda_intel"]
+      }
+    ]
+  }
+}

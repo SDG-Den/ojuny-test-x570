@@ -298,7 +298,7 @@
           "Derived Minimal (Experimental)"
         ];
         default = "lts";
-        description = "Linux kernel package set. LTS uses the nixpkgs default LTS kernel and is the default. Latest follows nixpkgs unstable. Zen is the nixpkgs Zen kernel. CachyOS latest and LTS use the nix-cachyos-kernel input. Facter uses the kernel supplied by the detected nixos-hardware profile, or LTS when the profile supplies none. Derived Minimal (Experimental) builds a custom latest kernel from the detected hardware and the enabled features; it is built locally and is not cached.";
+        description = "Linux kernel package set. LTS uses the nixpkgs default LTS kernel and is the default. Latest follows nixpkgs unstable. Zen is the nixpkgs Zen kernel. CachyOS latest and LTS use the nix-cachyos-kernel input. Facter uses the kernel supplied by the detected nixos-hardware profile, or LTS when the profile supplies none. Derived Minimal (Experimental) builds a custom kernel from a pinned 7.3 base using the detected hardware and the enabled features; it is built locally and is not cached.";
       };
 
       config = {

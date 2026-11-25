@@ -101,10 +101,11 @@ rolling repository.
   the profile supplies none. The selector overrides a kernel set by the
   profile; choose Facter to use it. A host can override the selector with
   `lib.mkForce boot.kernelPackages`. Derived Minimal (Experimental) builds a
-  custom latest kernel from the detected hardware, the declared filesystems
-  and the enabled features. It is built locally, is not cached, and can omit
-  hardware support; enable the matching switch on the System page for
-  hardware that is not detected.
+  custom kernel from a pinned 7.3 base from the detected hardware, the declared
+  filesystems and the enabled features. It is built locally, is not cached, and
+  can omit hardware support; enable the matching switch on the System page for
+  hardware that is not detected. The pinned base is updated only together with
+  a backend table update and the derived kernel matrix.
 
 ## Documentation
 

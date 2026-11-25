@@ -1683,11 +1683,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1795131262,
-        "narHash": "sha256-HexkjQdQc1M0Gfc9Ignq17OeiYxlnYkAonBtCsarLMQ=",
+        "lastModified": 1795640907,
+        "narHash": "sha256-WfEyBWDOkrUikNCtmWpvnxX6ekN2yPovod8/r6QyveY=",
         "owner": "ojuny-project",
         "repo": "raven",
-        "rev": "fd32cdebffc2214b861eace7a5c0d57381970f02",
+        "rev": "bd450e51302a26f22f427910296681bdf38c0c01",
         "type": "github"
       },
       "original": {

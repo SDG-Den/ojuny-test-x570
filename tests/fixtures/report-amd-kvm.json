@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "system": "x86_64-linux",
+  "virtualisation": "none",
+  "uefi": {
+    "supported": true,
+    "platform_size": 64
+  },
+  "hardware": {
+    "cpu": [
+      {
+        "architecture": "x86_64",
+        "vendor_name": "AuthenticAMD",
+        "model_name": "AMD Ryzen 9 7950X",
+        "cores": 32,
+        "features": ["svm", "npt", "avic", "v_vmsave_vmload"]
+      }
+    ],
+    "graphics_card": [
+      {
+        "class_list": ["graphics_card", "pci"],
+        "driver": "amdgpu",
+        "driver_modules": ["amdgpu"]
+      }
+    ],
+    "network_controller": [
+      {
+        "class_list": ["network_controller", "pci"],
+        "driver": "r8169",
+        "driver_modules": ["r8169"]
+      }
+    ],
+    "disk": [
+      {
+        "class_list": ["disk", "block_device", "nvme"],
+        "driver": "nvme",
+        "driver_modules": ["nvme"]
+      }
+    ],
+    "pci": [
+      {
+        "class_list": ["pci"],
+        "driver": "k10temp",
+        "driver_modules": ["k10temp"]
+      }
+    ],
+    "usb_controller": [
+      {
+        "class_list": ["usb_controller", "pci"],
+        "driver": "xhci_hcd",
+        "driver_modules": ["xhci_pci", "xhci_hcd"]
+      }
+    ],
+    "sound": [
+      {
+        "class_list": ["sound", "pci"],
+        "driver": "snd_hda_intel",
+        "driver_modules": ["snd_hda_intel"]
+      }
+    ]
+  }
+}

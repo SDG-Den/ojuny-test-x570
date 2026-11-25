@@ -15,8 +15,6 @@ let
         "PROC_FS"
         "SYSFS"
         "TMPFS"
-        "DEVPTS_FS"
-        "RAMFS"
         "VT"
         "FRAMEBUFFER_CONSOLE"
         "SERIAL_8250"
@@ -110,8 +108,10 @@ let
         "NETFILTER_XTABLES"
         "NF_TABLES"
         "NF_CONNTRACK"
-        "IP_NF_FILTER"
-        "IP6_NF_FILTER"
+        "NF_TABLES_IPV4"
+        "NF_TABLES_IPV6"
+        "NF_TABLES_INET"
+        "NF_TABLES_ARP"
         "NET_SCHED"
       ];
     };
@@ -161,7 +161,15 @@ let
         "INTEGRITY_PLATFORM_KEYRING"
         "INTEGRITY_MACHINE_KEYRING"
         "CRYPTO_ECDSA"
+        "TCG_TPM"
+        "TCG_CRB"
+        "TCG_TIS"
       ];
+      enableSymbols = {
+        TCG_TPM = "y";
+        TCG_CRB = "m";
+        TCG_TIS = "m";
+      };
     };
 
     usb = {
@@ -192,13 +200,19 @@ let
         "USB_EHCI_HCD"
         "USB_EHCI_PCI"
         "USB_OHCI_HCD"
-        "USB_OHCI_PCI"
+        "USB_OHCI_HCD_PCI"
         "USB_UHCI_HCD"
         "USB_HID"
         "USB_HIDDEV"
         "USB_STORAGE"
         "USB_UAS"
+        "USB_XHCI_PCI_PROM21"
       ];
+      enableSymbols = {
+        USB_OHCI_HCD = "m";
+        USB_OHCI_HCD_PCI = "m";
+        USB_XHCI_PCI_PROM21 = "m";
+      };
     };
 
     ps2 = {
@@ -206,13 +220,17 @@ let
       drivers = [ "atkbd" "i8042" "pcips2" ];
       symbols = [
         "SERIO_I8042"
-        "SERIO_PS2"
+        "SERIO_PCIPS2"
         "KEYBOARD_ATKBD"
         "MOUSE_PS2"
         "MOUSE_PS2_ELANTECH"
         "MOUSE_PS2_SYNAPTICS"
         "MOUSE_PS2_VMMOUSE"
       ];
+      enableSymbols = {
+        SERIO = "y";
+        SERIO_PCIPS2 = "m";
+      };
     };
 
     storageSata = {
@@ -263,8 +281,9 @@ let
 
     filesystemsCommon = {
       default = true;
-      drivers = [ "ext4" "vfat" "fat" "exfat" "ntfs3" "f2fs" "xfs" "btrfs" "squashfs" "isofs" "udf" "fuse" "nls_cp437" "nls_iso8859_1" "nls_utf8" ];
+      drivers = [ "ext2" "ext4" "vfat" "fat" "exfat" "ntfs3" "f2fs" "xfs" "btrfs" "squashfs" "isofs" "udf" "fuse" "autofs" "nls_cp437" "nls_iso8859_1" "nls_utf8" ];
       symbols = [
+        "EXT2_FS"
         "EXT4_FS"
         "VFAT_FS"
         "FAT_FS"
@@ -277,6 +296,7 @@ let
         "ISO9660_FS"
         "UDF_FS"
         "FUSE_FS"
+        "AUTOFS_FS"
         "NLS_CODEPAGE_437"
         "NLS_ISO8859_1"
         "NLS_UTF8"
@@ -293,7 +313,6 @@ let
         "SND_HDA_CODEC_HDMI"
         "SND_HDA_CODEC_REALTEK"
         "SND_HDA_CODEC_ANALOG"
-        "SND_HDA_CODEC_GENERIC"
         "SND_HDA_PATCH_LOADER"
         "SND_HDA_INPUT_BEEP"
         "SND_HDA_RECONFIG"
@@ -359,8 +378,9 @@ let
     };
 
     ethernetBroadcom = {
-      drivers = [ "tg3" "bnx2" "bnx2x" ];
-      symbols = [ "TG3" "BNX2" "BNX2X" ];
+      drivers = [ "tg3" "bnx2" "bnx2x" "cnic" ];
+      symbols = [ "NET_VENDOR_BROADCOM" "TG3" "BNX2" "BNX2X" "CNIC" ];
+      keepSymbols = [ "BNX2" "BNX2X" "CNIC" ];
     };
 
     ethernetAquantia = {
@@ -564,7 +584,7 @@ let
         "RTL8723DU"
         "RTL8821AE"
         "RTL8821CU"
-        "RNDIS_WLAN"
+        "USB_NET_RNDIS_WLAN"
       ];
     };
 
@@ -573,6 +593,8 @@ let
       drivers = [ "btusb" "btbcm" "btintel" "btrtl" "btmtk" "hci_uart" "hci_vhci" "rfcomm" ];
       symbols = [
         "BT"
+        "RFKILL"
+        "RFKILL_INPUT"
         "BT_HCIBTUSB"
         "BT_HCIBTUSB_AUTOSUSPEND"
         "BT_HCIBTUSB_MTK"
@@ -649,10 +671,25 @@ let
         "CRYPTO_USER_API_SKCIPHER"
         "CRYPTO_USER_API_HASH"
       ];
+      keepSymbols = [
+        "CRYPTO_AES"
+        "CRYPTO_XTS"
+        "CRYPTO_CBC"
+        "CRYPTO_LRW"
+        "CRYPTO_SHA1"
+        "CRYPTO_SHA256"
+        "CRYPTO_SHA512"
+        "CRYPTO_BLOWFISH"
+        "CRYPTO_TWOFISH"
+        "CRYPTO_SERPENT"
+        "CRYPTO_USER_API_SKCIPHER"
+        "CRYPTO_USER_API_HASH"
+      ];
     };
 
     lvm = {
       drivers = [ "dm_snapshot" "dm_mirror" "dm_raid" ];
+      implies = [ "raid" ];
       symbols = [
         "DM_SNAPSHOT"
         "DM_MIRROR"
@@ -675,7 +712,19 @@ let
 
     zram = {
       drivers = [ "zram" ];
-      symbols = [ "ZRAM" "ZSMALLOC" "ZRAM_DEF_COMP_ZSTD" ];
+      symbols = [
+        "ZRAM"
+        "ZSMALLOC"
+        "ZRAM_DEF_COMP_ZSTD"
+        "ZRAM_BACKEND_842"
+        "ZRAM_BACKEND_DEFLATE"
+        "ZRAM_BACKEND_LZ4"
+        "ZRAM_BACKEND_LZ4HC"
+        "ZRAM_BACKEND_LZO"
+        "ZRAM_BACKEND_ZSTD"
+        "ZRAM_MULTI_COMP"
+        "ZRAM_WRITEBACK"
+      ];
     };
 
     zswap = {
@@ -694,10 +743,24 @@ let
         "VFIO"
         "VFIO_PCI"
         "VFIO_IOMMU"
+        "VFIO_DEVICE_CDEV"
+        "VFIO_NOIOMMU"
+        "VFIO_PCI_VGA"
+        "X86_SGX_KVM"
         "VHOST_NET"
         "VHOST_VSOCK"
         "TUN"
       ];
+      enableSymbols = {
+        VIRTUALIZATION = "y";
+        KVM = "m";
+        KVM_AMD = "m";
+        KVM_INTEL = "m";
+        VFIO_DEVICE_CDEV = "y";
+        VFIO_NOIOMMU = "y";
+        VFIO_PCI_VGA = "y";
+        X86_SGX_KVM = "y";
+      };
     };
 
     containers = {
@@ -716,11 +779,14 @@ let
         "VIRTIO_FS"
         "VIRTIO_BALLOON"
         "VIRTIO_INPUT"
-        "VIRTIO_RNG"
         "HW_RANDOM_VIRTIO"
         "SCSI_VIRTIO"
         "DRM_VIRTIO_GPU"
       ];
+      enableSymbols = {
+        VIRTIO = "m";
+        HW_RANDOM_VIRTIO = "m";
+      };
     };
 
     ninep = {
@@ -728,11 +794,15 @@ let
       symbols = [
         "NET_9P"
         "9P_FS"
-        "9P_FSCACHE"
         "9P_FS_POSIX_ACL"
-        "9P_NET"
-        "9P_VIRTIO"
+        "NET_9P_VIRTIO"
+        "NET_9P_FD"
       ];
+      enableSymbols = {
+        NET_9P = "y";
+        NET_9P_VIRTIO = "m";
+        NET_9P_FD = "m";
+      };
     };
 
     nfs = {
@@ -747,7 +817,12 @@ let
         "NFS_ACL_SUPPORT"
         "SUNRPC"
         "LOCKD"
+        "NFSD"
+        "NFSD_V3_ACL"
+        "NFSD_V4"
+        "NFSD_V4_SECURITY_LABEL"
       ];
+      keepSymbols = [ "SUNRPC" ];
     };
 
     cifs = {
@@ -759,6 +834,8 @@ let
         "CIFS_FSCACHE"
         "CIFS_UPCALL"
         "CIFS_DFS_UPCALL"
+        "SMB_SERVER"
+        "SMB_SERVER_KERBEROS5"
       ];
     };
 
@@ -772,6 +849,11 @@ let
         "OVERLAY_FS_NFS_EXPORT"
         "OVERLAY_FS_METACOPY"
       ];
+      enableSymbols = {
+        OVERLAY_FS_REDIRECT_DIR = "y";
+        OVERLAY_FS_INDEX = "y";
+        OVERLAY_FS_METACOPY = "y";
+      };
     };
 
     bcachefs = {
@@ -897,7 +979,6 @@ let
         "DEBUG_INFO"
         "DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT"
         "DEBUG_INFO_BTF"
-        "DEBUG_INFO_REDUCED"
       ];
       offSymbols = { DEBUG_INFO_NONE = "y"; };
     };
@@ -976,26 +1057,53 @@ let
       (lib.filter (name: components.${name}.core or false) (lib.attrNames components))
   );
 
-  moduleComponents = lib.listToAttrs (
-    lib.concatMap
-      (name: map (driver: lib.nameValuePair driver [ name ]) (components.${name}.drivers or [ ]))
-      (lib.attrNames components)
-  );
+  moduleComponents = lib.foldl'
+    (
+      componentsForDriver: name:
+      lib.foldl'
+        (
+          acc: driver:
+          acc // { ${driver} = (acc.${driver} or [ ]) ++ [ name ]; }
+        )
+        componentsForDriver
+        (components.${name}.drivers or [ ])
+    )
+    { }
+    (lib.attrNames components);
+
+  classComponents = lib.foldl'
+    (
+      componentsForClass: name:
+      lib.foldl'
+        (
+          acc: class:
+          acc // { ${class} = (acc.${class} or [ ]) ++ [ name ]; }
+        )
+        componentsForClass
+        (components.${name}.classes or [ ])
+    )
+    { }
+    (lib.attrNames components);
 
   moduleSymbols = {
     "9p" = "9P_FS";
     "9pnet" = "NET_9P";
-    "9pnet_virtio" = "9P_VIRTIO";
+    "9pnet_virtio" = "NET_9P_VIRTIO";
     ahci = "SATA_AHCI";
     atkbd = "KEYBOARD_ATKBD";
+    autofs = "AUTOFS_FS";
     btrfs = "BTRFS_FS";
     ccp = "CRYPTO_DEV_CCP";
     cifs = "CIFS";
+    cnic = "CNIC";
+    ctr = "CRYPTO_CTR";
     coretemp = "SENSORS_CORETEMP";
     dm_mod = "BLK_DEV_DM";
     ehci_hcd = "USB_EHCI_HCD";
     ehci_pci = "USB_EHCI_PCI";
+    efivarfs = "EFIVAR_FS";
     exfat = "EXFAT_FS";
+    ext2 = "EXT2_FS";
     ext4 = "EXT4_FS";
     f2fs = "F2FS_FS";
     fuse = "FUSE_FS";
@@ -1012,15 +1120,19 @@ let
     ntfs3 = "NTFS3_FS";
     nvme = "BLK_DEV_NVME";
     ohci_hcd = "USB_OHCI_HCD";
-    ohci_pci = "USB_OHCI_PCI";
+    ohci_pci = "USB_OHCI_HCD_PCI";
     overlay = "OVERLAY_FS";
-    pcips2 = "SERIO_PS2";
+    pcips2 = "SERIO_PCIPS2";
     pcieport = "PCIEPORTBUS";
     rndis_host = "USB_NET_RNDIS_HOST";
+    rndis_wlan = "USB_NET_RNDIS_WLAN";
     sd_mod = "BLK_DEV_SD";
     sr_mod = "BLK_DEV_SR";
     squashfs = "SQUASHFS";
+    "tpm-crb" = "TCG_CRB";
+    "tpm-tis" = "TCG_TIS";
     udf = "UDF_FS";
+    uinput = "INPUT_UINPUT";
     uhci_hcd = "USB_UHCI_HCD";
     usb_storage = "USB_STORAGE";
     usbhid = "USB_HID";
@@ -1029,6 +1141,7 @@ let
     xfs = "XFS_FS";
     xhci_hcd = "USB_XHCI_HCD";
     xhci_pci = "USB_XHCI_PCI";
+    xhci_pci_prom21 = "USB_XHCI_PCI_PROM21";
     nvidia = null;
     nvidia_drm = null;
     nvidia_modeset = null;
@@ -1054,6 +1167,20 @@ in
       hardwareValue = name: hardware.${name} or null;
 
       reportIsList = name: let value = hardwareValue name; in builtins.isList value && value != [ ];
+
+      reportClasses = lib.filter reportIsList (lib.attrNames hardware);
+
+      moduleList =
+        config.boot.initrd.availableKernelModules
+        ++ config.boot.initrd.kernelModules
+        ++ config.boot.kernelModules;
+
+      moduleSymbol =
+        module:
+        if moduleSymbols ? ${module} then
+          moduleSymbols.${module}
+        else
+          lib.toUpper (lib.replaceStrings [ "-" ] [ "_" ] module);
 
       reportDevices = lib.concatMap (
         name:
@@ -1243,18 +1370,40 @@ in
             provides = [ "usb" "sdMmc" "filesystemsCommon" "scsiDisk" ];
           }
           {
+            applies = config.networking.wireless.enable or false;
+            provides = [ "wifi" ];
+          }
+          {
+            applies = config.virtualisation.containers.enable or false;
+            provides = [ "containers" ];
+          }
+          {
+            applies = config.services.nfs.server.enable or false;
+            provides = [ "nfs" ];
+          }
+          {
+            applies = config.services.samba.enable or false;
+            provides = [ "cifs" ];
+          }
+          {
+            applies = config.services.btrfs.autoScrub.enable or false;
+            provides = [ "filesystemsCommon" ];
+          }
+          {
+            applies = lib.any (
+              package: lib.elem (lib.getName package) [ "bpftrace" "bcc" "perf" ]
+            ) config.environment.systemPackages;
+            provides = [ "debugInfo" "tracing" ];
+          }
+          {
             applies = true;
             provides = fileSystemActive;
           }
           {
             applies = true;
             provides = lib.concatMap (
-              module: moduleComponents.${module} or [ ]
-            ) (
-              config.boot.initrd.availableKernelModules
-              ++ config.boot.initrd.kernelModules
-              ++ config.boot.kernelModules
-            );
+              module: moduleComponents.${normalizeDriver module} or [ ]
+            ) moduleList;
           }
         ]
         ++ gpuSources;
@@ -1322,7 +1471,22 @@ in
         lib.concatMap (name: components.${name}.symbols or [ ]) (lib.attrNames components)
       );
 
-      disabledSymbols = lib.filter (symbol: !(lib.elem symbol activeSymbols)) allSymbols;
+      moduleKeep = lib.concatMap (
+        module:
+        let
+          symbol = moduleSymbol module;
+        in
+        if symbol == null then [ ] else [ symbol ]
+      ) moduleList;
+
+      keepSymbols = lib.unique (
+        lib.concatMap (name: components.${name}.keepSymbols or [ ]) (lib.attrNames components)
+        ++ moduleKeep
+      );
+
+      disabledSymbols = lib.filter (
+        symbol: !(lib.elem symbol activeSymbols) && !(lib.elem symbol keepSymbols)
+      ) allSymbols;
 
       inactiveComponents = lib.filter (name: !(lib.elem name activeComponents)) (lib.attrNames components);
 
@@ -1356,8 +1520,11 @@ in
         // lib.listToAttrs (map mkEntry offEntries)
         // lib.listToAttrs (map mkEntry enableEntries);
 
-      customKernel = pkgs.linux_latest.override {
+      baseKernel = pkgs.linux_7_3;
+
+      customKernel = baseKernel.override {
         structuredExtraConfig = structuredExtraConfig;
+        ignoreConfigErrors = true;
       };
 
       kernelPackages = pkgs.linuxPackagesFor customKernel;
@@ -1392,6 +1559,41 @@ in
           description = "Kernel configuration symbol for each module name the derived kernel check inspects.";
         };
 
+        activeComponents = lib.mkOption {
+          type = lib.types.listOf lib.types.str;
+          internal = true;
+          readOnly = true;
+          description = "Components active for the current report and settings.";
+        };
+
+        reportDrivers = lib.mkOption {
+          type = lib.types.listOf lib.types.str;
+          internal = true;
+          readOnly = true;
+          description = "Driver names found in the facter report.";
+        };
+
+        reportClasses = lib.mkOption {
+          type = lib.types.listOf lib.types.str;
+          internal = true;
+          readOnly = true;
+          description = "Hardware classes found in the facter report.";
+        };
+
+        moduleComponents = lib.mkOption {
+          type = lib.types.attrsOf (lib.types.listOf lib.types.str);
+          internal = true;
+          readOnly = true;
+          description = "Component names for each known driver.";
+        };
+
+        classComponents = lib.mkOption {
+          type = lib.types.attrsOf (lib.types.listOf lib.types.str);
+          internal = true;
+          readOnly = true;
+          description = "Component names for each known report class.";
+        };
+
         wifi = lib.mkEnableOption "Wi-Fi support in the derived kernel";
         usbNetworking = lib.mkEnableOption "USB networking support in the derived kernel";
         webcam = lib.mkEnableOption "webcam support in the derived kernel";
@@ -1409,6 +1611,11 @@ in
         ojuny.derivedKernel.activeSymbols = activeSymbols;
         ojuny.derivedKernel.coreSymbols = coreSymbols;
         ojuny.derivedKernel.moduleSymbols = moduleSymbols;
+        ojuny.derivedKernel.activeComponents = activeComponents;
+        ojuny.derivedKernel.reportDrivers = normalizedDrivers;
+        ojuny.derivedKernel.reportClasses = reportClasses;
+        ojuny.derivedKernel.moduleComponents = moduleComponents;
+        ojuny.derivedKernel.classComponents = classComponents;
       };
     };
 }
