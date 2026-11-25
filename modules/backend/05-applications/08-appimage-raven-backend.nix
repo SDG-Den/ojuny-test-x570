@@ -26,6 +26,130 @@
             env | LC_ALL=C sort | grep -E '^(RAVEN_|WAYLAND_|XDG_|DISPLAY=|HOME=|PATH=|LANG=|LC_|DESKTOP_|DBUS_SESSION_BUS_ADDRESS=)' | sed 's/^/  /' || true
       '';
 
+      ravenShortcutTarget = pkgs.writeText "raven-shortcut-target.py" ''
+        import argparse
+        import re
+        from pathlib import Path
+
+        from LnkParse3.lnk_file import LnkFile
+
+        ENVIRONMENT = {
+            "%SystemDrive%": "C:",
+            "%SystemRoot%": "C:\\windows",
+            "%windir%": "C:\\windows",
+            "%ProgramFiles%": "C:\\Program Files",
+            "%ProgramFiles(x86)%": "C:\\Program Files (x86)",
+            "%ProgramW6432%": "C:\\Program Files",
+            "%ALLUSERSPROFILE%": "C:\\ProgramData",
+        }
+
+        def user_profile(prefix):
+            for folder in ("Users", "users"):
+                root = Path(prefix) / "drive_c" / folder
+                try:
+                    entries = sorted(root.iterdir())
+                except OSError:
+                    continue
+                for entry in entries:
+                    lowered = entry.name.lower()
+                    if entry.is_dir() and lowered != "public" and not lowered.startswith("default"):
+                        return "C:\\Users\\" + entry.name
+            return None
+
+        def expand(target, prefix):
+            values = dict(ENVIRONMENT)
+            profile = user_profile(prefix)
+            if profile:
+                values["%USERPROFILE%"] = profile
+                values["%APPDATA%"] = profile + "\\AppData\\Roaming"
+                values["%LOCALAPPDATA%"] = profile + "\\AppData\\Local"
+            for name in sorted(values, key=len, reverse=True):
+                target = re.sub(re.escape(name), lambda _: values[name], target, flags=re.IGNORECASE)
+            return target
+
+        def windows_target(lnk):
+            data = lnk.get_json()
+            info = data.get("link_info") or {}
+            base = info.get("local_base_path") or info.get("local_base_path_unicode") or ""
+            suffix = info.get("common_path_suffix") or info.get("common_path_suffix_unicode") or ""
+            if base:
+                if not suffix:
+                    return base
+                if base.endswith("\\") or suffix.startswith("\\"):
+                    return base + suffix
+                return base + "\\" + suffix
+            items = (data.get("target") or {}).get("items") or []
+            volume = ""
+            names = []
+            for item in items:
+                if item.get("class") == "Volume Item":
+                    volume = item.get("volume_name") or ""
+                elif item.get("class") == "File entry":
+                    name = item.get("primary_name")
+                    if name:
+                        names.append(name)
+            if volume and names:
+                return volume.rstrip("\\") + "\\" + "\\".join(names)
+            strings = data.get("data") or {}
+            relative = strings.get("relative_path") or ""
+            working = strings.get("working_directory") or ""
+            if relative:
+                if re.match(r"^[A-Za-z]:[\\/]", relative) or relative.startswith("\\\\"):
+                    return relative
+                relative = relative.removeprefix(".\\")
+                if working:
+                    return working.rstrip("\\") + "\\" + relative
+            return ""
+
+        def host_path(target, prefix):
+            target = target.strip().strip('"')
+            if not target:
+                return ""
+            match = re.match(r"^([A-Za-z]):", target)
+            if match:
+                drive = match.group(1).lower()
+                rest = target[2:].replace("/", "\\").lstrip("\\").replace("\\", "/")
+                root = Path(prefix) / ("drive_" + drive)
+                if drive == "z":
+                    root = Path("/")
+                candidate = (root / rest).resolve()
+                if not candidate.is_relative_to(root.resolve()):
+                    return ""
+                return str(candidate)
+            if target.startswith("/"):
+                return target
+            return ""
+
+        def main():
+            parser = argparse.ArgumentParser(description="Resolve a Windows shortcut to a host path")
+            parser.add_argument("--prefix", required=True)
+            parser.add_argument("shortcuts", nargs="+")
+            args = parser.parse_args()
+            for shortcut in args.shortcuts:
+                try:
+                    with open(shortcut, "rb") as stream:
+                        target = windows_target(LnkFile(fhandle=stream))
+                    host = host_path(expand(target, args.prefix), args.prefix)
+                    if host and Path(host).is_file():
+                        print(f"{host}\t{shortcut}")
+                except Exception:
+                    continue
+
+        if __name__ == "__main__":
+            main()
+      '';
+
+      ravenSandboxLog = ''
+        prefix="''${RAVEN_PREFIX:-$HOME/.local/share/raven/default}"
+        if [ -f "$prefix/sandbox.log" ]; then
+          {
+            echo
+            echo "--- sandbox refusals ---"
+            tail -n 100 "$prefix/sandbox.log"
+          } >> "$report"
+        fi
+      '';
+
       ravenReport = pkgs.writeShellApplication {
         name = "ojuny-raven-report";
         runtimeInputs = [ pkgs.coreutils pkgs.yad ];
@@ -93,6 +217,7 @@ Are you really sure?" \
           pkgs.gnused
           pkgs.util-linux
           pkgs.desktop-file-utils
+          (pkgs.python3.withPackages (ps: [ ps.lnkparse3 ]))
         ];
         text = ''
           prefix="''${RAVEN_PREFIX:-$HOME/.local/share/raven/default}"
@@ -103,34 +228,37 @@ Are you really sure?" \
           mkdir -p "$applications"
           rm -f "$applications"/ojuny-raven-*.desktop
 
-          roots=()
-          for root in \
-            "$drive/Program Files" \
-            "$drive/Program Files (x86)" \
-            "$drive/ProgramData/Microsoft/Windows/Start Menu/Programs" \
-            "$drive/Users/Public/Desktop"; do
-            if [ -d "$root" ]; then
-              roots+=("$root")
+          desktops=()
+          for desktop in "$drive"/Users/*/Desktop "$drive"/users/*/Desktop; do
+            if [ -d "$desktop" ]; then
+              desktops+=("$desktop")
             fi
           done
-          for root in "$drive"/Users/*/AppData/Local/Programs; do
-            if [ -d "$root" ]; then
-              roots+=("$root")
-            fi
-          done
-          [ "''${#roots[@]}" -gt 0 ] || exit 0
+          [ "''${#desktops[@]}" -gt 0 ] || exit 0
 
-          while IFS= read -r -d "" exe; do
-            base="$(basename "$exe")"
-            case "$base" in
-              unins*|setup*|update*|crashpad*|helper*|*.tmp) continue ;;
+          declare -A seen=()
+          while IFS= read -r -d "" shortcut; do
+            result="$(python3 ${ravenShortcutTarget} --prefix "$prefix" "$shortcut" 2>/dev/null)" || continue
+            [ -n "$result" ] || continue
+            target="''${result%%$'\t'*}"
+            [ -n "$target" ] || continue
+            case "''${target,,}" in
+              *.exe) ;;
+              *) continue ;;
             esac
-            name="$(basename "$(dirname "$exe")")"
-            if [ "$name" = "Program Files" ]; then
-              name="''${base%.exe}"
+            base="$(basename "$target")"
+            case "''${base,,}" in
+              *unins*|*setup*|*update*|*crashpad*|*helper*) continue ;;
+            esac
+            if [ -n "''${seen["$target"]:-}" ]; then
+              continue
             fi
-            exec_path="''${exe//%/%%}"
-            hash="$(printf '%s' "$exe" | sha256sum | cut -c1-16)"
+            seen["$target"]=1
+            name="''${shortcut##*/}"
+            name="''${name%.[lL][nN][kK]}"
+            name="''${name% - Shortcut}"
+            exec_path="''${target//%/%%}"
+            hash="$(printf '%s' "$target" | sha256sum | cut -c1-16)"
             {
               echo "[Desktop Entry]"
               echo "Type=Application"
@@ -142,7 +270,7 @@ Are you really sure?" \
               echo "Categories=Utility;"
               echo "NoDisplay=false"
             } > "$applications/ojuny-raven-$hash.desktop"
-          done < <(find "''${roots[@]}" -type f -iname '*.exe' -print0 2>/dev/null)
+          done < <(find "''${desktops[@]}" -type f -iname '*.lnk' -print0 2>/dev/null | sort -z)
 
           update-desktop-database "$applications" >/dev/null 2>&1 || true
         '';
@@ -168,7 +296,7 @@ Are you really sure?" \
             echo "Time: $(date -Is)"
             echo "Application: $host_file"
             echo "Wrapper: $0"
-            echo "Raven command: ${config.programs.raven.package}/bin/raven --run-process --execution=native --timeout-ms=86400000 --desktop=wayland --directory=$win_dir $host_file"
+            echo "Raven command: ${config.programs.raven.package}/bin/raven --run-process --execution=native --timeout-ms=86400000 --desktop=wayland --directory=$win_dir $host_file -- $*"
             ${ravenDiagnostics}
             echo "Report this at https://github.com/mirkobrombin/raven/issues"
             echo
@@ -177,12 +305,12 @@ Are you really sure?" \
 
           if [ -t 1 ] || [ -t 2 ]; then
             set +e
-            ${config.programs.raven.package}/bin/raven --run-process --execution=native --timeout-ms=86400000 --desktop=wayland --directory="$win_dir" "$host_file" "$@" 2>&1 | tee -a "$log"
+            ${config.programs.raven.package}/bin/raven --run-process --execution=native --timeout-ms=86400000 --desktop=wayland --directory="$win_dir" "$host_file" -- "$@" 2>&1 | tee -a "$log"
             status="''${PIPESTATUS[0]}"
             set -e
           else
             set +e
-            ${config.programs.raven.package}/bin/raven --run-process --execution=native --timeout-ms=86400000 --desktop=wayland --directory="$win_dir" "$host_file" "$@" >> "$log" 2>&1
+            ${config.programs.raven.package}/bin/raven --run-process --execution=native --timeout-ms=86400000 --desktop=wayland --directory="$win_dir" "$host_file" -- "$@" >> "$log" 2>&1
             status=$?
             set -e
           fi
@@ -197,6 +325,7 @@ Are you really sure?" \
           fi
           report="$log_dir/$(date +%Y%m%d-%H%M%S)-failure.log"
           cp "$log" "$report"
+          ${ravenSandboxLog}
           echo "Report file: $report" >> "$report"
           ${ravenReport}/bin/ojuny-raven-report "$report" "$host_file" "$0" "$status" "''${original_args[@]}"
           exit "$status"
@@ -215,6 +344,23 @@ Are you really sure?" \
         categories = [ "Utility" ];
       };
 
+      ravenControlRun = pkgs.writeShellApplication {
+        name = "ojuny-raven-control";
+        text = ''
+          exec ${config.programs.raven.package}/bin/raven --run-process --execution=native --desktop=wayland --timeout-ms=86400000 ${config.programs.raven.package.unwrapped}/libexec/raven/control.exe
+        '';
+      };
+
+      ravenControlDesktop = pkgs.makeDesktopItem {
+        name = "ojuny-raven-control";
+        exec = "${ravenControlRun}/bin/ojuny-raven-control";
+        desktopName = "Raven control panel (experimental)";
+        genericName = "Windows application runtime settings";
+        comment = "Folders, network access, refusals, snapshots and layers of the Raven prefix.";
+        icon = "preferences-system";
+        categories = [ "Settings" "Utility" ];
+      };
+
       ravenMsiRun = pkgs.writeShellApplication {
         name = "ojuny-raven-msi";
         runtimeInputs = [ pkgs.coreutils pkgs.gnused pkgs.gnugrep pkgs.pciutils ];
@@ -225,6 +371,7 @@ Are you really sure?" \
           fi
           original_args=("$@")
           host_file="$(realpath -- "$1")"
+          host_dir="$(dirname -- "$host_file")"
           shift
           win_file="Z:$(printf '%s' "$host_file" | sed 's|/|\\|g')"
           win_dir="Z:$(dirname -- "$host_file" | sed 's|/|\\|g')"
@@ -236,7 +383,7 @@ Are you really sure?" \
             echo "Time: $(date -Is)"
             echo "Application: $host_file"
             echo "Wrapper: $0"
-            echo "Raven command: ${config.programs.raven.package}/bin/raven --run-process --execution=native --timeout-ms=86400000 --desktop=wayland --directory=$win_dir ${config.programs.raven.package.unwrapped}/libexec/raven/msiexec.exe -- /i $win_file"
+            echo "Raven command: ${config.programs.raven.package}/bin/raven --run-process --execution=native --timeout-ms=86400000 --desktop=wayland --directory=$win_dir --grant-read=$host_dir ${config.programs.raven.package.unwrapped}/libexec/raven/msiexec.exe -- /i $win_file"
             ${ravenDiagnostics}
             echo "Report this at https://github.com/mirkobrombin/raven/issues"
             echo
@@ -245,12 +392,12 @@ Are you really sure?" \
 
           if [ -t 1 ] || [ -t 2 ]; then
             set +e
-            ${config.programs.raven.package}/bin/raven --run-process --execution=native --timeout-ms=86400000 --desktop=wayland --directory="$win_dir" ${config.programs.raven.package.unwrapped}/libexec/raven/msiexec.exe -- /i "$win_file" 2>&1 | tee -a "$log"
+            ${config.programs.raven.package}/bin/raven --run-process --execution=native --timeout-ms=86400000 --desktop=wayland --directory="$win_dir" --grant-read="$host_dir" ${config.programs.raven.package.unwrapped}/libexec/raven/msiexec.exe -- /i "$win_file" 2>&1 | tee -a "$log"
             status="''${PIPESTATUS[0]}"
             set -e
           else
             set +e
-            ${config.programs.raven.package}/bin/raven --run-process --execution=native --timeout-ms=86400000 --desktop=wayland --directory="$win_dir" ${config.programs.raven.package.unwrapped}/libexec/raven/msiexec.exe -- /i "$win_file" >> "$log" 2>&1
+            ${config.programs.raven.package}/bin/raven --run-process --execution=native --timeout-ms=86400000 --desktop=wayland --directory="$win_dir" --grant-read="$host_dir" ${config.programs.raven.package.unwrapped}/libexec/raven/msiexec.exe -- /i "$win_file" >> "$log" 2>&1
             status=$?
             set -e
           fi
@@ -265,6 +412,7 @@ Are you really sure?" \
           fi
           report="$log_dir/$(date +%Y%m%d-%H%M%S)-msi-failure.log"
           cp "$log" "$report"
+          ${ravenSandboxLog}
           echo "Report file: $report" >> "$report"
           ${ravenReport}/bin/ojuny-raven-report "$report" "$host_file" "$0" "$status" "''${original_args[@]}"
           exit "$status"
@@ -293,6 +441,7 @@ Are you really sure?" \
           fi
           original_args=("$@")
           host_file="$(realpath -- "$1")"
+          host_dir="$(dirname -- "$host_file")"
           shift
           win_file="Z:$(printf '%s' "$host_file" | sed 's|/|\\|g')"
           win_dir="Z:$(dirname -- "$host_file" | sed 's|/|\\|g')"
@@ -304,7 +453,7 @@ Are you really sure?" \
             echo "Time: $(date -Is)"
             echo "Application: $host_file"
             echo "Wrapper: $0"
-            echo "Raven command: ${config.programs.raven.package}/bin/raven --run-process --execution=native --timeout-ms=86400000 --desktop=wayland --directory=$win_dir ${config.programs.raven.package.unwrapped}/libexec/raven/cmd.exe -- /c $win_file"
+            echo "Raven command: ${config.programs.raven.package}/bin/raven --run-process --execution=native --timeout-ms=86400000 --desktop=wayland --directory=$win_dir --grant-write=$host_dir ${config.programs.raven.package.unwrapped}/libexec/raven/cmd.exe -- /c $win_file"
             ${ravenDiagnostics}
             echo "Report this at https://github.com/mirkobrombin/raven/issues"
             echo
@@ -313,12 +462,12 @@ Are you really sure?" \
 
           if [ -t 1 ] || [ -t 2 ]; then
             set +e
-            ${config.programs.raven.package}/bin/raven --run-process --execution=native --timeout-ms=86400000 --desktop=wayland --directory="$win_dir" ${config.programs.raven.package.unwrapped}/libexec/raven/cmd.exe -- /c "$win_file" 2>&1 | tee -a "$log"
+            ${config.programs.raven.package}/bin/raven --run-process --execution=native --timeout-ms=86400000 --desktop=wayland --directory="$win_dir" --grant-write="$host_dir" ${config.programs.raven.package.unwrapped}/libexec/raven/cmd.exe -- /c "$win_file" 2>&1 | tee -a "$log"
             status="''${PIPESTATUS[0]}"
             set -e
           else
             set +e
-            ${config.programs.raven.package}/bin/raven --run-process --execution=native --timeout-ms=86400000 --desktop=wayland --directory="$win_dir" ${config.programs.raven.package.unwrapped}/libexec/raven/cmd.exe -- /c "$win_file" >> "$log" 2>&1
+            ${config.programs.raven.package}/bin/raven --run-process --execution=native --timeout-ms=86400000 --desktop=wayland --directory="$win_dir" --grant-write="$host_dir" ${config.programs.raven.package.unwrapped}/libexec/raven/cmd.exe -- /c "$win_file" >> "$log" 2>&1
             status=$?
             set -e
           fi
@@ -333,6 +482,7 @@ Are you really sure?" \
           fi
           report="$log_dir/$(date +%Y%m%d-%H%M%S)-bat-failure.log"
           cp "$log" "$report"
+          ${ravenSandboxLog}
           echo "Report file: $report" >> "$report"
           ${ravenReport}/bin/ojuny-raven-report "$report" "$host_file" "$0" "$status" "''${original_args[@]}"
           exit "$status"
@@ -368,6 +518,8 @@ Are you really sure?" \
           ravenReport
           ravenRun
           ravenDesktop
+          ravenControlRun
+          ravenControlDesktop
           ravenMsiRun
           ravenMsiDesktop
           ravenBatRun

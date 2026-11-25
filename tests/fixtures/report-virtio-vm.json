@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "system": "x86_64-linux",
+  "virtualisation": "kvm",
+  "uefi": {
+    "supported": false,
+    "platform_size": 0
+  },
+  "hardware": {
+    "cpu": [
+      {
+        "architecture": "x86_64",
+        "vendor_name": "AuthenticAMD",
+        "model_name": "QEMU Virtual CPU version 2.5+",
+        "cores": 4
+      }
+    ],
+    "graphics_card": [
+      {
+        "class_list": ["graphics_card", "pci"],
+        "driver": "virtio_gpu",
+        "driver_modules": ["virtio_gpu"]
+      }
+    ],
+    "network_controller": [
+      {
+        "class_list": ["network_controller", "pci"],
+        "driver": "virtio_net",
+        "driver_modules": ["virtio_net"]
+      }
+    ],
+    "disk": [
+      {
+        "class_list": ["disk", "block_device"],
+        "driver": "virtio_blk",
+        "driver_modules": ["virtio_blk", "virtio_pci"]
+      }
+    ],
+    "usb_controller": [
+      {
+        "class_list": ["usb_controller", "pci"],
+        "driver": "xhci_hcd",
+        "driver_modules": ["xhci_pci", "xhci_hcd"]
+      }
+    ],
+    "sound": [
+      {
+        "class_list": ["sound", "pci"],
+        "driver": "snd_hda_intel",
+        "driver_modules": ["snd_hda_intel"]
+      }
+    ]
+  }
+}
