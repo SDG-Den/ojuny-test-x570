@@ -12,18 +12,18 @@ shopt -s nullglob
 for file in "$watch_dir"/*.conf; do
   name="$(basename "$file" .conf)"
   checksum="$(sha256sum "$file" | cut -d' ' -f1)"
-  previous="$(cat "$state_dir/$name" 2>/dev/null || true)"
+  previous="$(cat "$state_dir/$name"  || true)"
 
   if [ "$checksum" = "$previous" ]; then
     continue
   fi
 
   if nmcli -t -f NAME connection show | grep -Fxq "$name"; then
-    nmcli connection delete "$name" >/dev/null
+    nmcli connection delete "$name" 
   fi
 
   before="$(nmcli -t -f UUID,TYPE connection show | awk -F: '$2 == "wireguard" { print $1 }' | sort)"
-  nmcli connection import type wireguard file "$file" >/dev/null
+  nmcli connection import type wireguard file "$file" 
   after="$(nmcli -t -f UUID,TYPE connection show | awk -F: '$2 == "wireguard" { print $1 }' | sort)"
   imported="$(comm -13 <(printf '%s\n' "$before") <(printf '%s\n' "$after") | head -n 1)"
 
@@ -38,7 +38,7 @@ for marker in "$state_dir"/*; do
   name="$(basename "$marker")"
   if [ ! -f "$watch_dir/$name.conf" ]; then
     if nmcli -t -f NAME connection show | grep -Fxq "$name"; then
-      nmcli connection delete "$name" >/dev/null
+      nmcli connection delete "$name" 
     fi
     rm -f "$marker"
   fi

@@ -5,11 +5,11 @@ sbctl_conf="${OJUNY_SBCTL_CONF:-/var/lib/ojuny/sbctl.conf}"
 
 remove_database_entry() {
     local file="$1"
-    command -v sbctl >/dev/null 2>&1 || return 0
+    command -v sbctl  || return 0
     if [ -f "$sbctl_conf" ]; then
-        sbctl --config "$sbctl_conf" --disable-landlock remove-file "$file" >/dev/null 2>&1 || true
+        sbctl --config "$sbctl_conf" --disable-landlock remove-file "$file"  || true
     else
-        sbctl --disable-landlock remove-file "$file" >/dev/null 2>&1 || true
+        sbctl --disable-landlock remove-file "$file"  || true
     fi
 }
 
@@ -22,5 +22,5 @@ if [ -f "$entry_file" ]; then
     rm -f "$entry_file"
 fi
 if [ -n "$boot_mount" ] && [ -d "$boot_mount/EFI/ojuny" ]; then
-    rmdir "$boot_mount/EFI/ojuny" 2>/dev/null || true
+    rmdir "$boot_mount/EFI/ojuny"  || true
 fi

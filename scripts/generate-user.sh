@@ -41,8 +41,8 @@ echo
 
 hashed="!"
 if [ -n "$password" ]; then
-  if command -v mkpasswd >/dev/null 2>&1; then
-    hashed="$(mkpasswd -m yescrypt "$password" 2>/dev/null || mkpasswd -m sha-512 "$password")"
+  if command -v mkpasswd; then
+    hashed="$(mkpasswd -m yescrypt "$password" || mkpasswd -m sha-512 "$password")"
   else
     echo "generate-user: mkpasswd not found" >&2
     exit 1
@@ -120,6 +120,6 @@ EOF
 } >"$OUT"
 
 python3 "$HELPER" --root "$REPO_ROOT" --non-interactive ensure-imports \
-  --name users >/dev/null
+  --name users
 
 echo "generate-user: wrote $OUT"

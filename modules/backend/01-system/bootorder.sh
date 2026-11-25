@@ -1,7 +1,7 @@
 mode="${OJUNY_BOOTORDER_MODE:-service}"
 
 if [ "$mode" = "snapshot" ]; then
-    efibootmgr -v 2>/dev/null || true
+    efibootmgr -v  || true
     exit 0
 fi
 
@@ -9,19 +9,19 @@ boot_mount="${OJUNY_BOOT_MOUNT:?}"
 recovery_file="${OJUNY_RECOVERY_FILE:-}"
 recovery_enabled="${OJUNY_RECOVERY_ENABLED:-false}"
 
-source="$(findmnt -no SOURCE "$boot_mount" 2>/dev/null || true)"
+source="$(findmnt -no SOURCE "$boot_mount"  || true)"
 if [ -z "$source" ]; then
     exit 0
 fi
 
-disk="$(lsblk -no PKNAME "$source" 2>/dev/null | head -n1 || true)"
-partnum="$(lsblk -no PARTN "$source" 2>/dev/null | head -n1 || true)"
-partuuid="$(blkid -s PARTUUID -o value "$source" 2>/dev/null || true)"
+disk="$(lsblk -no PKNAME "$source"  | head -n1 || true)"
+partnum="$(lsblk -no PARTN "$source"  | head -n1 || true)"
+partuuid="$(blkid -s PARTUUID -o value "$source"  || true)"
 if [ -z "$disk" ] || [ -z "$partnum" ] || [ -z "$partuuid" ]; then
     exit 0
 fi
 
-efi="$(efibootmgr -v 2>/dev/null || true)"
+efi="$(efibootmgr -v  || true)"
 
 entry_exists() {
     efi_has_entry "$efi" "$1"
@@ -66,15 +66,15 @@ if [ -z "$ojuny_num" ] && [ "$mode" = "service" ]; then
     ojuny_num="$(find_by_path 'BOOTX64.EFI')"
 fi
 if [ -z "$ojuny_num" ] && [ "$mode" = "service" ]; then
-    efibootmgr -c -d "/dev/$disk" -p "$partnum" -L 'Linux Boot Manager' -l '\EFI\systemd\systemd-bootx64.efi' >/dev/null 2>&1 || true
-    efi="$(efibootmgr -v 2>/dev/null || true)"
+    efibootmgr -c -d "/dev/$disk" -p "$partnum" -L 'Linux Boot Manager' -l '\EFI\systemd\systemd-bootx64.efi'  || true
+    efi="$(efibootmgr -v  || true)"
     ojuny_num="$(find_by_path 'systemd-bootx64.efi')"
 fi
 
 recovery_num="$(find_by_path 'ojuny-recovery.efi')"
 if [ "$mode" = "service" ] && [ "$recovery_enabled" = "true" ] && [ -n "$recovery_file" ] && [ -f "$recovery_file" ] && [ -z "$recovery_num" ]; then
-    efibootmgr -c -d "/dev/$disk" -p "$partnum" -L 'Ojuny Recovery' -l '\EFI\ojuny\recovery\ojuny-recovery.efi' >/dev/null 2>&1 || true
-    efi="$(efibootmgr -v 2>/dev/null || true)"
+    efibootmgr -c -d "/dev/$disk" -p "$partnum" -L 'Ojuny Recovery' -l '\EFI\ojuny\recovery\ojuny-recovery.efi'  || true
+    efi="$(efibootmgr -v  || true)"
     recovery_num="$(find_by_path 'ojuny-recovery.efi')"
 fi
 
@@ -130,7 +130,7 @@ apply_order() {
     fi
 }
 
-order="$(efibootmgr 2>/dev/null | sed -n 's/^BootOrder: //p' | head -n1 || true)"
+order="$(efibootmgr  | sed -n 's/^BootOrder: //p' | head -n1 || true)"
 [ -n "$order" ] || exit 0
 IFS=',' read -r -a raw_order <<<"$order"
 current_order=()

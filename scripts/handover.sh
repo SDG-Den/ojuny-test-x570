@@ -28,7 +28,7 @@ while [ "$#" -gt 0 ]; do
   shift
 done
 
-repo_root="${OJUNY_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+repo_root="${OJUNY_ROOT:-$(git rev-parse --show-toplevel || pwd)}"
 helper="$repo_root/scripts/flake_structure.py"
 host="$(python3 "$helper" --root "$repo_root" current-host)"
 host_file="$(python3 "$helper" --root "$repo_root" --non-interactive path --module host --host "$host" --fallback modules/00-host.nix)"

@@ -14,8 +14,8 @@ sbctl_cmd() {
 }
 
 efi_is_signed() {
-    sbctl_cmd --json verify "$1" 2>/dev/null |
-        jq -e 'type == "array" and length == 1 and .[0].is_signed == 1' >/dev/null
+    sbctl_cmd --json verify "$1"  |
+        jq -e 'type == "array" and length == 1 and .[0].is_signed == 1' 
 }
 
 install -d "$recovery_dir" "$(dirname "$manifest")"
@@ -73,7 +73,7 @@ if [ -d "$pki_bundle/keys" ]; then
     mv "$sbctl_conf.tmp" "$sbctl_conf"
 
     key_marker="$recovery_dir/.ojuny-recovery-key"
-    key_id="$(sha256sum "$pki_bundle/keys/db/db.pem" 2>/dev/null | cut -d" " -f1 || true)"
+    key_id="$(sha256sum "$pki_bundle/keys/db/db.pem"  | cut -d" " -f1 || true)"
     if ! efi_is_signed "$recovery_file"; then
         sbctl_cmd sign -s "$recovery_file" || true
     fi

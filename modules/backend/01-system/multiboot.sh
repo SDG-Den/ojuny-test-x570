@@ -24,8 +24,8 @@ sbctl_cmd() {
 }
 
 efi_is_signed() {
-    sbctl_cmd --json verify "$1" 2>/dev/null |
-        jq -e 'type == "array" and length == 1 and .[0].is_signed == 1' >/dev/null
+    sbctl_cmd --json verify "$1"  |
+        jq -e 'type == "array" and length == 1 and .[0].is_signed == 1' 
 }
 
 cleanup_mounts() {
@@ -34,8 +34,8 @@ cleanup_mounts() {
         return 0
     fi
     for mount in "${mounts[@]}"; do
-        umount "$mount" 2>/dev/null || true
-        rmdir "$mount" 2>/dev/null || true
+        umount "$mount"  || true
+        rmdir "$mount"  || true
     done
 }
 
@@ -46,7 +46,7 @@ same_device() {
     local mount="$2"
     local source
 
-    source="$(findmnt -no SOURCE "$mount" 2>/dev/null || true)"
+    source="$(findmnt -no SOURCE "$mount"  || true)"
     [ -n "$source" ] || return 1
     [ "$(readlink -f "$device")" = "$(readlink -f "$source")" ]
 }
@@ -54,23 +54,23 @@ same_device() {
 esp_partuuid() {
     local source
 
-    source="$(findmnt -no SOURCE "$esp_mount" 2>/dev/null || true)"
+    source="$(findmnt -no SOURCE "$esp_mount"  || true)"
     [ -n "$source" ] || return 0
-    blkid -s PARTUUID -o value "$source" 2>/dev/null || true
+    blkid -s PARTUUID -o value "$source"  || true
 }
 
 boot_partuuid() {
     local source
 
-    source="$(findmnt -no SOURCE "$boot_mount" 2>/dev/null || true)"
+    source="$(findmnt -no SOURCE "$boot_mount"  || true)"
     [ -n "$source" ] || return 0
-    blkid -s PARTUUID -o value "$source" 2>/dev/null || true
+    blkid -s PARTUUID -o value "$source"  || true
 }
 
 secure_boot_enabled() {
     local file
 
-    file="$(find /sys/firmware/efi/efivars -maxdepth 1 -name 'SecureBoot-*' -print -quit 2>/dev/null || true)"
+    file="$(find /sys/firmware/efi/efivars -maxdepth 1 -name 'SecureBoot-*' -print -quit  || true)"
     [ -n "$file" ] || return 1
     [ "$(od -An -t u1 -j 4 -N 1 "$file" | tr -d ' ')" = "1" ]
 }
@@ -129,7 +129,7 @@ sign_helper() {
 
     local key_marker="$helper_dir/.ojuny-refind-key"
     local key_id
-    key_id="$(sha256sum "$pki_bundle/keys/db/db.pem" 2>/dev/null | cut -d" " -f1 || true)"
+    key_id="$(sha256sum "$pki_bundle/keys/db/db.pem"  | cut -d" " -f1 || true)"
     if ! efi_is_signed "$refind_bin"; then
         sbctl_cmd sign -s "$refind_bin" || true
     fi
@@ -159,19 +159,19 @@ ensure_windows_entry() {
     local disk partnum before after newnum
 
     [ "$can_touch_efi" = "true" ] || return 0
-    if efibootmgr -v 2>/dev/null | grep -qi 'bootmgfw.efi'; then
+    if efibootmgr -v  | grep -qi 'bootmgfw.efi'; then
         return 0
     fi
 
-    disk="$(lsblk -no PKNAME "$partition" 2>/dev/null | head -n1 || true)"
-    partnum="$(lsblk -no PARTN "$partition" 2>/dev/null | head -n1 || true)"
+    disk="$(lsblk -no PKNAME "$partition"  | head -n1 || true)"
+    partnum="$(lsblk -no PARTN "$partition"  | head -n1 || true)"
     [ -n "$disk" ] && [ -n "$partnum" ] || return 0
 
-    before="$(efibootmgr 2>/dev/null | sed -n 's/^BootOrder: //p' | head -n1 || true)"
-    after="$(efibootmgr -c -d "/dev/$disk" -p "$partnum" -L 'Windows Boot Manager' -l '\EFI\Microsoft\Boot\bootmgfw.efi' 2>/dev/null || true)"
+    before="$(efibootmgr  | sed -n 's/^BootOrder: //p' | head -n1 || true)"
+    after="$(efibootmgr -c -d "/dev/$disk" -p "$partnum" -L 'Windows Boot Manager' -l '\EFI\Microsoft\Boot\bootmgfw.efi'  || true)"
     newnum="$(printf '%s\n' "$after" | sed -n 's/^Boot\([0-9A-Fa-f]\{4\}\)\*.*Windows Boot Manager.*/\1/p' | head -n1 || true)"
     if [ -n "$before" ] && [ -n "$newnum" ]; then
-        efibootmgr -o "$before,$newnum" >/dev/null 2>&1 || true
+        efibootmgr -o "$before,$newnum"  || true
     fi
 }
 
@@ -180,11 +180,11 @@ disk_has_bitlocker() {
     local partition fs
 
     while IFS= read -r partition; do
-        fs="$(blkid -s TYPE -o value "$partition" 2>/dev/null || true)"
+        fs="$(blkid -s TYPE -o value "$partition"  || true)"
         case "$fs" in
         BitLocker*) return 0 ;;
         esac
-    done < <(lsblk -no PATH "$disk" 2>/dev/null | tail -n +2)
+    done < <(lsblk -no PATH "$disk"  | tail -n +2)
     return 1
 }
 
@@ -196,7 +196,7 @@ add_target() {
     local path="$5"
     local partuuid
 
-    partuuid="$(blkid -s PARTUUID -o value "$partition" 2>/dev/null || true)"
+    partuuid="$(blkid -s PARTUUID -o value "$partition"  || true)"
     jq -cn \
         --arg kind "$kind" \
         --arg disk "$disk" \
@@ -220,7 +220,7 @@ scan_esp() {
     if [ -z "$scan_mount" ]; then
         scan_mount="$(mktemp -d)"
         if ! mount -o ro,nosuid,nodev,noexec "$partition" "$scan_mount"; then
-            rmdir "$scan_mount" 2>/dev/null || true
+            rmdir "$scan_mount"  || true
             return 0
         fi
         mounts+=("$scan_mount")
@@ -248,7 +248,7 @@ scan_esp() {
 }
 
 list_esps() {
-    lsblk --tree -J -o NAME,PATH,TYPE,RM,TRAN,PARTTYPE,MOUNTPOINT,PKNAME 2>/dev/null |
+    lsblk --tree -J -o NAME,PATH,TYPE,RM,TRAN,PARTTYPE,MOUNTPOINT,PKNAME  |
         jq -r '
             def is_esp:
                 ((.parttype // "") | ascii_downcase) == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b";
@@ -286,10 +286,10 @@ if secure_boot_enabled; then
 fi
 state="$(helper_state)"
 
-ojuny_esp_source="$(findmnt -no SOURCE "$esp_mount" 2>/dev/null || true)"
+ojuny_esp_source="$(findmnt -no SOURCE "$esp_mount"  || true)"
 ojuny_esp_disk=""
 if [ -n "$ojuny_esp_source" ]; then
-    ojuny_esp_disk="$(lsblk -no PKNAME "$ojuny_esp_source" 2>/dev/null | head -n1 || true)"
+    ojuny_esp_disk="$(lsblk -no PKNAME "$ojuny_esp_source"  | head -n1 || true)"
 fi
 ojuny_partuuid="$(esp_partuuid)"
 ojuny_boot_partuuid="$(boot_partuuid)"

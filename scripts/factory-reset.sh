@@ -38,7 +38,7 @@ while [ "$#" -gt 0 ]; do
   shift
 done
 
-repo_root="${OJUNY_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+repo_root="${OJUNY_ROOT:-$(git rev-parse --show-toplevel || pwd)}"
 helper="$repo_root/scripts/flake_structure.py"
 host="$(python3 "$helper" --root "$repo_root" current-host)"
 host_file="$(python3 "$helper" --root "$repo_root" --non-interactive path --module host --host "$host" --fallback modules/00-host.nix)"
@@ -69,7 +69,7 @@ hostname="${hostname:-ojuny}"
 system_state_version="$(sed -n 's/^ *system\.stateVersion = "\([0-9][0-9.]*\)";/\1/p' "$config_file" | sed -n '1p')"
 system_state_version="${system_state_version:-26.11}"
 
-template="${template:-$(git -C "$repo_root" remote get-url origin 2>/dev/null || true)}"
+template="${template:-$(git -C "$repo_root" remote get-url origin || true)}"
 [ -n "$template" ] || {
   echo "factory-reset: no origin remote; pass --template URL" >&2
   exit 1

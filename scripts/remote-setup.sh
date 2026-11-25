@@ -98,7 +98,7 @@ fi
 
 if [ -z "$host" ]; then
   host="$(nix eval --raw "$flake_ref#nixosConfigurations" \
-    --apply 'x: builtins.head (builtins.attrNames x)' 2>/dev/null || true)"
+    --apply 'x: builtins.head (builtins.attrNames x)' || true)"
   if [ -z "$host" ]; then
     echo "remote-setup: the flake has no nixosConfigurations; run setup first or pass --host" >&2
     exit 1
@@ -119,7 +119,7 @@ if [ -n "$ssh_user" ]; then
   target_user="$ssh_user"
 fi
 
-if ! nix eval --raw "$flake_ref#deploy.nodes.$host.hostname" >/dev/null 2>&1; then
+if ! nix eval --raw "$flake_ref#deploy.nodes.$host.hostname"; then
   echo "remote-setup: $flake does not declare deploy.nodes.$host" >&2
   exit 1
 fi

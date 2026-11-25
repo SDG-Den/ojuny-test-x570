@@ -38,13 +38,13 @@ If you have not made a fork yet:
 
 EOF
 
-read -rp "Git URL of your fork: " fork_url
+read -rp "Git URL of your fork: " fork_url || true
 if [ -z "${fork_url:-}" ]; then
   echo "setup: no URL given, aborting" >&2
   exit 1
 fi
 
-read -rp "Location to clone into [$default_clone_dir]: " clone_answer
+read -rp "Location to clone into [$default_clone_dir]: " clone_answer || true
 CLONE_DIR="${clone_answer:-$default_clone_dir}"
 
 if [ -e "$CLONE_DIR" ]; then
@@ -66,16 +66,16 @@ export OJUNY_ROOT="$CLONE_DIR"
 cd "$CLONE_DIR"
 
 echo "==> repository cloned, press any key to continue"
-read -rn 1
+read -rn 1 || true
 
 upgrade=0
-if ! grep -q '^VARIANT_ID=installer' /etc/os-release 2>/dev/null &&
-  command -v nixos-rebuild >/dev/null 2>&1; then
+if ! grep -q '^VARIANT_ID=installer' /etc/os-release &&
+  command -v nixos-rebuild; then
   upgrade=1
 fi
 
 release_version="$(
-  sed -n 's/^VERSION_ID="\([0-9][0-9]\.[0-9][0-9]\).*/\1/p' /etc/os-release 2>/dev/null | head -n1
+  sed -n 's/^VERSION_ID="\([0-9][0-9]\.[0-9][0-9]\).*/\1/p' /etc/os-release | head -n1 || true
 )"
 release_version="${release_version:-26.11}"
 
@@ -90,10 +90,10 @@ read_state_versions_from_flake() {
   [ -n "$source" ] || return 1
   [ -f "$source/flake.nix" ] || return 1
   system="$(
-    nix eval --raw "path:$source#nixosConfigurations.$host_hint.config.system.stateVersion" 2>/dev/null || true
+    nix eval --raw "path:$source#nixosConfigurations.$host_hint.config.system.stateVersion" || true
   )"
   home="$(
-    nix eval --raw "path:$source#nixosConfigurations.$host_hint.config.home-manager.users.$user_hint.home.stateVersion" 2>/dev/null || true
+    nix eval --raw "path:$source#nixosConfigurations.$host_hint.config.home-manager.users.$user_hint.home.stateVersion" || true
   )"
   if [ -z "$system" ] && [ -z "$home" ]; then
     return 1
@@ -104,18 +104,18 @@ read_state_versions_from_flake() {
 
 if [ "$upgrade" -eq 1 ]; then
   # 1. An ojuny install points at the source that built it.
-  if grep -q '^ID=ojuny' /etc/os-release 2>/dev/null &&
+  if grep -q '^ID=ojuny' /etc/os-release &&
     [ -L /etc/ojuny/flake-source ]; then
     read_state_versions_from_flake "$(readlink -f /etc/ojuny/flake-source)" || true
   fi
 
   # 2. The running NixOS configuration, when nixos-option can evaluate it.
   if [ -z "$system_state_version" ]; then
-    system_state_version="$(nixos-option system.stateVersion 2>/dev/null | tr -d '"[:space:]')"
+    system_state_version="$(nixos-option system.stateVersion | tr -d '"[:space:]' || true)"
   fi
   if [ -z "$home_state_version" ]; then
     home_state_version="$(
-      nixos-option "home-manager.users.$user_hint.home.stateVersion" 2>/dev/null | tr -d '"[:space:]'
+      nixos-option "home-manager.users.$user_hint.home.stateVersion" | tr -d '"[:space:]' || true
     )"
   fi
 
@@ -123,14 +123,14 @@ if [ "$upgrade" -eq 1 ]; then
   if [ -z "$system_state_version" ] && [ -f /etc/nixos/configuration.nix ]; then
     system_state_version="$(
       sed -n 's/.*system\.stateVersion[[:space:]]*=[[:space:]]*"\([0-9][0-9.]*\)".*/\1/p' \
-        /etc/nixos/configuration.nix | head -n1
+        /etc/nixos/configuration.nix | head -n1 || true
     )"
   fi
   if [ -z "$home_state_version" ] && [ -d /etc/nixos ]; then
     home_state_version="$(
-      grep -rh --include='*.nix' 'home\.stateVersion[[:space:]]*=' /etc/nixos 2>/dev/null |
+      grep -rh --include='*.nix' 'home\.stateVersion[[:space:]]*=' /etc/nixos |
         sed -n 's/.*home\.stateVersion[[:space:]]*=[[:space:]]*"\([0-9][0-9.]*\)".*/\1/p' |
-        head -n1
+        head -n1 || true
     )"
   fi
 
@@ -139,18 +139,18 @@ if [ "$upgrade" -eq 1 ]; then
     while IFS= read -r source; do
       read_state_versions_from_flake "$source" && break
     done <<EOF
-$(nix-store -qR /run/current-system 2>/dev/null | grep -- '-source$' || true)
+$(nix-store -qR /run/current-system | grep -- '-source$' || true)
 EOF
   fi
 
   # 5. Ask, and never guess for an existing install.
   if [ -n "$system_state_version" ]; then
-    read -rp "system.stateVersion from the previous install [$system_state_version]: " answer
+    read -rp "system.stateVersion from the previous install [$system_state_version]: " answer || true
     system_state_version="${answer:-$system_state_version}"
   else
     echo "setup: could not read the previous system.stateVersion."
     echo "setup: on an existing install it must keep its original value."
-    read -rp "Previous system.stateVersion (for example 25.11): " system_state_version
+    read -rp "Previous system.stateVersion (for example 25.11): " system_state_version || true
   fi
   [ -n "$system_state_version" ] || {
     echo "setup: refusing to guess system.stateVersion" >&2
@@ -165,12 +165,12 @@ EOF
   esac
 
   if [ -n "$home_state_version" ]; then
-    read -rp "home.stateVersion from the previous install [$home_state_version]: " answer
+    read -rp "home.stateVersion from the previous install [$home_state_version]: " answer || true
     home_state_version="${answer:-$home_state_version}"
   else
     echo "setup: could not read the previous home.stateVersion."
     echo "setup: on an existing install it must keep its original value."
-    read -rp "Previous home.stateVersion (for example 26.11): " home_state_version
+    read -rp "Previous home.stateVersion (for example 26.11): " home_state_version || true
   fi
   [ -n "$home_state_version" ] || {
     echo "setup: refusing to guess home.stateVersion" >&2
@@ -228,7 +228,7 @@ nix_settings_gui_dir="$HOME/.config/nix-settings-gui"
 mkdir -p "$nix_settings_gui_dir"
 user_module="$(python3 "$helper" --root "$CLONE_DIR" --non-interactive path --module users --fallback modules/00-user.nix)"
 terminal_shell="$(sed -n 's/.*shell = pkgs\.\([A-Za-z0-9_-]*\);.*/\1/p' \
-  "$user_module" 2>/dev/null | sed -n '1p')"
+  "$user_module" | sed -n '1p' || true)"
 terminal_shell="${terminal_shell:-zsh}"
 cat >"$nix_settings_gui_dir/config.json" <<EOF
 {

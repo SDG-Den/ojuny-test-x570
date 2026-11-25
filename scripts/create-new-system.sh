@@ -24,10 +24,10 @@ clone_path="${OJUNY_CLONE_PATH:-repos/nix-flake}"
 python3 "$HELPER" --root "$REPO_ROOT" --non-interactive ensure-configuration \
   --hostname "$hostname" \
   --state-version "$state_version" \
-  --repo-path "$clone_path" >/dev/null
+  --repo-path "$clone_path"
 
 python3 "$HELPER" --root "$REPO_ROOT" --non-interactive host \
   --hostname "$hostname" \
-  --clone-path "$clone_path" >/dev/null
+  --clone-path "$clone_path"
 
 echo "create-new-system: wired nixosConfigurations.$hostname"

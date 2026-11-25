@@ -2,7 +2,7 @@
 set -euo pipefail
 
 notify() {
-  if command -v notify-send >/dev/null 2>&1; then
+  if command -v notify-send; then
     notify-send "Disk image" "$1"
   else
     printf '%s\n' "$1" >&2
@@ -19,7 +19,7 @@ fail() {
 image="$1"
 [ -f "$image" ] || fail "Not a file: $image"
 
-if ! command -v udisksctl >/dev/null 2>&1; then
+if ! command -v udisksctl; then
   fail "udisksctl is not installed"
 fi
 
@@ -35,17 +35,17 @@ for ((attempt = 0; attempt < 20; attempt++)); do
 done
 [ -b "$loop_device" ] || fail "Loop device $loop_device did not appear"
 
-mount_point="$(findmnt -n -o TARGET --source "$loop_device" 2>/dev/null | sed -n '1p' || true)"
+mount_point="$(findmnt -n -o TARGET --source "$loop_device" | sed -n '1p' || true)"
 
-if [ -z "$mount_point" ] && udisksctl mount --block-device "$loop_device" >/dev/null 2>&1; then
-  mount_point="$(findmnt -n -o TARGET --source "$loop_device" 2>/dev/null | sed -n '1p' || true)"
+if [ -z "$mount_point" ] && udisksctl mount --block-device "$loop_device"; then
+  mount_point="$(findmnt -n -o TARGET --source "$loop_device" | sed -n '1p' || true)"
 fi
 
 if [ -z "$mount_point" ]; then
   while IFS= read -r partition; do
     device="/dev/$partition"
-    if udisksctl mount --block-device "$device" >/dev/null 2>&1; then
-      mount_point="$(findmnt -n -o TARGET --source "$device" 2>/dev/null | sed -n '1p' || true)"
+    if udisksctl mount --block-device "$device"; then
+      mount_point="$(findmnt -n -o TARGET --source "$device" | sed -n '1p' || true)"
       if [ -n "$mount_point" ]; then
         break
       fi
@@ -55,6 +55,6 @@ fi
 
 [ -n "$mount_point" ] || fail "Attached $loop_device but could not mount it"
 
-if ! xdg-open "$mount_point" >/dev/null 2>&1; then
+if ! xdg-open "$mount_point"; then
   notify "Mounted at $mount_point"
 fi
