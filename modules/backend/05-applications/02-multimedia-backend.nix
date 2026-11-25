@@ -191,7 +191,7 @@
         ++ lib.optionals config.ojuny.apps.multimedia.audacity [ pkgs.audacity ]
         ++ lib.optionals config.ojuny.apps.multimedia.gimp [ pkgs.gimp ]
         ++ lib.optionals config.ojuny.apps.multimedia.krita [ pkgs.krita ]
-        ++ lib.optionals config.ojuny.apps.multimedia.kdenlive [ pkgs.kdenlive ]
+        ++ lib.optionals config.ojuny.apps.multimedia.kdenlive [ pkgs.kdePackages.kdenlive ]
         ++ lib.optionals config.ojuny.apps.multimedia.blender [ pkgs.blender ]
         ++ lib.optionals (config.ojuny.apps.multimedia.calculator == "gnome-calculator") [
           pkgs.gnome-calculator

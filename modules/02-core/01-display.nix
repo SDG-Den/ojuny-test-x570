@@ -20,7 +20,7 @@
         # Monitors
         # @option widget = "monitors"; label = "Monitors"; group = "Monitors"; groupOrder = 10; disabledFeatures = [ "match" "mirror" "priority" "modeline" "power" "reflection" "focusAtStartup" "brightness" "autoRotation" "autoHdr" "color.profile" "color.wideGamut" "color.bitDepth" "hdr.sdrBrightness" "hdr.sdrSaturation" "hdr.sdrMinLuminance" "hdr.sdrMaxLuminance" "hdr.sdrEotf" "sync.allowTearing" "sync.maxRenderTime" "render" "signal" "reserved" "hotCorners" "background" ]; description = "Drag monitors to set their position. The output name is the identity; replace a monitor by removing the old row and adding the new one.";
         services.nix-settings-gui.monitors = {
-          DP-2 = {
+          "DP-2" = {
             width = 1920;
             height = 1080;
             refresh = 60;
@@ -29,7 +29,7 @@
             scale = 1.00;
             transform = "normal";
           };
-          DP-1 = {
+          "DP-1" = {
             width = 1920;
             height = 1080;
             refresh = 60;
@@ -38,7 +38,7 @@
             scale = 1.00;
             transform = "normal";
           };
-          HDMI-A-1 = {
+          "HDMI-A-1" = {
             width = 1920;
             height = 1080;
             refresh = 60;
