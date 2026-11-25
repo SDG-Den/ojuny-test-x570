@@ -79,6 +79,9 @@
     # @option widget = "switch"; label = "Device management"; group = "Device management"; groupOrder = 37; order = 10; description = "Discover and manage NixOS devices on the LAN. Disabled by default.";
     services.nix-connect.enable = false;
 
+    # @option widget = "switch"; label = "Device management GUI"; group = "Device management"; groupOrder = 37; order = 15; visibleWhen.path = "services.nix-connect.enable"; visibleWhen.equals = true; description = "Install the nix-connect GUI for pairing and managing devices.";
+    services.nix-connect.gui.enable = true;
+
     # @option widget = "spin"; label = "Information port"; group = "Device management"; groupOrder = 37; order = 20; min = 1; max = 65535; visibleWhen.path = "services.nix-connect.enable"; visibleWhen.equals = true; description = "Public, signed device information port.";
     services.nix-connect.infoPort = 5060;
 
