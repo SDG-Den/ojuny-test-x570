@@ -64,7 +64,7 @@
             url = "https://www.youtube.com";
             icon = null;
           };
-          row = {
+          whatsapp = {
             enable = true;
             name = "Whatsapp";
             url = "https://web.whatsapp.com";
