@@ -134,10 +134,8 @@
 
         # @option widget = "list"; label = "Login splash tips"; group = "Login"; groupOrder = 95; order = 40; itemLabel = "Tip"; addLabel = "Add tip"; description = "One tip is chosen at random under the welcome text. Empty hides the subtext.";
         desktop.ojuny.splash.tips = [
-          this
-          is
-          a
-          tip
+          "this is a tip!"
+          "very tippy"
         ];
 
         # System
