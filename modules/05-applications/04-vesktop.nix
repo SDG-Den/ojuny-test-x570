@@ -19,12 +19,20 @@
     {
 
       options.ojuny.apps.vesktop.enable = lib.mkEnableOption "the Vesktop Discord client";
+      options.ojuny.apps.vesktop.autostart = lib.mkEnableOption "starting Vesktop at login";
 
       config = {
         # @option widget = "switch"; label = "Vesktop (Discord)"; group = "Vesktop"; groupOrder = 10; order = 1;
         ojuny.apps.vesktop.enable = true;
 
+        # @option widget = "switch"; label = "Autostart on boot"; group = "Vesktop"; groupOrder = 10; order = 2; visibleWhen.path = "ojuny.apps.vesktop.enable"; visibleWhen.equals = true; description = "Start Vesktop minimized when the desktop session opens.";
+        ojuny.apps.vesktop.autostart = false;
+
         environment.systemPackages = lib.mkIf config.ojuny.apps.vesktop.enable [ pkgs.vesktop ];
+
+        desktop.ojuny.mango.execOnce = lib.mkIf config.ojuny.apps.vesktop.autostart (
+          lib.mkAfter [ "vesktop --start-minimized" ]
+        );
 
         # Expose to the launcher and keybinds so `vesktop.desktop` resolves.
         desktop.ojuny.defaultApps = lib.optionals config.ojuny.apps.vesktop.enable [ pkgs.vesktop ];

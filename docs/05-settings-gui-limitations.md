@@ -67,19 +67,20 @@ config = lib.mkIf active {
 };
 ```
 
-`lib.mkIf` is fine. An annotated assignment may sit directly inside a
-conditional attribute set. The annotation must be directly above the
-assignment, inside the set:
+`lib.mkIf` is fine for Nix evaluation, but the settings scanner does not
+descend into the conditional body. An annotation placed there can be dropped,
+so the control does not appear in the GUI even though the assignment runs. Keep
+the annotated assignment in a plain attribute set when the control must be
+editable:
 
 ```nix
-config = lib.mkIf active {
-  # @option widget = "switch"; label = "Service";
-  services.example.enable = true;
-};
+# @option widget = "switch"; label = "Service";
+services.example.enable = true;
 ```
 
-Do not move options out of `lib.mkIf`. It is supported. Only lists and
-function-call wrappers are the problem.
+The same rule applies to `lib.mkMerge`, list literals, `map`, `forEach` and
+`lib.optionalAttrs`. Nix accepts the expression; the GUI does not see the
+annotation. Move only the annotated assignment, not the gated logic.
 
 The rule is about the shape of the surrounding expression, not about the
 function that gates it. `lib.mkMerge` is the common offender, but any list

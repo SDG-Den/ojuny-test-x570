@@ -57,6 +57,8 @@
         };
 
         extest = lib.mkEnableOption "the extest library for Steam Input on Wayland";
+
+        autostart = lib.mkEnableOption "starting Steam at login";
       };
 
       options.ojuny.hardware.xpadneo = lib.mkEnableOption "the xpadneo driver for Xbox One and Series wireless controllers";
@@ -69,7 +71,9 @@
           lib.optionals config.ojuny.steam.protonGE [ pkgs.proton-ge-bin ]
           ++ lib.optionals config.ojuny.steam.dxvkSarek [ pkgs.dwproton-bin ];
 
-        programs.gamescope.enable = lib.mkIf (config.ojuny.steam.compat || config.ojuny.steam.gamescopeSession) true;
+        programs.gamescope.enable = lib.mkIf (
+          config.ojuny.steam.compat || config.ojuny.steam.gamescopeSession
+        ) true;
 
         services.displayManager.sessionPackages = lib.optionals config.ojuny.steam.gamescopeSession [
           gamescopeSessionFile

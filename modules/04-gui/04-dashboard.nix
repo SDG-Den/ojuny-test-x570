@@ -11,8 +11,8 @@
 
   flake.modules.nixos.desktop-dashboard = { config, pkgs, ... }: {
 
-    # @option widget = "switch"; label = "Overview tab"; group = "Tabs"; groupOrder = 10; order = 10;
-    desktop.ojuny.dux.dashTabs.overview.enabled = false;
+    # @option widget = "switch"; label = "Overview tab"; group = "Tabs"; groupOrder = 10; order = 10; description = "Show the Overview tab that hosts the dashboard cards, including network throughput.";
+    desktop.ojuny.dux.dashTabs.overview.enabled = true;
 
     # @option widget = "switch"; label = "Media tab"; group = "Tabs"; groupOrder = 10; order = 20;
     desktop.ojuny.dux.dashTabs.media.enabled = true;
@@ -279,6 +279,7 @@
         w = 2;
         h = 2;
         city = false;
+        # @option widget = "dropdown"; label = "Conditions tone"; group = "Weather widgets"; groupOrder = 40; order = 18; choices = [ "" "primary" "secondary" "tertiary" ]; description = "Empty uses the surface tone.";
         tone = "primary";
       };
       hourly = {
@@ -296,6 +297,7 @@
         w = 1;
         h = 2;
         graphics = true;
+        # @option widget = "dropdown"; label = "Humidity tone"; group = "Weather widgets"; groupOrder = 40; order = 26; choices = [ "" "primary" "secondary" "tertiary" ]; description = "Empty uses the surface tone.";
         tone = "";
       };
       wind = {
@@ -304,6 +306,7 @@
         w = 1;
         h = 2;
         graphics = true;
+        # @option widget = "dropdown"; label = "Wind tone"; group = "Weather widgets"; groupOrder = 40; order = 27; choices = [ "" "primary" "secondary" "tertiary" ]; description = "Empty uses the surface tone.";
         tone = "";
       };
       daily = {
@@ -321,6 +324,7 @@
         w = 1;
         h = 2;
         graphics = true;
+        # @option widget = "dropdown"; label = "Precipitation tone"; group = "Weather widgets"; groupOrder = 40; order = 28; choices = [ "" "primary" "secondary" "tertiary" ]; description = "Empty uses the surface tone.";
         tone = "";
       };
       uv = {
@@ -329,6 +333,7 @@
         w = 1;
         h = 2;
         graphics = true;
+        # @option widget = "dropdown"; label = "UV tone"; group = "Weather widgets"; groupOrder = 40; order = 29; choices = [ "" "primary" "secondary" "tertiary" ]; description = "Empty uses the surface tone.";
         tone = "";
       };
       moon = {

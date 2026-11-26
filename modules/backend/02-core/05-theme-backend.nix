@@ -21,14 +21,12 @@
           description = "base16 scheme name from pkgs.base16-schemes, without the .yaml suffix.";
         };
         wallpaperPreset = lib.mkOption {
-          type = lib.types.nullOr (
-            lib.types.oneOf [
-              (lib.types.enum presetNames)
-              lib.types.path
-            ]
-          );
-          default = null;
-          description = "Bundled wallpaper preset name, a custom image path, or null for the default preset. Presets are recolored with the active palette; paths are used as-is.";
+          type = lib.types.oneOf [
+            (lib.types.enum presetNames)
+            lib.types.path
+          ];
+          default = "default";
+          description = "Bundled wallpaper preset name or a custom image path. Presets are recolored with the active palette; paths are used as-is.";
         };
         wallpaperCycleIncludeBuiltins = lib.mkOption {
           type = lib.types.bool;
@@ -44,12 +42,12 @@
 
       config = {
         # Derived from the palette name; no @option so a GUI edit cannot lose the store path.
-        stylix.base16Scheme =
-          "${pkgs.base16-schemes}/share/themes/${
-            if config.ojuny.accessibility.highContrast
-            then config.ojuny.accessibility.highContrastPalette
-            else config.ojuny.style.palette
-          }.yaml";
+        stylix.base16Scheme = "${pkgs.base16-schemes}/share/themes/${
+          if config.ojuny.accessibility.highContrast then
+            config.ojuny.accessibility.highContrastPalette
+          else
+            config.ojuny.style.palette
+        }.yaml";
 
         desktop.ojuny.wallpaper.image = if wallpaperIsPreset then null else wallpaperValue;
         desktop.ojuny.wallpaper.preset = lib.mkIf wallpaperIsPreset wallpaperValue;

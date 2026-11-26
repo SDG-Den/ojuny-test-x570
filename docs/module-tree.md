@@ -112,6 +112,7 @@ differs from the generator output.
 - `modules/backend/01-system/12-derived-kernel.nix`
 - `modules/backend/01-system/13-recovery-backend.nix`
 - `modules/backend/01-system/14-deploy-rs.nix`
+- `modules/backend/01-system/15-system-checks.nix`
 - `modules/backend/01-system/bootorder.sh`
 - `modules/backend/01-system/device-quirks.nix`
 - `modules/backend/01-system/lanzaboote-cleanup.sh`
@@ -133,6 +134,7 @@ differs from the generator output.
 - `modules/backend/02-core/07-git-backend.nix`
 - `modules/backend/02-core/08-terminal-backend.nix`
 - `modules/backend/02-core/12-audio-backend.nix`
+- `modules/backend/02-core/13-browser-check.nix`
 - `modules/backend/02-core/terminal/config.zsh`
 - `modules/backend/02-core/terminal/functions.zsh`
 - `modules/backend/02-core/terminal/nixupdate.sh`
@@ -144,6 +146,7 @@ differs from the generator output.
 - `modules/backend/03-desktop/11-screensaver-backend.nix`
 - `modules/backend/03-desktop/13-monocle-deck-backend.nix`
 - `modules/backend/03-desktop/15-overflow-layout.nix`
+- `modules/backend/03-desktop/16-overflow-check.nix`
 - `modules/backend/03-desktop/overflow-layout.sh`
 - `modules/backend/04-gui/06-menu-backend.nix`
 - `modules/backend/04-gui/07-dot-backend.nix`
@@ -156,7 +159,15 @@ differs from the generator output.
 - `modules/backend/05-applications/08-appimage-backend.nix`
 - `modules/backend/05-applications/08-appimage-raven-backend.nix`
 - `modules/backend/05-applications/12-mount-image.nix`
+- `modules/backend/05-applications/13-application-checks.nix`
 - `modules/backend/06-utility/00-dux-tools-backend.nix`
+
+## `flake`
+
+- `modules/flake/apps.nix`
+- `modules/flake/checks.nix`
+- `modules/flake/outputs.nix`
+- `modules/flake/packages.nix`
 
 ## `patches`
 

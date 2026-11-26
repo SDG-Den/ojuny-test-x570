@@ -141,11 +141,11 @@
           # @option widget = "spin"; label = "Satellite hover gap"; group = "Island"; groupOrder = 40; min = 0; max = 100; unit = "px"; description = "Extra satellite gap while the island is hovered.";
           islandSatelliteHoverGap = 5;
 
-          # @option widget = "spin"; label = "Hover open delay"; group = "Island"; groupOrder = 40; min = 0; max = 2000; unit = "ms"; description = "Delay before a hovered satellite opens.";
-          islandHoverOpenDelay = 350;
+          # @option widget = "spin"; label = "Hover open delay"; group = "Island"; groupOrder = 40; min = 0; max = 2000; unit = "ms"; description = "Delay before a hovered satellite opens. 500 ms leaves time to click the compact island.";
+          islandHoverOpenDelay = 500;
 
           # @option widget = "spin"; label = "Hover close delay"; group = "Island"; groupOrder = 40; min = 0; max = 2000; unit = "ms"; description = "Delay before a hovered satellite closes.";
-          islandHoverCloseDelay = 350;
+          islandHoverCloseDelay = 300;
 
           # @option widget = "spin"; label = "Spring stiffness"; group = "Island motion"; hidden = true; min = 0;
           islandSpringStiffness = 760;

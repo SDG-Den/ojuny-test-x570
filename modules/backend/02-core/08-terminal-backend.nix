@@ -60,6 +60,12 @@
             default = null;
             description = "Path to the image used as the fastfetch logo when customLogo is enabled.";
           };
+
+          templateBase = lib.mkOption {
+            type = lib.types.str;
+            default = "Ojuny";
+            description = "Template family shown by the fastfetch Ojuny base row, for example Ojuny or Ojuny Pro.";
+          };
         };
       };
 
@@ -130,7 +136,9 @@
         osConfig.ojuny.apps.terminal.fastfetch or {
           customLogo = false;
           customLogoPath = null;
+          templateBase = "Ojuny";
         };
+      repoPath = osConfig.environment.variables.OJUNY_REPO_PATH or "";
     in
     {
       config = lib.mkIf (osConfig.ojuny.apps.terminal.enable or false) {
@@ -178,9 +186,21 @@
               }
               {
                 type = "custom";
-                key = "├  Dotfiles";
+                key = "├󰉋 Local Repo";
                 keyColor = colors.variables.hex;
-                format = "Ojuny";
+                format = repoPath;
+              }
+              {
+                type = "command";
+                key = "├󰊤 Remote Repo";
+                keyColor = colors.variables.hex;
+                command = "git -C ${lib.escapeShellArg repoPath} remote get-url origin 2>/dev/null || printf unknown";
+              }
+              {
+                type = "custom";
+                key = "├󰋼 Ojuny Base";
+                keyColor = colors.variables.hex;
+                format = fastfetch.templateBase;
               }
               {
                 type = "kernel";
@@ -194,7 +214,7 @@
               }
               {
                 type = "shell";
-                key = "├ Shell";
+                key = "├󰞷 Shell";
                 keyColor = colors.variables.hex;
               }
               {
@@ -247,12 +267,12 @@
               }
               {
                 type = "terminal";
-                key = "├ Terminal";
+                key = "├󰆍 Terminal";
                 keyColor = colors.classes.hex;
               }
               {
                 type = "terminalfont";
-                key = "└ Terminal Font";
+                key = "└󰛖 Terminal Font";
                 keyColor = colors.classes.hex;
               }
               "break"
@@ -263,7 +283,7 @@
               }
               {
                 type = "board";
-                key = "├ Board";
+                key = "├󰟃 Board";
                 keyColor = colors.functions.hex;
               }
               {
@@ -285,7 +305,7 @@
               }
               {
                 type = "swap";
-                key = "├󰓡 Zram";
+                key = "├󰓡 Swap";
                 keyColor = colors.functions.hex;
                 percent = {
                   type = 3;
@@ -295,7 +315,7 @@
               }
               {
                 type = "disk";
-                key = "├ Disk";
+                key = "├󰋊 Disk";
                 keyColor = colors.functions.hex;
                 percent = {
                   type = 3;
