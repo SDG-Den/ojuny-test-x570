@@ -48,6 +48,49 @@ accessibility: mouse mode clicks do not work.
 
 acessibility: on-screen keyboard does not work using the mouse, as when the mouse is over it, it focuses the keyboard and does not pass through the information to your application. this same issue was not the case using WVKBD when tested in the past. 
 
+nix-settings-gui: changing the icons settings to tela makes the typography module unparseable. switching back to papirus fixes it. 
+
+nix-settings-gui: splash screen tips need to be quoted, but are not automatically quoted, which is confusing to the user. on save, it changes the input string to being individual words. 
+
+GTK applications like nix-settings-gui: selecting text in the application immediately deselects it. 
+
+nix-settings-gui: the commit message save prompt should automatically select the text box, and pressing enter should send it.
+
+ojuny-login-splash: launch-on-rebuild doesnt end automatically because it gets started *before* the user presses any button to close the window, while the DMS reload it's supposed to cover happens *after*
+
+rebuilding via nix-settings-gui should be switched to using an ojuny CLI item, we should add some build-related items to the ojuny script. namely:
+
+ojuny rebuild - equal to `echo "starting rebuild" && nixos-rebuild switch --flake (insert ojuny flake dir here) &| nom` with a bit of extra wiring to make the experience smoother
+
+ojuny rebuild boot - like rebuild but with boot instead of switch
+
+ojuny rebuild switch - equal to ojuny rebuild, effectively ojuny rebuild is a category with the default subcommand being switch
+
+ojuny rebuild rollback - roll back to an older generation
+
+
+patch-ojuny-agent: agent has no ability to search the web in assist mode, and refuses to do so in agentic mode.
+
+report from the agent:
+
+For your harness notes, the concrete things this exposed:
+- Tool exposure vs. agent prompt disagree: websearch/webfetch are in the session's tool schema, but the ojuny-agent guide still says "no network." One of those needs to win.
+- Mid-session agent switch doesn't re-bind: switching to ojuny-agent changed the ojuny-side config (ojuny-agent-cli status shows both agents), but the prompt and tools for the running session stayed as they were.
+- No ojuny web command: ojuny commands --json has nothing for web/search/fetch, so there's no CLI-level probe to fall back on.
+- ojuny-assist web search is a config gap, not a permission failure — worth checking its agent definition separately.
+
+
+ojuny-manual: no way to start CLI version while in a graphical environment, should have a way to do that.
+
+fastfetch - some items are missing icons: shell, terminal, terminal font, disk, board. SWAP is labeled zram, dotfiles entry should be replaced by:
+
+local repo (path to local repository)
+remote repo (path to remote repository)
+ojuny base (the template type it was made from, in this case it would be just Ojuny, but for ojuny pro this would list Ojuny Pro)
+
+
+
+
 
 
 
