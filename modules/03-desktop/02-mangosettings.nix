@@ -124,16 +124,21 @@
 
         # Login
         # @option widget = "switch"; label = "Show login splash on rebuild"; group = "Login"; groupOrder = 95; order = 10; description = "Start the login splash after a rebuild. Off shows it only at boot/login.";
-        desktop.ojuny.splash.showOnRebuild = false;
+        desktop.ojuny.splash.showOnRebuild = true;
 
         # @option widget = "slider"; label = "Splash asset fade-in"; group = "Login"; groupOrder = 95; order = 20; min = 0.0; max = 2.0; step = 0.1; unit = "s"; description = "Fade the logo and text in. 0 disables it.";
         desktop.ojuny.splash.fadeIn = 0.3;
 
         # @option widget = "slider"; label = "Splash fade-out"; group = "Login"; groupOrder = 95; order = 30; min = 0.0; max = 2.0; step = 0.1; unit = "s"; description = "Fade the splash out before the timer exit. 0 disables it.";
-        desktop.ojuny.splash.fadeOut = 0.3;
+        desktop.ojuny.splash.fadeOut = 1.0;
 
         # @option widget = "list"; label = "Login splash tips"; group = "Login"; groupOrder = 95; order = 40; itemLabel = "Tip"; addLabel = "Add tip"; description = "One tip is chosen at random under the welcome text. Empty hides the subtext.";
-        desktop.ojuny.splash.tips = [ ];
+        desktop.ojuny.splash.tips = [
+          this
+          is
+          a
+          tip
+        ];
 
         # System
         # @option widget = "switch"; label = "Allow shortcut inhibition"; group = "System"; groupOrder = 90; description = "Let clients inhibit keyboard shortcuts."; applyCommand = "mmsg dispatch setoption,allow_shortcuts_inhibit,$(case %%val%% in true) echo 1;; *) echo 0;; esac)";

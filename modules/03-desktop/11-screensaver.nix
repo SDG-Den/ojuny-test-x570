@@ -21,7 +21,7 @@
 
       config = {
         # @option widget = "switch"; label = "Screensaver"; group = "Screensaver"; description = "Show a terminal screensaver before the DMS lock.";
-        ojuny.screensaver.enable = false;
+        ojuny.screensaver.enable = true;
 
         # @option widget = "spin"; label = "Idle seconds"; group = "Screensaver"; min = 10; description = "Must be lower than the DMS lock timeout.";
         ojuny.screensaver.idleSeconds = 120;
@@ -30,7 +30,7 @@
         ojuny.screensaver.terminal = "foot --app-id=org.ojuny.screensaver";
 
         # @option widget = "text"; label = "Screensaver command"; group = "Screensaver"; description = "Command run inside the terminal, e.g. cmatrix -b or pipes.sh.";
-        ojuny.screensaver.command = "${pkgs.cmatrix}/bin/cmatrix -b";
+        ojuny.screensaver.command = "\${pkgs.cmatrix}/bin/cmatrix -b -a -C $(export COLORINT=$(shuf -i 0-7 -n 1); if [ $COLORINT = 0 ]; then echo \"Black\"; elif [ $COLORINT = 1 ]; then echo \"White\"; elif [ $COLORINT = 2 ]; then echo \"Red\"; elif [ $COLORINT = 3 ]; then echo \"Green\"; elif [ $COLORINT = 4 ]; then echo \"Yellow\"; elif [ $COLORINT = 5 ]; then echo \"Blue\"; elif [ $COLORINT = 6 ]; then echo \"Magenta\"; elif [ $COLORINT = 7 ]; then echo \"Cyan\"; else echo \"no color\"; fi)";
       };
     };
 }

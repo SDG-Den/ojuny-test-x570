@@ -153,10 +153,10 @@
     desktop.ojuny.dux.settings.rememberLastMode = true;
 
     # @option widget = "switch"; label = "Include files in All tab"; group = "Search"; groupOrder = 20; order = 30; applyCommand = "dms ipc call settings set dankLauncherV2IncludeFilesInAll %%val%%";
-    desktop.ojuny.dux.settings.dankLauncherV2IncludeFilesInAll = false;
+    desktop.ojuny.dux.settings.dankLauncherV2IncludeFilesInAll = true;
 
     # @option widget = "switch"; label = "Include folders in All tab"; group = "Search"; groupOrder = 20; order = 40; applyCommand = "dms ipc call settings set dankLauncherV2IncludeFoldersInAll %%val%%";
-    desktop.ojuny.dux.settings.dankLauncherV2IncludeFoldersInAll = false;
+    desktop.ojuny.dux.settings.dankLauncherV2IncludeFoldersInAll = true;
 
     # @option widget = "switch"; label = "Remember last query"; group = "Search"; groupOrder = 20; order = 50; description = "Keep the previous query when the launcher reopens."; applyCommand = "dms ipc call settings set rememberLastQuery %%val%%";
     desktop.ojuny.dux.settings.rememberLastQuery = false;
@@ -183,10 +183,10 @@
     desktop.ojuny.dux.settings.notepadSlideoutSide = "right";
 
     # @option widget = "switch"; label = "Show line numbers"; group = "Notepad"; groupOrder = 40; order = 30; applyCommand = "dms ipc call settings set notepadShowLineNumbers %%val%%";
-    desktop.ojuny.dux.settings.notepadShowLineNumbers = false;
+    desktop.ojuny.dux.settings.notepadShowLineNumbers = true;
 
     # @option widget = "switch"; label = "Auto-save to disk"; group = "Notepad"; groupOrder = 40; order = 40; description = "Automatically save changes to opened files as you type."; applyCommand = "dms ipc call settings set notepadAutoSave %%val%%";
-    desktop.ojuny.dux.settings.notepadAutoSave = false;
+    desktop.ojuny.dux.settings.notepadAutoSave = true;
 
     # @option widget = "switch"; label = "Use monospace font"; group = "Notepad"; groupOrder = 40; order = 50; description = "Use the global monospace font from Personalization."; applyCommand = "dms ipc call settings set notepadUseMonospace %%val%%";
     desktop.ojuny.dux.settings.notepadUseMonospace = true;

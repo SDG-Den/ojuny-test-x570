@@ -38,7 +38,7 @@
         programs.craftapps.linkFonts = true;
 
         # @option widget = "switch"; label = "All craft apps"; group = "Craft apps"; groupOrder = 20; order = 1; description = "Install every ArtCraft app; the switches below still exclude individual apps.";
-        ojuny.apps.office.craftAll = false;
+        ojuny.apps.office.craftAll = true;
 
         # Derived, no @option: the upstream apps default to `enableAll`.
         programs.craftapps.enableAll = config.ojuny.apps.office.craftAll;

@@ -180,7 +180,7 @@
 
         # Multiplexer
         # @option widget = "dropdown"; label = "Type"; group = "Multiplexer"; groupOrder = 58; order = 10; choices = [ "tmux" "zellij" "herdr" ]; description = "Backend used by the session list."; applyCommand = "dms ipc call settings set muxType %%val%%";
-        desktop.ojuny.dux.settings.muxType = "tmux";
+        desktop.ojuny.dux.settings.muxType = "zellij";
 
         # @option widget = "switch"; label = "Use custom command"; group = "Multiplexer"; groupOrder = 58; order = 20; applyCommand = "dms ipc call settings set muxUseCustomCommand %%val%%";
         desktop.ojuny.dux.settings.muxUseCustomCommand = false;

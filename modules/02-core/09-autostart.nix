@@ -26,6 +26,7 @@
         "wl-paste --type image --watch cliphist store"
         "ghostty"
         "ydotoold"
+        "vesktop -m"
       ];
 
       # @option widget = "list"; label = "Run on every reload"; group = "Session commands"; description = "Started after each mango config reload.";

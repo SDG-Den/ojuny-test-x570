@@ -56,7 +56,7 @@
         ojuny.workspaces.defaultLayout = "tile";
 
         # @option widget = "switch"; label = "Overflow layout"; group = "Overflow layout"; groupOrder = 15; order = 5; description = "Switch the active workspace to the overflow layout when it holds the configured number of tiled windows. The previous layout is restored when the count drops below it.";
-        ojuny.workspaces.overflow.enable = false;
+        ojuny.workspaces.overflow.enable = true;
 
         # @option widget = "spin"; label = "Overflow after this many windows"; group = "Overflow layout"; groupOrder = 15; order = 10; min = 1; max = 99; unit = "windows"; visibleWhen.path = "ojuny.workspaces.overflow.enable"; visibleWhen.equals = true; description = "Switch the active workspace to the overflow layout when it holds at least this many tiled windows. Floating windows are not counted.";
         ojuny.workspaces.overflow.windowCount = 4;

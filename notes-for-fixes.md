@@ -1,39 +1,9 @@
-nix-settings-gui git pull seemingly doesn't work when the flake has multiple branches, must pull branch main. 
 
 development patch projects menu does not work correctly for agent, obsidian or terminal. it ends up in home. both terminal and vscodium end up inside the devshell which is good, both open zsh which is correct. obsidian will also open previously-opened windows, which we do not want. 
 
-rebuilding fails with the following error:
 
-tarting [systemd-run] /nix/store/0aclzqci9b57srwzmxabwkj3azlhr23x-nixos-system-ojuny-26.11.20261121.2786a2a/bin/switch-to-configuration switch...
-Started [systemd-run] /nix/store/0aclzqci9b57srwzmxabwkj3azlhr23x-nixos-system-ojuny-26.11.20261121.2786a2a/bin/switch-to-configuration switch.
-Checking switch inhibitors... done
-Skipping "/boot/EFI/systemd/systemd-bootx64.efi", same boot loader version in place already.
-Skipping "/boot/EFI/BOOT/BOOTX64.EFI", same boot loader version in place already.
-Traceback (most recent call last):
-  File "/nix/store/4pbpcyyyq610jfyflpyzji7hwf8dw0h9-systemd-boot/bin/systemd-boot", line 688, in <module>
-    main()
-    ~~~~^^
-  File "/nix/store/4pbpcyyyq610jfyflpyzji7hwf8dw0h9-systemd-boot/bin/systemd-boot", line 666, in main
-    install_bootloader(args)
-    ~~~~~~~~~~~~~~~~~~^^^^^^
-  File "/nix/store/4pbpcyyyq610jfyflpyzji7hwf8dw0h9-systemd-boot/bin/systemd-boot", line 593, in install_bootloader
-    write_loader_conf(default_entry_id)
-    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
-  File "/nix/store/4pbpcyyyq610jfyflpyzji7hwf8dw0h9-systemd-boot/bin/systemd-boot", line 299, in write_loader_conf
-    with tmp.open("x") as f:
-         ~~~~~~~~^^^^^
-  File "/nix/store/bya4ansy58az5133kryqp2cvrxbnz8qy-python3-3.14.10/lib/python3.14/pathlib/__init__.py", line 771, in open
-    return io.open(self, mode, buffering, encoding, errors, newline)
-           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-FileExistsError: [Errno 17] File exists: '/boot/loader/loader.tmp'
-Failed to install bootloader
-nixos-rebuild-switch-to-configuration.service: Main process exited, code=exited, status=1/FAILURE
-nixos-rebuild-switch-to-configuration.service: Failed with result 'exit-code'.
-Command 'systemd-run -E LOCALE_ARCHIVE -E NIXOS_INSTALL_BOOTLOADER -E NIXOS_NO_CHECK --collect --no-ask-password --quiet --service-type=exec --unit=nixos-rebuild-switch-to-configuration --wait --verbose --output=cat /nix/store/0aclzqci9b57srwzmxabwkj3azlhr23x-nixos-system-ojuny-26.11.20261121.2786a2a/bin/switch-to-configuration switch' returned non-zero exit status 1.
 
-ojuny cli hangs forever instead of replying.
 
-automatic disk mount does not work for all ISO's, nixos iso worked, mint iso did not. mint image 3.1gb, nixos iso tested was under 1gb
 
 
 
@@ -43,4 +13,43 @@ round 2:
 nix-cleaner: view resets whenever an item is checked, making checking large amounts of items extremely tedious. 
 
 nix-cleaner: clean failed because of a link in /tmp "outside permitted locations"
+
+automatic disk mount does not work for all ISO's, nixos iso worked, mint iso did not. mint image 3.1gb, nixos iso tested was under 1gb
+
+nix-settings-gui: opening the GUI when local repo is synced and git auto-sync is on reports "the local branch has diverged from upstream (ahead 0, behind 0)" when it is not actually ahead or behind or diverged. 
+
+ojuny CLI: ojuny raw-settings lacks a way to list available pages, and for example "secureboot" does not open the secureboot page because it only filters on Secure Boot. 
+
+dux control center: control center grid placement was off. likely because the row with the wifi, bluetooth, vpn, valent and disk modules overlaps the microphone slider, which causes the whole stack to be pushed down below that space automatically. the power and lock buttons are also beside eachother, almost like the grid is forced to be one width smaller than it should be, resulting in this behaviour. this may have come from a dux update.
+
+raven: office installer exits with error 255, trying to select the full error in raven for copying causes a full system freeze. `ojuny crashes` does not show a crash, but a hard reset was required to fix it. this is replicable.
+
+nix-regedit: type listing is too far to the right, so even type "key" only shows "ke..."
+
+nix-settings-gui: wallpaper previews are missing, and auto-themed shouldn't be its own separate option, since the bundled wallpapers are auto-themed.
+
+nix-settings-gui: hovering over a spinner once again automatically selects is, so scrolling past one means as soon as you reach it it'll start changing the value instead. 
+
+nix-settings-gui: options under OSD and sounds don't have descriptions that show. 
+
+card layout: network throughput entirely absent from dashboard. 
+
+nix-settings-gui: cards with a "tone" do not have other options past "primary", except weather which has a blank open text field. 
+
+craft apps: toggle for "all craft apps" in menu is misleading, claims it installs everything but doesn't install anything until the user toggles on specific items. this option should be hidden into the backend and enabled automatically if any individual craftapp is enabled. 
+
+vesktop/steam: should both have an "autostart on boot" entry that adds an exec_once entry. 
+
+screenshots: OCR QR code scanning uses super+shift+q, which is not good because it means with a little slip-up of not holding down shift enough, the user can accidentally close the window instead of scanning the QR code. it also does not seem to copy the payload. 
+
+firefox/chromium: sponsorblock gets a "review options" page on first boot. 
+
+accessibility: mouse mode clicks do not work. 
+
+acessibility: on-screen keyboard does not work using the mouse, as when the mouse is over it, it focuses the keyboard and does not pass through the information to your application. this same issue was not the case using WVKBD when tested in the past. 
+
+
+
+
+
 

@@ -45,7 +45,7 @@
       config = {
 
         # @option widget = "switch"; label = "Screen reader (Orca)"; group = "Vision"; groupOrder = 10; order = 10; description = "Install Orca, Speech Dispatcher and AT-SPI, and enable Qt and DMS accessibility. Save and rebuild; Orca starts with the session.";
-        services.orca.enable = false;
+        services.orca.enable = true;
 
         # @option widget = "switch"; label = "Braille (BRLTTY)"; group = "Vision"; groupOrder = 10; order = 20; description = "Enable the BRLTTY daemon. Requires a refreshable braille display.";
         services.brltty.enable = false;

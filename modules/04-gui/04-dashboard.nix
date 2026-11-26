@@ -232,6 +232,7 @@
         h = 2;
       };
       calendar = {
+        weekends = true;
         _order = 40;
         col = 0;
         row = 1;

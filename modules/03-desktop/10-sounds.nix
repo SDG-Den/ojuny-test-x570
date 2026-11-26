@@ -18,7 +18,7 @@
     desktop.ojuny.dux.settings.useSystemSoundTheme = false;
 
     # @option widget = "switch"; label = "Login"; group = "Sounds"; groupOrder = 10; order = 30; visibleWhen.path = "desktop.ojuny.dux.settings.soundsEnabled"; visibleWhen.equals = true; applyCommand = "dms ipc call settings set soundLogin %%val%%";
-    desktop.ojuny.dux.settings.soundLogin = false;
+    desktop.ojuny.dux.settings.soundLogin = true;
 
     # @option widget = "switch"; label = "New notification"; group = "Sounds"; groupOrder = 10; order = 40; visibleWhen.path = "desktop.ojuny.dux.settings.soundsEnabled"; visibleWhen.equals = true; applyCommand = "dms ipc call settings set soundNewNotification %%val%%";
     desktop.ojuny.dux.settings.soundNewNotification = true;

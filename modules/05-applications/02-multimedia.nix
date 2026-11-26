@@ -41,7 +41,7 @@
           # @option widget = "switch"; label = "Blender"; group = "Creative"; groupOrder = 30; order = 30; description = "3D creation suite, themed through the Stylix Blender target.";
           blender = false;
           # @option widget = "dropdown"; label = "Calculator"; group = "Calculator"; groupOrder = 40; order = 10; choices = [ "none" "gnome-calculator" "qalculate-gtk" ]; description = "Calculator installed for quick arithmetic. No file type is associated with it.";
-          calculator = "none";
+          calculator = "gnome-calculator";
         };
 
         # @option widget = "packages"; label = "Multimedia tools"; group = "Tools"; groupOrder = 20;
