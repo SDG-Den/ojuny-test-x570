@@ -29,19 +29,11 @@ nix-settings-gui: splash screen tips need to be quoted, but are not automaticall
 
 GTK applications like nix-settings-gui: selecting text in the application immediately deselects it. > still a problem
 
-nix-settings-gui: the commit message save prompt should automatically select the text box, and pressing enter should send it.
 
-ojuny-login-splash: launch-on-rebuild doesnt end automatically because it gets started *before* the user presses any button to close the window, while the DMS reload it's supposed to cover happens *after*
+ojuny-login-splash: launch-on-rebuild doesnt end automatically because it gets started *before* the user presses any button to close the window, while the DMS reload it's supposed to cover happens *after* > doesn't happen at all now
 
-rebuilding via nix-settings-gui should be switched to using an ojuny CLI item, we should add some build-related items to the ojuny script. namely:
+rebuilding via nix-settings-gui should be switched to using an ojuny CLI item, we should add some build-related items to the ojuny script. > not configured on test device, but individual commands work, replacing manually (settings gui settings are not managed by nix) works.
 
-ojuny rebuild - equal to `echo "starting rebuild" && nixos-rebuild switch --flake (insert ojuny flake dir here) &| nom` with a bit of extra wiring to make the experience smoother
-
-ojuny rebuild boot - like rebuild but with boot instead of switch
-
-ojuny rebuild switch - equal to ojuny rebuild, effectively ojuny rebuild is a category with the default subcommand being switch
-
-ojuny rebuild rollback - roll back to an older generation
 
 
 patch-ojuny-agent: agent has no ability to search the web in assist mode, and refuses to do so in agentic mode.
