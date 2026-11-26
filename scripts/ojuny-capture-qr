@@ -14,5 +14,5 @@ if [ -z "$payload" ]; then
   exit 0
 fi
 
-printf '%s' "$payload" | wl-copy --sensitive
-notify-send "QR code copied" "The decoded payload is on the clipboard."
+printf '%s' "$payload" | wl-copy
+notify-send "QR code copied" "$payload"

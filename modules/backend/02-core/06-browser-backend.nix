@@ -276,4 +276,65 @@
       };
     };
 
+  flake.modules.homeManager.applications-browser-backend =
+    {
+      config,
+      lib,
+      pkgs,
+      osConfig ? { },
+      ...
+    }:
+    let
+      sponsorBlockFirefoxId = "sponsorBlocker@ajay.app";
+      sponsorBlockChromiumId = "mnjggcdmjocbbbhaepdhchncahnbgone";
+
+      browserSeeders = import ../../../packages/browser-storage-seeders.nix { inherit pkgs; };
+
+      firefoxProfileRoot =
+        let
+          configPath = config.programs.firefox.configPath;
+        in
+        if lib.hasPrefix "/" configPath then configPath else "${config.home.homeDirectory}/${configPath}";
+
+      firefoxProfileDir = "${firefoxProfileRoot}/${config.programs.firefox.profiles.default.path}";
+
+      seedFirefoxStorage =
+        (osConfig.programs.firefox.enable or false)
+        && lib.any (extension: (extension.addonId or "") == sponsorBlockFirefoxId) (
+          osConfig.ojuny.browser.firefox.extensions or [ ]
+        );
+
+      chromiumProfileRoots =
+        lib.optional (osConfig.programs.chromium.enable or false) "chromium"
+        ++ lib.optional (osConfig.ojuny.browser.chrome.enable or false) "google-chrome"
+        ++ lib.optional (osConfig.ojuny.browser.brave.enable or false) "BraveSoftware/Brave-Browser";
+
+      seedChromiumStorage =
+        lib.elem sponsorBlockChromiumId (osConfig.ojuny.browser.chromiumExtensions or [ ])
+        && chromiumProfileRoots != [ ];
+    in
+    {
+      config = lib.mkMerge [
+        (lib.mkIf seedFirefoxStorage {
+          programs.firefox.profiles.default.settings."extensions.webextensions.ExtensionStorageIDB.enabled" =
+            false;
+
+          home.activation.sponsorBlockFirefox = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+            ${browserSeeders.firefox}/bin/seed-firefox-extension-storage "${firefoxProfileDir}"
+          '';
+        })
+        (lib.mkIf seedChromiumStorage {
+          home.activation.sponsorBlockChromium = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+            for profileRoot in ${lib.escapeShellArgs chromiumProfileRoots}; do
+              storage="${config.xdg.configHome}/$profileRoot/Default/Local Extension Settings/${sponsorBlockChromiumId}"
+              if [ ! -e "$storage" ]; then
+                ${pkgs.coreutils}/bin/mkdir -p "$(${pkgs.coreutils}/bin/dirname "$storage")"
+                ${browserSeeders.chromium}/bin/seed-extension-storage "$storage" "$(${pkgs.coreutils}/bin/cat /proc/sys/kernel/random/uuid)"
+              fi
+            done
+          '';
+        })
+      ];
+    };
+
 }

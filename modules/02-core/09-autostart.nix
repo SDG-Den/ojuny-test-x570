@@ -21,7 +21,7 @@
       desktop.ojuny.mango.execOnce = [
         "dms run"
         "dcal run -d --hidden"
-        "wl-clip-persist --clipboard both"
+        "wl-clip-persist --clipboard regular"
         "wl-paste --type text --watch cliphist store"
         "wl-paste --type image --watch cliphist store"
         "ghostty"

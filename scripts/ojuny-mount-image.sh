@@ -33,7 +33,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-loop_output="$(udisksctl loop-setup --file "$image")" || fail "Could not attach $image"
+loop_output="$(udisksctl loop-setup --read-only --file "$image")" || fail "Could not attach $image"
 loop_device="$(printf '%s\n' "$loop_output" | sed -n 's/.* as \(\/dev\/loop[0-9]*\).*/\1/p' | sed -n '1p')"
 [ -n "$loop_device" ] || fail "Could not find the loop device for $image"
 
@@ -46,41 +46,71 @@ done
 [ -b "$loop_device" ] || fail "Loop device $loop_device did not appear"
 
 if command -v udevadm >/dev/null 2>&1; then
-  udevadm settle --timeout=5 >/dev/null 2>&1 || true
+  udevadm settle --timeout=10 >/dev/null 2>&1 || true
 fi
+
+fstype_of() {
+  lsblk -ln -o FSTYPE "$1" 2>/dev/null | sed -n '1p'
+}
+
+read_candidates() {
+  local line name fstype
+  preferred=()
+  others=()
+
+  fstype="$(fstype_of "$loop_device")"
+  if [ -n "$fstype" ]; then
+    if [ "$fstype" = "iso9660" ] || [ "$fstype" = "udf" ]; then
+      preferred+=("$loop_device")
+    else
+      others+=("$loop_device")
+    fi
+  fi
+
+  while IFS= read -r line; do
+    [ -n "$line" ] || continue
+    name="${line%% *}"
+    fstype="${line#* }"
+    [ "$name" = "$(basename "$loop_device")" ] && continue
+    [ -n "$fstype" ] || continue
+    if [ "$fstype" = "iso9660" ] || [ "$fstype" = "udf" ]; then
+      preferred+=("/dev/$name")
+    else
+      others+=("/dev/$name")
+    fi
+  done < <(lsblk -ln -o NAME,FSTYPE "$loop_device" 2>/dev/null)
+}
+
+candidates=()
+for ((attempt = 0; attempt < 50; attempt++)); do
+  read_candidates
+  candidates=("${preferred[@]}" "${others[@]}")
+  [ "${#candidates[@]}" -gt 0 ] && break
+  sleep 0.1
+done
+[ "${#candidates[@]}" -gt 0 ] || fail "Attached $image but found no filesystem"
 
 mount_device() {
   local device="$1" attempt output
   for attempt in 1 2 3 4 5 6 7 8 9 10; do
     if output="$(udisksctl mount --block-device "$device" --options ro 2>&1)"; then
-      printf '%s\n' "$output"
-      return 0
+      mount_point="$(printf '%s\n' "$output" | sed -n 's/.* at \(.*\)$/\1/p' | sed -n '1p')"
+      if [ -z "$mount_point" ]; then
+        mount_point="$(findmnt -n -o TARGET --source "$device" | sed -n '1p' || true)"
+      fi
+      [ -n "$mount_point" ] && return 0
     fi
     sleep 0.2
   done
   return 1
 }
 
-candidates=("$loop_device")
-while IFS= read -r child; do
-  if [ -n "$child" ]; then
-    candidates+=("/dev/$child")
-  fi
-done < <(lsblk -ln -o NAME "$loop_device" 2>/dev/null | sed -n '2,$p')
-
 for device in "${candidates[@]}"; do
   if [ ! -b "$device" ]; then
     continue
   fi
-  fstype="$(lsblk -ln -o FSTYPE "$device" 2>/dev/null | sed -n '1p')"
-  if [ -z "$fstype" ]; then
-    continue
-  fi
   if mount_device "$device"; then
-    mount_point="$(findmnt -n -o TARGET --source "$device" | sed -n '1p' || true)"
-    if [ -n "$mount_point" ]; then
-      break
-    fi
+    break
   fi
 done
 

@@ -26,8 +26,6 @@
 
       options.ojuny.apps.office.enable = lib.mkEnableOption "the LibreOffice office suite";
 
-      options.ojuny.apps.office.craftAll = lib.mkEnableOption "every ArtCraft app at once";
-
       config = {
         # @option widget = "switch"; label = "LibreOffice"; group = "Office suite"; groupOrder = 10; order = 1;
         ojuny.apps.office.enable = false;
@@ -36,12 +34,6 @@
         # switches below, so it never appears as a control of its own.
         # @option widget = "switch"; label = "Link system fonts"; group = "Craft apps"; hidden = true;
         programs.craftapps.linkFonts = true;
-
-        # @option widget = "switch"; label = "All craft apps"; group = "Craft apps"; groupOrder = 20; order = 1; description = "Install every ArtCraft app; the switches below still exclude individual apps.";
-        ojuny.apps.office.craftAll = false;
-
-        # Derived, no @option: the upstream apps default to `enableAll`.
-        programs.craftapps.enableAll = config.ojuny.apps.office.craftAll;
 
         # @option widget = "horizontal-submodule"; label = "Craft apps"; group = "Craft apps"; groupOrder = 20;
         programs.craftapps.apps = {
@@ -69,6 +61,10 @@
           wordcraft.enable = false;
           # @option widget = "switch"; label = "Deckcraft"; group = "Craft apps";
           deckcraft.enable = false;
+          # @option widget = "switch"; label = "Figcraft"; group = "Craft apps";
+          figcraft.enable = false;
+          # @option widget = "switch"; label = "Craft Anything"; group = "Craft apps";
+          craft-anything.enable = false;
         };
 
         # Derived, no @option: the upstream module only installs while the core
@@ -85,7 +81,9 @@
           || config.programs.craftapps.apps.soundcraft.enable
           || config.programs.craftapps.apps.cadcraft.enable
           || config.programs.craftapps.apps.wordcraft.enable
-          || config.programs.craftapps.apps.deckcraft.enable;
+          || config.programs.craftapps.apps.deckcraft.enable
+          || config.programs.craftapps.apps.figcraft.enable
+          || config.programs.craftapps.apps.craft-anything.enable;
       };
     };
 
@@ -136,11 +134,9 @@
         # @option widget = "list"; label = "Vault names"; group = "Obsidian"; groupOrder = 10; order = 20; visibleWhen.path = "ojuny.apps.obsidian.enable"; visibleWhen.equals = true; description = "Exact vault names to theme. A vault created after the last rebuild is not themed until its name is added.";
         ojuny.apps.obsidian.vaults = [ ];
 
-        environment.systemPackages =
-          lib.optionals config.ojuny.apps.obsidian.enable [ pkgs.obsidian ];
+        environment.systemPackages = lib.optionals config.ojuny.apps.obsidian.enable [ pkgs.obsidian ];
 
-        desktop.ojuny.defaultApps =
-          lib.optionals config.ojuny.apps.obsidian.enable [ pkgs.obsidian ];
+        desktop.ojuny.defaultApps = lib.optionals config.ojuny.apps.obsidian.enable [ pkgs.obsidian ];
       };
     };
 

@@ -98,7 +98,10 @@ current working set for review.
   blur, floating windows, motion, surfaces and color modes for Dux Modular Shell.
 - `06-browser.nix` `[menu]`. Web browser, default browser and MIME
   associations; file manager and remote scheme defaults live on the
-  Applications page and point at dux-files.
+  Applications page and point at dux-files. The Firefox profile seeds the
+  SponsorBlock welcome state in `browser-extension-data` and the Chromium
+  profile gets a pre-seeded local-storage database, so the extension does not
+  open its first-run help page.
 - `07-git.nix` `[menu]`. Git and version control defaults.
 - `08-terminal.nix` `[menu]`. Terminal emulator, zsh, aliases, command line
   tools and the btop, lazygit and yazi TUIs. `rmtrash` and `trash-cli` are
@@ -297,8 +300,9 @@ current working set for review.
   When a nixos-hardware profile owns the GPU settings, the profile page marks
   them managed and the manual driver, PRIME and bus ID controls do not take
   effect. The supported combinations are listed in `hardware-matrix.md`.
-- `08-accessibility.nix` `[menu]`. Orca screen reader, braille, the on-screen
-  keyboard, colour profiles and the keyboard and mouse accessibility binds.
+- `08-accessibility.nix` `[menu]`. Orca screen reader, braille, the themed wvkbd
+  on-screen keyboard with focus auto show/hide and a tray toggle, colour
+  profiles and the keyboard and mouse accessibility binds.
 - `09-facter.nix` `[menu]`. Hardware profile selection through the `facter`
   widget, which reads `facter.json` and shows the detected model, profile,
   coverage state, effective GPU layout and its source. `auto` uses

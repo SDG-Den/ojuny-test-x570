@@ -76,11 +76,25 @@ def assignment_after(text, offset):
     return text[start : end + 1]
 
 
+WRAPPER_RE = re.compile(r"(lib\.mkMerge|lib\.optionalAttrs|\bmap\s|\bforEach\s)")
+DESCRIPTION_PAGES = {"09-osd.nix", "10-sounds.nix"}
+
+
 def check(root):
     root = pathlib.Path(root)
     errors = []
     for path in sorted((root / "modules").rglob("*.nix")):
         text = path.read_text()
+        lines = text.splitlines()
+        for index, line in enumerate(lines):
+            if re.search(r"(#|/\*)\s*@option\b", line):
+                context = "\n".join(lines[max(0, index - 3) : index])
+                if WRAPPER_RE.search(context):
+                    errors.append(
+                        "{}:{}: annotated option is inside a list or function-call wrapper; move it to a plain set".format(
+                            path, index + 1
+                        )
+                    )
         for line, body in option_blocks(text):
             widget = WIDGET_RE.search(body)
             if widget is None:
@@ -104,6 +118,10 @@ def check(root):
                             path, line
                         )
                     )
+            if path.name in DESCRIPTION_PAGES and "description" not in body:
+                errors.append(
+                    "{}:{}: OSD and Sounds options need a description".format(path, line)
+                )
     return errors
 
 

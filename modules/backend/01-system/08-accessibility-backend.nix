@@ -38,12 +38,48 @@
           default = false;
           description = "Disable DMS and Mango window animations.";
         };
+        onScreenKeyboard = {
+          enable = lib.mkOption {
+            type = lib.types.bool;
+            default = false;
+            description = "Install and run the themed wvkbd on-screen keyboard.";
+          };
+          auto = lib.mkOption {
+            type = lib.types.bool;
+            default = true;
+            description = "Show the keyboard when a text field takes focus and hide it when focus leaves. Requires zwp_input_method_v2.";
+          };
+          tray = lib.mkOption {
+            type = lib.types.bool;
+            default = true;
+            description = "Show a tray icon that toggles the keyboard.";
+          };
+          portraitHeight = lib.mkOption {
+            type = lib.types.ints.positive;
+            default = 300;
+            description = "Keyboard height in portrait orientation, in pixels.";
+          };
+          landscapeHeight = lib.mkOption {
+            type = lib.types.ints.positive;
+            default = 200;
+            description = "Keyboard height in landscape orientation, in pixels.";
+          };
+          rounding = lib.mkOption {
+            type = lib.types.ints.unsigned;
+            default = 12;
+            description = "Corner rounding radius of the keyboard keys, in pixels.";
+          };
+          fontSize = lib.mkOption {
+            type = lib.types.ints.positive;
+            default = 20;
+            description = "Keyboard label size, in points.";
+          };
+        };
       };
 
       config = {
 
-        environment.sessionVariables.QT_ACCESSIBILITY =
-          lib.mkIf config.services.orca.enable "1";
+        environment.sessionVariables.QT_ACCESSIBILITY = lib.mkIf config.services.orca.enable "1";
       };
     };
 

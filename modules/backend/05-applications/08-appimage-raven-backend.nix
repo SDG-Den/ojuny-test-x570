@@ -11,19 +11,19 @@
       cfg = config.ojuny.raven;
 
       ravenDiagnostics = ''
-            echo "Raven revision: ${inputs.raven.rev or "unknown"}"
-            echo "Raven package: ${config.programs.raven.package.unwrapped.version or "unknown"}"
-            echo "System:"
-            echo "  Architecture: $(uname -m)"
-            echo "  Kernel: $(uname -srm)"
-            grep -E '^(PRETTY_NAME|VERSION_ID|ID|ID_LIKE)=' /etc/os-release | sed 's/^/  /' || true
-            echo "  CPU: $(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2- | sed 's/^ *//')"
-            grep -E '^(MemTotal|MemAvailable):' /proc/meminfo | sed 's/^/  /' || true
-            lspci -nn 2>/dev/null | grep -Ei 'vga|3d|display' | sed 's/^/  GPU: /' || true
-            echo "  Compositor: ''${XDG_CURRENT_DESKTOP:-unknown}"
-            echo "  Session: ''${XDG_SESSION_TYPE:-unknown}"
-            echo "Environment:"
-            env | LC_ALL=C sort | grep -E '^(RAVEN_|WAYLAND_|XDG_|DISPLAY=|HOME=|PATH=|LANG=|LC_|DESKTOP_|DBUS_SESSION_BUS_ADDRESS=)' | sed 's/^/  /' || true
+        echo "Raven revision: ${inputs.raven.rev or "unknown"}"
+        echo "Raven package: ${config.programs.raven.package.unwrapped.version or "unknown"}"
+        echo "System:"
+        echo "  Architecture: $(uname -m)"
+        echo "  Kernel: $(uname -srm)"
+        grep -E '^(PRETTY_NAME|VERSION_ID|ID|ID_LIKE)=' /etc/os-release | sed 's/^/  /' || true
+        echo "  CPU: $(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2- | sed 's/^ *//')"
+        grep -E '^(MemTotal|MemAvailable):' /proc/meminfo | sed 's/^/  /' || true
+        lspci -nn 2>/dev/null | grep -Ei 'vga|3d|display' | sed 's/^/  GPU: /' || true
+        echo "  Compositor: ''${XDG_CURRENT_DESKTOP:-unknown}"
+        echo "  Session: ''${XDG_SESSION_TYPE:-unknown}"
+        echo "Environment:"
+        env | LC_ALL=C sort | grep -E '^(RAVEN_|WAYLAND_|XDG_|DISPLAY=|HOME=|PATH=|LANG=|LC_|DESKTOP_|DBUS_SESSION_BUS_ADDRESS=)' | sed 's/^/  /' || true
       '';
 
       ravenShortcutTarget = pkgs.writeText "raven-shortcut-target.py" ''
@@ -150,63 +150,7 @@
         fi
       '';
 
-      ravenReport = pkgs.writeShellApplication {
-        name = "ojuny-raven-report";
-        runtimeInputs = [ pkgs.coreutils pkgs.yad ];
-        text = ''
-          if [ "$#" -lt 4 ]; then
-            echo "usage: ojuny-raven-report REPORT APP WRAPPER STATUS [ARG...]" >&2
-            exit 2
-          fi
-          report="$1"
-          app="$2"
-          wrapper="$3"
-          status="$4"
-          shift 4
-          app_name="$(basename "$app")"
-
-          if [ -n "''${OJUNY_RAVEN_SURVEY:-}" ]; then
-            if [ -n "''${WAYLAND_DISPLAY:-}''${DISPLAY:-}" ]; then
-              yad --text-info --title="Raven failed: $app_name (survey mode)" --filename="$report" --width=900 --height=600 --class=ojuny-raven-report --name=ojuny-raven-report --center --on-top --button="Close:0" || true
-            else
-              cat "$report" >&2
-            fi
-            exit 0
-          fi
-
-          if [ -z "''${WAYLAND_DISPLAY:-}''${DISPLAY:-}" ] || [ -t 2 ]; then
-            cat "$report" >&2
-            exit 0
-          fi
-
-          set +e
-          yad --text-info --title="Raven failed: $app_name (exit $status)" --filename="$report" --width=900 --height=600 --class=ojuny-raven-report --name=ojuny-raven-report --center --on-top \
-            --button="Close:0" --button="Relaunch in survey mode:3"
-          choice=$?
-          set -e
-
-          if [ "$choice" -ne 3 ]; then
-            exit 0
-          fi
-
-          set +e
-          yad --title="Raven survey mode" --class=ojuny-raven-report --name=ojuny-raven-report --center --on-top \
-            --text="This may break your Raven configuration and might result in undefined behaviour.
-
-Are you really sure?" \
-            --button="Cancel:1" --button="Relaunch:0"
-          confirm=$?
-          set -e
-
-          if [ "$confirm" -ne 0 ]; then
-            exit 0
-          fi
-
-          export RAVEN_SURVEY_MISSING=1
-          export OJUNY_RAVEN_SURVEY=1
-          exec "$wrapper" "$@"
-        '';
-      };
+      ravenReport = import ../../../packages/raven-report.nix { inherit pkgs; };
 
       ravenRefresh = pkgs.writeShellApplication {
         name = "ojuny-raven-refresh";
@@ -278,7 +222,12 @@ Are you really sure?" \
 
       ravenRun = pkgs.writeShellApplication {
         name = "ojuny-raven";
-        runtimeInputs = [ pkgs.coreutils pkgs.gnused pkgs.gnugrep pkgs.pciutils ];
+        runtimeInputs = [
+          pkgs.coreutils
+          pkgs.gnused
+          pkgs.gnugrep
+          pkgs.pciutils
+        ];
         text = ''
           if [ "$#" -eq 0 ]; then
             echo "usage: ojuny-raven FILE.exe" >&2
@@ -358,12 +307,20 @@ Are you really sure?" \
         genericName = "Windows application runtime settings";
         comment = "Folders, network access, refusals, snapshots and layers of the Raven prefix.";
         icon = "preferences-system";
-        categories = [ "Settings" "Utility" ];
+        categories = [
+          "Settings"
+          "Utility"
+        ];
       };
 
       ravenMsiRun = pkgs.writeShellApplication {
         name = "ojuny-raven-msi";
-        runtimeInputs = [ pkgs.coreutils pkgs.gnused pkgs.gnugrep pkgs.pciutils ];
+        runtimeInputs = [
+          pkgs.coreutils
+          pkgs.gnused
+          pkgs.gnugrep
+          pkgs.pciutils
+        ];
         text = ''
           if [ "$#" -eq 0 ]; then
             echo "usage: ojuny-raven-msi FILE.msi" >&2
@@ -433,7 +390,12 @@ Are you really sure?" \
 
       ravenBatRun = pkgs.writeShellApplication {
         name = "ojuny-raven-bat";
-        runtimeInputs = [ pkgs.coreutils pkgs.gnused pkgs.gnugrep pkgs.pciutils ];
+        runtimeInputs = [
+          pkgs.coreutils
+          pkgs.gnused
+          pkgs.gnugrep
+          pkgs.pciutils
+        ];
         text = ''
           if [ "$#" -eq 0 ]; then
             echo "usage: ojuny-raven-bat FILE.bat" >&2
@@ -528,14 +490,11 @@ Are you really sure?" \
 
         system.activationScripts.ojuny-raven-refresh = lib.mkIf cfg.enable {
           deps = [ "users" ];
-          text = lib.concatMapStrings (
-            user:
-            ''
-              if [ -d ${lib.escapeShellArg user.home} ]; then
-                ${pkgs.util-linux}/bin/runuser -u ${lib.escapeShellArg user.name} -- ${pkgs.coreutils}/bin/env HOME=${lib.escapeShellArg user.home} ${ravenRefresh}/bin/ojuny-raven-refresh >/dev/null 2>&1 || true
-              fi
-            ''
-          ) (lib.filter (user: user.isNormalUser && user.home != "/") (lib.attrValues config.users.users));
+          text = lib.concatMapStrings (user: ''
+            if [ -d ${lib.escapeShellArg user.home} ]; then
+              ${pkgs.util-linux}/bin/runuser -u ${lib.escapeShellArg user.name} -- ${pkgs.coreutils}/bin/env HOME=${lib.escapeShellArg user.home} ${ravenRefresh}/bin/ojuny-raven-refresh >/dev/null 2>&1 || true
+            fi
+          '') (lib.filter (user: user.isNormalUser && user.home != "/") (lib.attrValues config.users.users));
         };
 
         xdg.mime.defaultApplications = lib.mkIf cfg.enable {

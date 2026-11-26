@@ -70,3 +70,12 @@ hdparm -W /dev/sdX
 ```
 
 The output reports write-caching off when the drive accepted the command.
+
+## Opening disk images
+
+`ojuny-mount-image` attaches an image read-only, waits for its partition nodes,
+and mounts the first ISO9660 or UDF filesystem before falling back to another
+filesystem. A hybrid image with an EFI partition therefore opens its ISO root,
+not the EFI partition. If no partition node appears, the script falls back to
+`gnome-disk-image-mounter --read-only`. The mount is opened in the file manager
+or reported through a notification.

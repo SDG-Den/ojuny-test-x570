@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Check the mount-image script contract and the image fixtures it must handle."""
 
+import os
 import pathlib
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -10,15 +12,61 @@ import tempfile
 REQUIRED = [
     "udevadm settle",
     "lsblk -ln -o FSTYPE",
+    "loop-setup --read-only",
     "--options ro",
     "trap cleanup EXIT",
     "udisksctl loop-delete",
     "gnome-disk-image-mounter --read-only",
+    "iso9660",
+    "udf",
 ]
 
 
 def run(command, **kwargs):
     subprocess.run(command, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, **kwargs)
+
+
+def stub(path, body, bash):
+    path.write_text(f"#!{bash}\n{body}\n")
+    path.chmod(0o755)
+
+
+def check_candidate_selection(work, script):
+    text = script.read_text()
+    start = text.index("fstype_of() {")
+    end = text.index("candidates=()", start)
+    bindir = work / "bin"
+    bindir.mkdir()
+    bash = shutil.which("bash")
+
+    stub(
+        bindir / "lsblk",
+        """case "$*" in
+*"-o FSTYPE /tmp/loop0") ;;
+*"-o FSTYPE /tmp/loop0p1") printf 'iso9660\\n' ;;
+*"-o FSTYPE /tmp/loop0p2") printf 'vfat\\n' ;;
+*"-o NAME,FSTYPE /tmp/loop0") printf 'loop0\\nloop0p1 iso9660\\nloop0p2 vfat\\n' ;;
+esac""",
+        bash,
+    )
+    probe = work / "probe.sh"
+    probe.write_text(
+        "set -euo pipefail\n"
+        "loop_device=/tmp/loop0\n"
+        + text[start:end]
+        + "\nread_candidates\n"
+        + "printf 'P:%s\\n' \"${preferred[@]}\"\n"
+        + "printf 'O:%s\\n' \"${others[@]}\"\n"
+    )
+    env = os.environ.copy()
+    env["PATH"] = f"{bindir}:{env['PATH']}"
+    result = subprocess.run(["bash", str(probe)], capture_output=True, text=True, env=env)
+    if result.returncode != 0:
+        sys.exit(f"candidate selection failed: {result.stdout}\n{result.stderr}")
+    if "P:/dev/loop0p1" not in result.stdout:
+        sys.exit(f"the ISO partition was not preferred: {result.stdout!r} {result.stderr!r}")
+    if "O:/dev/loop0p2" not in result.stdout:
+        sys.exit(f"the EFI partition was not kept as a fallback: {result.stdout!r}")
 
 
 def main():
@@ -68,7 +116,9 @@ def main():
         if "ISO 9660" not in kind:
             sys.exit("the plain fixture is not an ISO 9660 image")
 
-    print("mount-image: contract and plain/hybrid fixtures verified")
+        check_candidate_selection(work, root / "scripts" / "ojuny-mount-image.sh")
+
+    print("mount-image: contract, plain/hybrid fixtures and ISO partition selection verified")
 
 
 if __name__ == "__main__":

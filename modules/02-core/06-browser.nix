@@ -218,44 +218,48 @@
         };
     in
     {
-      config = lib.mkIf (osConfig.programs.firefox.enable or false) {
+      imports = [ self.modules.homeManager.applications-browser-backend ];
 
-        programs.firefox.enable = true;
-        programs.firefox.policies = osConfig.programs.firefox.policies or { };
+      config = lib.mkMerge [
+        (lib.mkIf (osConfig.programs.firefox.enable or false) {
 
-        # @option widget = "text"; label = "Profile name"; group = "Firefox"; order = 10; description = "Name of the main profile on disk."; visibleWhen.path = "ojuny.browser.selected"; visibleWhen.equals = "firefox";
-        programs.firefox.profiles.default.name = "default";
+          programs.firefox.enable = true;
+          programs.firefox.policies = osConfig.programs.firefox.policies or { };
 
-        # @option widget = "switch"; label = "Default profile"; group = "Firefox"; order = 11; visibleWhen.path = "ojuny.browser.selected"; visibleWhen.equals = "firefox";
-        programs.firefox.profiles.default.isDefault = true;
+          # @option widget = "text"; label = "Profile name"; group = "Firefox"; order = 10; description = "Name of the main profile on disk."; visibleWhen.path = "ojuny.browser.selected"; visibleWhen.equals = "firefox";
+          programs.firefox.profiles.default.name = "default";
 
-        # @option widget = "text"; label = "Search engine"; group = "Firefox"; order = 12; description = "Engine the profile starts with."; visibleWhen.path = "ojuny.browser.selected"; visibleWhen.equals = "firefox";
-        programs.firefox.profiles.default.search.default = "google";
+          # @option widget = "switch"; label = "Default profile"; group = "Firefox"; order = 11; visibleWhen.path = "ojuny.browser.selected"; visibleWhen.equals = "firefox";
+          programs.firefox.profiles.default.isDefault = true;
 
-        programs.firefox.profiles.default.settings =
-          lib.mkIf (osConfig.ojuny.browser.firefox.autoEnableExtensions or false)
-            {
-              "extensions.autoDisableScopes" = 0;
-            };
+          # @option widget = "text"; label = "Search engine"; group = "Firefox"; order = 12; description = "Engine the profile starts with."; visibleWhen.path = "ojuny.browser.selected"; visibleWhen.equals = "firefox";
+          programs.firefox.profiles.default.search.default = "google";
 
-        programs.firefox.profiles.default.search.engines = firefoxEngines;
+          programs.firefox.profiles.default.settings =
+            lib.mkIf (osConfig.ojuny.browser.firefox.autoEnableExtensions or false)
+              {
+                "extensions.autoDisableScopes" = 0;
+              };
 
-        programs.firefox.profiles.default.bookmarks = lib.mkIf (firefoxBookmarks != [ ]) {
-          force = true;
-          settings = firefoxBookmarks;
-        };
+          programs.firefox.profiles.default.search.engines = firefoxEngines;
 
-        programs.firefox.profiles.default.extensions.packages =
-          osConfig.ojuny.browser.firefox.extensions or [ ];
+          programs.firefox.profiles.default.bookmarks = lib.mkIf (firefoxBookmarks != [ ]) {
+            force = true;
+            settings = firefoxBookmarks;
+          };
 
-        # @option widget = "list"; label = "Stylix profile names"; group = "Firefox"; groupOrder = 20; order = 9; itemLabel = "Profile key"; addLabel = "Add profile"; visibleWhen.path = "ojuny.browser.selected"; visibleWhen.equals = "firefox"; description = "Firefox profile keys themed by Stylix. The template profile key is default.";
-        stylix.targets.firefox.profileNames = [ "default" ];
+          programs.firefox.profiles.default.extensions.packages =
+            osConfig.ojuny.browser.firefox.extensions or [ ];
 
-        stylix.targets.firefox.colorTheme.enable = osConfig.ojuny.browser.firefox.stylixColorTheme or true;
+          # @option widget = "list"; label = "Stylix profile names"; group = "Firefox"; groupOrder = 20; order = 9; itemLabel = "Profile key"; addLabel = "Add profile"; visibleWhen.path = "ojuny.browser.selected"; visibleWhen.equals = "firefox"; description = "Firefox profile keys themed by Stylix. The template profile key is default.";
+          stylix.targets.firefox.profileNames = [ "default" ];
 
-        programs.firefox.profiles.default.extensions.force = true;
+          stylix.targets.firefox.colorTheme.enable = osConfig.ojuny.browser.firefox.stylixColorTheme or true;
 
-      };
+          programs.firefox.profiles.default.extensions.force = true;
+
+        })
+      ];
     };
 
 }

@@ -11,6 +11,9 @@
 
   flake.modules.nixos.desktop-controlcenter = { config, pkgs, ... }: {
 
+    # @option widget = "spin"; label = "Columns"; group = "Widgets"; groupOrder = 10; order = 5; hidden = true; min = 8; max = 8; unit = "columns"; description = "The control center layout is authored for eight columns. Keep this at eight so the tiles are not clamped and pushed down.";
+    desktop.ojuny.dux.settings.controlCenterColumns = 8;
+
     # @option widget = "grid-configuration"; label = "Widget layout"; group = "Widgets"; groupOrder = 10; order = 10; gridColumns = 8;
     desktop.ojuny.dux.controlCenterWidgets = {
       user = {

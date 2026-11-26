@@ -400,15 +400,27 @@
             fi
             ;;
           "Open terminal")
-            run_in_devshell "$terminal"
+            if [ "$(basename "$terminal")" = "ghostty" ] || [ "$(basename "$terminal")" = "ojuny-ghostty" ]; then
+              run_in_devshell "$terminal" --working-directory="$SELECTED"
+            else
+              run_in_devshell "$terminal"
+            fi
             ;;
           "Start agent")
-            run_in_devshell "$assistant"
+            if [ "$(basename "$assistant")" = "opencode" ]; then
+              run_in_devshell "$assistant" "$SELECTED"
+            else
+              run_in_devshell "$assistant"
+            fi
             ;;
           "Open Obsidian vault")
             vault_path="$SELECTED"
-            vault_path="''${vault_path// /%20}"
-            xdg-open "obsidian://open?path=$vault_path" >/dev/null 2>&1 &
+            vault_uri="obsidian://open?path=''${vault_path// /%20}"
+            if command -v obsidian >/dev/null 2>&1; then
+              obsidian --new-window "$vault_uri" >/dev/null 2>&1 &
+            else
+              xdg-open "$vault_uri" >/dev/null 2>&1 &
+            fi
             ;;
         esac
       '';

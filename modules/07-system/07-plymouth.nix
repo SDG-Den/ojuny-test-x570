@@ -59,9 +59,11 @@
               "$out"
           '';
 
+      colors = self.colors config.lib.stylix.colors;
+
       theme = pkgs.callPackage ./plymouth/_theme.nix {
-        background = config.lib.stylix.colors.base00;
-        foreground = config.lib.stylix.colors.base05;
+        background = colors.defaultBackground.hex;
+        foreground = colors.defaultForeground.hex;
         inherit logo;
         logoSize = 512;
       };

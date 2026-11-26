@@ -11,31 +11,31 @@
 
   flake.modules.nixos.desktop-sounds = { config, pkgs, ... }: {
 
-    # @option widget = "switch"; label = "System sounds"; group = "Sounds"; groupOrder = 10; order = 10;
+    # @option widget = "switch"; label = "System sounds"; group = "Sounds"; groupOrder = 10; order = 10; description = "Play desktop sound effects for session events.";
     desktop.ojuny.dux.settings.soundsEnabled = true;
 
-    # @option widget = "switch"; label = "Use system sound theme"; group = "Sounds"; groupOrder = 10; order = 20; visibleWhen.path = "desktop.ojuny.dux.settings.soundsEnabled"; visibleWhen.equals = true; applyCommand = "dms ipc call settings set useSystemSoundTheme %%val%%";
+    # @option widget = "switch"; label = "Use system sound theme"; group = "Sounds"; groupOrder = 10; order = 20; description = "Use the freedesktop sound theme instead of the bundled sounds."; visibleWhen.path = "desktop.ojuny.dux.settings.soundsEnabled"; visibleWhen.equals = true; applyCommand = "dms ipc call settings set useSystemSoundTheme %%val%%";
     desktop.ojuny.dux.settings.useSystemSoundTheme = false;
 
-    # @option widget = "switch"; label = "Login"; group = "Sounds"; groupOrder = 10; order = 30; visibleWhen.path = "desktop.ojuny.dux.settings.soundsEnabled"; visibleWhen.equals = true; applyCommand = "dms ipc call settings set soundLogin %%val%%";
+    # @option widget = "switch"; label = "Login"; group = "Sounds"; groupOrder = 10; order = 30; description = "Play a sound when the desktop session starts."; visibleWhen.path = "desktop.ojuny.dux.settings.soundsEnabled"; visibleWhen.equals = true; applyCommand = "dms ipc call settings set soundLogin %%val%%";
     desktop.ojuny.dux.settings.soundLogin = false;
 
-    # @option widget = "switch"; label = "New notification"; group = "Sounds"; groupOrder = 10; order = 40; visibleWhen.path = "desktop.ojuny.dux.settings.soundsEnabled"; visibleWhen.equals = true; applyCommand = "dms ipc call settings set soundNewNotification %%val%%";
+    # @option widget = "switch"; label = "New notification"; group = "Sounds"; groupOrder = 10; order = 40; description = "Play a sound when a notification arrives."; visibleWhen.path = "desktop.ojuny.dux.settings.soundsEnabled"; visibleWhen.equals = true; applyCommand = "dms ipc call settings set soundNewNotification %%val%%";
     desktop.ojuny.dux.settings.soundNewNotification = true;
 
-    # @option widget = "switch"; label = "Volume changed"; group = "Sounds"; groupOrder = 10; order = 50; visibleWhen.path = "desktop.ojuny.dux.settings.soundsEnabled"; visibleWhen.equals = true; applyCommand = "dms ipc call settings set soundVolumeChanged %%val%%";
+    # @option widget = "switch"; label = "Volume changed"; group = "Sounds"; groupOrder = 10; order = 50; description = "Play a sound when the output volume changes."; visibleWhen.path = "desktop.ojuny.dux.settings.soundsEnabled"; visibleWhen.equals = true; applyCommand = "dms ipc call settings set soundVolumeChanged %%val%%";
     desktop.ojuny.dux.settings.soundVolumeChanged = true;
 
     # @option widget = "switch"; label = "Plugged in"; group = "Sounds"; groupOrder = 10; order = 60; description = "Needs a battery."; visibleWhen.path = "desktop.ojuny.dux.settings.soundsEnabled"; visibleWhen.equals = true; applyCommand = "dms ipc call settings set soundPluggedIn %%val%%";
     desktop.ojuny.dux.settings.soundPluggedIn = true;
 
-    # @option widget = "switch"; label = "Mute during media playback"; group = "Sounds"; groupOrder = 10; order = 70; visibleWhen.path = "desktop.ojuny.dux.settings.soundsEnabled"; visibleWhen.equals = true; applyCommand = "dms ipc call settings set muteSoundsWhenMediaPlaying %%val%%";
+    # @option widget = "switch"; label = "Mute during media playback"; group = "Sounds"; groupOrder = 10; order = 70; description = "Silence sound effects while media is playing."; visibleWhen.path = "desktop.ojuny.dux.settings.soundsEnabled"; visibleWhen.equals = true; applyCommand = "dms ipc call settings set muteSoundsWhenMediaPlaying %%val%%";
     desktop.ojuny.dux.settings.muteSoundsWhenMediaPlaying = true;
 
-    # @option widget = "switch"; label = "Show virtual devices"; group = "Advanced audio"; groupOrder = 20; order = 20; advanced = true; applyCommand = "dms ipc call settings set audioShowStreamDevices %%val%%";
+    # @option widget = "switch"; label = "Show virtual devices"; group = "Advanced audio"; groupOrder = 20; order = 20; advanced = true; description = "List virtual audio devices in the volume controls."; applyCommand = "dms ipc call settings set audioShowStreamDevices %%val%%";
     desktop.ojuny.dux.settings.audioShowStreamDevices = false;
 
-    # @option widget = "switch"; label = "Audio visualizer"; group = "Advanced audio"; groupOrder = 20; order = 30; advanced = true; applyCommand = "dms ipc call settings set audioVisualizerEnabled %%val%%";
+    # @option widget = "switch"; label = "Audio visualizer"; group = "Advanced audio"; groupOrder = 20; order = 30; advanced = true; description = "Show an audio visualizer in the media controls."; applyCommand = "dms ipc call settings set audioVisualizerEnabled %%val%%";
     desktop.ojuny.dux.settings.audioVisualizerEnabled = true;
 
     # @option widget = "spin"; label = "Volume step"; group = "Advanced audio"; groupOrder = 20; order = 40; min = 0; max = 99; advanced = true; description = "Wheel scroll volume increment.";

@@ -234,8 +234,8 @@ cat >"$nix_settings_gui_dir/config.json" <<EOF
 {
   "flake_path": "$CLONE_DIR",
   "terminal_command": "ghostty -e $terminal_shell -c",
-  "rebuild_command": "sudo echo \"starting rebuild\"; sudo nixos-rebuild switch --flake $CLONE_DIR#$host |& nom; echo \"finished build, press any button to close the window\"; read -n 1",
-  "reload_dms_on_rebuild": true
+  "rebuild_command": "ojuny rebuild",
+  "environment_reload_command": "dms kill && mmsg dispatch spawn_shell,dms run"
 }
 EOF
 echo "==> wrote $nix_settings_gui_dir/config.json"

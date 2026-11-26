@@ -9,7 +9,13 @@
 
 { self, inputs, ... }: {
 
-  flake.modules.nixos.desktop-osd = { config, lib, pkgs, ... }:
+  flake.modules.nixos.desktop-osd =
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       positions = {
         "top-left" = 2;
@@ -24,59 +30,59 @@
     in
     {
 
-    options.ojuny.dux.osdPosition = lib.mkOption {
-      type = lib.types.enum (lib.attrNames positions);
-      default = "bottom-center";
-      description = "On-screen display position.";
+      options.ojuny.dux.osdPosition = lib.mkOption {
+        type = lib.types.enum (lib.attrNames positions);
+        default = "bottom-center";
+        description = "On-screen display position.";
+      };
+
+      config = {
+
+        # @option widget = "dropdown"; label = "Position"; group = "General"; groupOrder = 10; order = 10; choices = [ "top-left" "top-center" "top-right" "left-center" "right-center" "bottom-left" "bottom-center" "bottom-right" ]; description = "Where the on-screen display popups appear.";
+        ojuny.dux.osdPosition = "bottom-center";
+
+        desktop.ojuny.dux.settings.osdPosition = positions.${config.ojuny.dux.osdPosition};
+
+        # @option widget = "switch"; label = "Always show percentage"; group = "General"; groupOrder = 10; order = 20; description = "Keep the on-screen volume and brightness readout visible.";
+        desktop.ojuny.dux.settings.osdAlwaysShowValue = true;
+
+        # @option widget = "switch"; label = "Volume"; group = "Events"; groupOrder = 20; order = 10; description = "Show an on-screen display when the output volume changes."; applyCommand = "dms ipc call settings set osdVolumeEnabled %%val%%";
+        desktop.ojuny.dux.settings.osdVolumeEnabled = true;
+
+        # @option widget = "switch"; label = "Media volume"; group = "Events"; groupOrder = 20; order = 20; description = "Show an on-screen display when a media player volume changes."; applyCommand = "dms ipc call settings set osdMediaVolumeEnabled %%val%%";
+        desktop.ojuny.dux.settings.osdMediaVolumeEnabled = true;
+
+        # @option widget = "switch"; label = "Media playback"; group = "Events"; groupOrder = 20; order = 30; description = "Show an on-screen display when media starts or stops."; applyCommand = "dms ipc call settings set osdMediaPlaybackEnabled %%val%%";
+        desktop.ojuny.dux.settings.osdMediaPlaybackEnabled = false;
+
+        # @option widget = "switch"; label = "Brightness"; group = "Events"; groupOrder = 20; order = 40; description = "Show an on-screen display when the display brightness changes.";
+        desktop.ojuny.dux.settings.osdBrightnessEnabled = true;
+
+        # @option widget = "switch"; label = "Idle inhibitor"; group = "Events"; groupOrder = 20; order = 50; description = "Show an on-screen display when the idle inhibitor is toggled."; applyCommand = "dms ipc call settings set osdIdleInhibitorEnabled %%val%%";
+        desktop.ojuny.dux.settings.osdIdleInhibitorEnabled = true;
+
+        # @option widget = "switch"; label = "Microphone mute"; group = "Events"; groupOrder = 20; order = 60; description = "Show an on-screen display when the microphone is muted or unmuted."; applyCommand = "dms ipc call settings set osdMicMuteEnabled %%val%%";
+        desktop.ojuny.dux.settings.osdMicMuteEnabled = true;
+
+        # @option widget = "switch"; label = "Microphone volume"; group = "Events"; groupOrder = 20; order = 70; description = "Show an on-screen display when the microphone volume changes."; applyCommand = "dms ipc call settings set osdMicVolumeEnabled %%val%%";
+        desktop.ojuny.dux.settings.osdMicVolumeEnabled = true;
+
+        # @option widget = "switch"; label = "Caps lock"; group = "Events"; groupOrder = 20; order = 80; description = "Show an on-screen display when Caps Lock is toggled."; applyCommand = "dms ipc call settings set osdCapsLockEnabled %%val%%";
+        desktop.ojuny.dux.settings.osdCapsLockEnabled = true;
+
+        # @option widget = "switch"; label = "Touchpad"; group = "Events"; groupOrder = 20; order = 90; description = "Niri only."; applyCommand = "dms ipc call settings set osdTouchpadEnabled %%val%%";
+        desktop.ojuny.dux.settings.osdTouchpadEnabled = true;
+
+        # @option widget = "switch"; label = "Power profile"; group = "Events"; groupOrder = 20; order = 100; description = "Show an on-screen display when the power profile changes."; applyCommand = "dms ipc call settings set osdPowerProfileEnabled %%val%%";
+        desktop.ojuny.dux.settings.osdPowerProfileEnabled = false;
+
+        # @option widget = "switch"; label = "Audio output switch"; group = "Events"; groupOrder = 20; order = 110; description = "Show an on-screen display when the default audio output changes."; applyCommand = "dms ipc call settings set osdAudioOutputEnabled %%val%%";
+        desktop.ojuny.dux.settings.osdAudioOutputEnabled = true;
+
+        # @option widget = "switch"; label = "Workspace switch"; group = "Events"; groupOrder = 20; order = 120; description = "Show an on-screen display when the active workspace changes."; applyCommand = "dms ipc call settings set osdWorkspaceEnabled %%val%%";
+        desktop.ojuny.dux.settings.osdWorkspaceEnabled = false;
+
+      };
     };
-
-    config = {
-
-    # @option widget = "dropdown"; label = "Position"; group = "General"; groupOrder = 10; order = 10; choices = [ "top-left" "top-center" "top-right" "left-center" "right-center" "bottom-left" "bottom-center" "bottom-right" ];
-    ojuny.dux.osdPosition = "bottom-center";
-
-    desktop.ojuny.dux.settings.osdPosition = positions.${config.ojuny.dux.osdPosition};
-
-    # @option widget = "switch"; label = "Always show percentage"; group = "General"; groupOrder = 10; order = 20; description = "Keep the on-screen volume and brightness readout visible.";
-    desktop.ojuny.dux.settings.osdAlwaysShowValue = true;
-
-    # @option widget = "switch"; label = "Volume"; group = "Events"; groupOrder = 20; order = 10; applyCommand = "dms ipc call settings set osdVolumeEnabled %%val%%";
-    desktop.ojuny.dux.settings.osdVolumeEnabled = true;
-
-    # @option widget = "switch"; label = "Media volume"; group = "Events"; groupOrder = 20; order = 20; applyCommand = "dms ipc call settings set osdMediaVolumeEnabled %%val%%";
-    desktop.ojuny.dux.settings.osdMediaVolumeEnabled = true;
-
-    # @option widget = "switch"; label = "Media playback"; group = "Events"; groupOrder = 20; order = 30; applyCommand = "dms ipc call settings set osdMediaPlaybackEnabled %%val%%";
-    desktop.ojuny.dux.settings.osdMediaPlaybackEnabled = false;
-
-    # @option widget = "switch"; label = "Brightness"; group = "Events"; groupOrder = 20; order = 40;
-    desktop.ojuny.dux.settings.osdBrightnessEnabled = true;
-
-    # @option widget = "switch"; label = "Idle inhibitor"; group = "Events"; groupOrder = 20; order = 50; applyCommand = "dms ipc call settings set osdIdleInhibitorEnabled %%val%%";
-    desktop.ojuny.dux.settings.osdIdleInhibitorEnabled = true;
-
-    # @option widget = "switch"; label = "Microphone mute"; group = "Events"; groupOrder = 20; order = 60; applyCommand = "dms ipc call settings set osdMicMuteEnabled %%val%%";
-    desktop.ojuny.dux.settings.osdMicMuteEnabled = true;
-
-    # @option widget = "switch"; label = "Microphone volume"; group = "Events"; groupOrder = 20; order = 70; applyCommand = "dms ipc call settings set osdMicVolumeEnabled %%val%%";
-    desktop.ojuny.dux.settings.osdMicVolumeEnabled = true;
-
-    # @option widget = "switch"; label = "Caps lock"; group = "Events"; groupOrder = 20; order = 80; applyCommand = "dms ipc call settings set osdCapsLockEnabled %%val%%";
-    desktop.ojuny.dux.settings.osdCapsLockEnabled = true;
-
-    # @option widget = "switch"; label = "Touchpad"; group = "Events"; groupOrder = 20; order = 90; description = "Niri only."; applyCommand = "dms ipc call settings set osdTouchpadEnabled %%val%%";
-    desktop.ojuny.dux.settings.osdTouchpadEnabled = true;
-
-    # @option widget = "switch"; label = "Power profile"; group = "Events"; groupOrder = 20; order = 100; applyCommand = "dms ipc call settings set osdPowerProfileEnabled %%val%%";
-    desktop.ojuny.dux.settings.osdPowerProfileEnabled = false;
-
-    # @option widget = "switch"; label = "Audio output switch"; group = "Events"; groupOrder = 20; order = 110; applyCommand = "dms ipc call settings set osdAudioOutputEnabled %%val%%";
-    desktop.ojuny.dux.settings.osdAudioOutputEnabled = true;
-
-    # @option widget = "switch"; label = "Workspace switch"; group = "Events"; groupOrder = 20; order = 120; applyCommand = "dms ipc call settings set osdWorkspaceEnabled %%val%%";
-    desktop.ojuny.dux.settings.osdWorkspaceEnabled = false;
-
-    };
-  };
 
 }

@@ -38,6 +38,55 @@
         esac
       '';
 
+      osk = config.ojuny.accessibility.onScreenKeyboard;
+      oskToggle = import ../../packages/osk-toggle.nix { inherit pkgs; };
+      oskColors = self.colors config.lib.stylix.colors;
+      oskColor = name: alpha: lib.removePrefix "#" oskColors.${name}.hex + alpha;
+      oskArgs = [
+        "-H"
+        (toString osk.portraitHeight)
+        "-L"
+        (toString osk.landscapeHeight)
+        "-R"
+        (toString osk.rounding)
+        "--fn"
+        "${config.stylix.fonts.sansSerif.name} ${toString osk.fontSize}"
+        "--bg"
+        (oskColor "defaultBackground" "cc")
+        "--fg"
+        (oskColor "lighterBackground" "ff")
+        "--fg-sp"
+        (oskColor "selectionBackground" "ff")
+        "--press"
+        (oskColor "comments" "ff")
+        "--press-sp"
+        (oskColor "darkForeground" "ff")
+        "--swipe"
+        (oskColor "comments" "ff")
+        "--swipe-sp"
+        (oskColor "darkForeground" "ff")
+        "--text"
+        (oskColor "defaultForeground" "ff")
+        "--text-sp"
+        (oskColor "functions" "ff")
+        "--text-press"
+        (oskColor "defaultBackground" "ff")
+        "--text-press-sp"
+        (oskColor "defaultBackground" "ff")
+      ]
+      ++ lib.optional osk.auto "--auto";
+
+      oskTray = pkgs.writeShellApplication {
+        name = "ojuny-osk-tray";
+        runtimeInputs = [
+          pkgs.yad
+          oskToggle
+        ];
+        text = ''
+          exec yad --notification --image=input-keyboard-symbolic --text="On-screen keyboard" --command="ojuny-osk-toggle" --menu="Toggle keyboard!ojuny-osk-toggle|Quit!quit"
+        '';
+      };
+
     in
     {
       imports = [ self.modules.nixos.system-accessibility-backend ];
@@ -65,7 +114,28 @@
         # @option widget = "switch"; label = "Reduce motion"; group = "Motion"; groupOrder = 30; order = 10; applyCommand = "dms ipc call settings set reduceMotion %%val%%"; description = "Disable DMS motion and force Mango window animations off. Window animations apply on rebuild.";
         ojuny.accessibility.reduceMotion = false;
 
-        # @option widget = "keybinds"; label = "Common binds"; group = "Keybinds"; groupOrder = 40; order = 10; description = "Accessibility binds. The screen reader bind works when Orca is enabled, the on-screen keyboard bind works when the virtual keyboard plugin is enabled, and the mouse mode toggle is always active.";
+        # @option widget = "switch"; label = "On-screen keyboard (wvkbd)"; group = "Keyboard"; groupOrder = 25; order = 10; description = "Install wvkbd, start it with the session and theme it with the Stylix palette. It types through the wlroots virtual-keyboard and input-method protocols and works with touch.";
+        ojuny.accessibility.onScreenKeyboard.enable = false;
+
+        # @option widget = "switch"; label = "Show on text fields"; group = "Keyboard"; groupOrder = 25; order = 20; visibleWhen.path = "ojuny.accessibility.onScreenKeyboard.enable"; visibleWhen.equals = true; description = "Use wvkbd --auto so the keyboard appears when a text field takes focus and hides when focus leaves. Mango implements zwp_input_method_v2.";
+        ojuny.accessibility.onScreenKeyboard.auto = true;
+
+        # @option widget = "switch"; label = "Tray toggle"; group = "Keyboard"; groupOrder = 25; order = 30; visibleWhen.path = "ojuny.accessibility.onScreenKeyboard.enable"; visibleWhen.equals = true; description = "Show a tray icon. Left click toggles the keyboard; right click opens the menu.";
+        ojuny.accessibility.onScreenKeyboard.tray = true;
+
+        # @option widget = "spin"; label = "Portrait height"; group = "Keyboard"; groupOrder = 25; order = 40; min = 120; max = 600; unit = "px"; visibleWhen.path = "ojuny.accessibility.onScreenKeyboard.enable"; visibleWhen.equals = true; description = "Keyboard height while the display is upright.";
+        ojuny.accessibility.onScreenKeyboard.portraitHeight = 300;
+
+        # @option widget = "spin"; label = "Landscape height"; group = "Keyboard"; groupOrder = 25; order = 50; min = 120; max = 600; unit = "px"; visibleWhen.path = "ojuny.accessibility.onScreenKeyboard.enable"; visibleWhen.equals = true; description = "Keyboard height while the display is sideways.";
+        ojuny.accessibility.onScreenKeyboard.landscapeHeight = 200;
+
+        # @option widget = "spin"; label = "Corner rounding"; group = "Keyboard"; groupOrder = 25; order = 60; min = 0; max = 40; unit = "px"; visibleWhen.path = "ojuny.accessibility.onScreenKeyboard.enable"; visibleWhen.equals = true; description = "Corner radius of the keys.";
+        ojuny.accessibility.onScreenKeyboard.rounding = 12;
+
+        # @option widget = "spin"; label = "Label size"; group = "Keyboard"; groupOrder = 25; order = 70; min = 8; max = 48; unit = "pt"; visibleWhen.path = "ojuny.accessibility.onScreenKeyboard.enable"; visibleWhen.equals = true; description = "Size of the key labels in the sans-serif font.";
+        ojuny.accessibility.onScreenKeyboard.fontSize = 20;
+
+        # @option widget = "keybinds"; label = "Common binds"; group = "Keybinds"; groupOrder = 40; order = 10; description = "Accessibility binds. The screen reader bind works when Orca is enabled, the on-screen keyboard bind starts or toggles wvkbd when the keyboard is enabled, and the mouse mode toggle is always active.";
         desktop.ojuny.mango.binds.common = {
           accessibilityScreenReader = {
             modifier = [
@@ -86,7 +156,7 @@
             ];
             keys = [ "o" ];
             dispatcher = "spawn";
-            args = "dms ipc call virtualKeyboard toggle";
+            args = "${oskToggle}";
             description = "Toggle the on-screen keyboard (Super+Alt+O)";
             group = "Accessibility";
             subcat = "Keyboard";
@@ -183,7 +253,7 @@
             modifier = [ "NONE" ];
             keys = [ "space" ];
             dispatcher = "spawn";
-            args = "ydotool click 0x00";
+            args = "ydotool click 0xC0";
             description = "Left click";
             group = "Accessibility";
             subcat = "Mouse mode";
@@ -192,7 +262,7 @@
             modifier = [ "NONE" ];
             keys = [ "Return" ];
             dispatcher = "spawn";
-            args = "ydotool click 0x01";
+            args = "ydotool click 0xC1";
             description = "Right click";
             group = "Accessibility";
             subcat = "Mouse mode";
@@ -201,7 +271,7 @@
             modifier = [ "NONE" ];
             keys = [ "BackSpace" ];
             dispatcher = "spawn";
-            args = "ydotool click 0x02";
+            args = "ydotool click 0xC2";
             description = "Middle click";
             group = "Accessibility";
             subcat = "Mouse mode";
@@ -232,6 +302,33 @@
             description = "Exit the mouse mode";
             group = "Accessibility";
             subcat = "Mouse mode";
+          };
+        };
+
+        environment.systemPackages = lib.mkIf osk.enable [
+          pkgs.wvkbd
+          oskToggle
+          oskTray
+        ];
+
+        systemd.user.services.ojuny-osk = lib.mkIf osk.enable {
+          description = "Ojuny on-screen keyboard";
+          partOf = [ "mango-session.target" ];
+          wantedBy = [ "mango-session.target" ];
+          serviceConfig = {
+            Type = "exec";
+            ExecStart = "${pkgs.wvkbd}/bin/wvkbd-mobintl ${lib.escapeShellArgs oskArgs}";
+            Restart = "no";
+          };
+        };
+
+        systemd.user.services.ojuny-osk-tray = lib.mkIf (osk.enable && osk.tray) {
+          description = "Ojuny on-screen keyboard tray";
+          partOf = [ "mango-session.target" ];
+          wantedBy = [ "mango-session.target" ];
+          serviceConfig = {
+            ExecStart = "${oskTray}/bin/ojuny-osk-tray";
+            Restart = "on-failure";
           };
         };
       };

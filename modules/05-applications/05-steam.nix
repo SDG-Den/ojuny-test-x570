@@ -24,6 +24,13 @@
         # @option widget = "switch"; label = "Steam"; group = "Steam"; groupOrder = 10; order = 1;
         programs.steam.enable = false;
 
+        # @option widget = "switch"; label = "Autostart on boot"; group = "Steam"; groupOrder = 10; order = 2; visibleWhen.path = "programs.steam.enable"; visibleWhen.equals = true; description = "Start Steam minimized when the desktop session opens.";
+        ojuny.steam.autostart = false;
+
+        desktop.ojuny.mango.execOnce = lib.mkIf config.ojuny.steam.autostart (
+          lib.mkAfter [ "steam -silent" ]
+        );
+
         # @option widget = "switch"; label = "Windows compatibility tools"; group = "Steam"; description = "Install Wine, winetricks, protontricks and gamescope so non-Steam Windows games and launchers can run."; visibleWhen.path = "programs.steam.enable"; visibleWhen.equals = true;
         ojuny.steam.compat = true;
 
