@@ -1,14 +1,9 @@
+round 2 (theoretically implemented, must be tested):
+
 
 development patch projects menu does not work correctly for agent, obsidian or terminal. it ends up in home. both terminal and vscodium end up inside the devshell which is good, both open zsh which is correct. obsidian will also open previously-opened windows, which we do not want. 
 
 
-
-
-
-
-
-
-round 2:
 
 nix-cleaner: view resets whenever an item is checked, making checking large amounts of items extremely tedious. 
 
@@ -90,6 +85,38 @@ ojuny base (the template type it was made from, in this case it would be just Oj
 
 
 
+
+round 3:
+
+overflow layout does not work at all.
+
+nix-settings-gui resets scroll on flake inputs page for every update check it does, so you cannot scroll down to see it progress while it is going. 
+
+nix-shell-gui: no feedback when it is pulling/compiling something, so pressing launch can look like it did nothing even though it is actually starting the shell in the background.
+
+flatpak applications (flatseal and thunderbird) take very long to load.
+
+nix-settings-gui flake inputs: "scan commits" does nothing, commit hash pin is a free text field. 
+
+building ojuny-iso takes a really long time even on a ryzen 7 5700G with 32GB RAM because it seems to be limited to only 2 cores when it hits building wlr-utils (single build running) 
+
+steam settings in ojuny: steam is not themed by default when installed, it should be with a toggle to turn it off
+
+quake terminal is positioned centered on the screen, rather than near the top. it is also behind the bar instead of above. 
+
+btop does not show some GPU's (eg nvidia 3060)
+
+middle-click has some weird interactions with games (warframe: middle-click is intercepted and character moves camera to pointing directly downwards) this may be because straight middle-click does maximize. this should be changed to only happening if the focused window is not already fullscreen, and it should be a transparent bind. to add to this, we could change what this does since super+f is already the same bind. maybe we can have it do different things depending on layout? we can add a settings option set for that, with the default being to maximize, while default for tiling modes is zoom (makes the target the master)
+
+
+there should be a keybind that the user can use to either toggle off/on the focused display, or while holding shift, toggle off/on all displays. 
+
+USB automount does not occur if the device was already plugged in at boot. it has to be re-plugged to automount.
+
+rm command (rmtrash) doesn't work for root, which could cause other issues. when run as root, the rm shim we have should default to regular rm. only users and userspace applications/scripts should be automatically subjected to rmtrash. 
+
+
+sway needs to also receive the monitor configuration so multi-monitor setups have the right layout for the greeter.
 
 
 
