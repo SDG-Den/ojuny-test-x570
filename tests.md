@@ -287,3 +287,28 @@ Append results under a `## Results` section:
   actually evaluates (relative), then keep the generated-file denies specific.
 - T2, T3, T5, T6, T7, T8, T9 and T11 were not run: T0 is the stated
   prerequisite and results cannot be recorded through the normal edit path.
+
+### T0. Correction after the 00:08 render
+- Date: 2026-11-28
+- Render: `~/.config/opencode/opencode.json` -> `/nix/store/nhn15cyn...-opencode.json`
+  (00:08:53). Generator: `modules/patches/patch-ojuny-agent.nix`.
+- Observed after the reorder:
+  - The `edit`/`write`/`patch` tools are **not exposed to the agent session at
+    all**; only `read`, `shell`, `grep`, `glob` and the rest are offered. A T0
+    step 1 edit prompt therefore cannot be produced.
+  - `read /home/den/repos/nix-flake/.env` now returns
+    `tool.execution: File not found`, i.e. the read was **allowed**. Under the
+    previous rule order the same call returned `permission.rejected`.
+- Conclusion: the evaluator is **last-match-wins**, not first-match.
+  `readRules` now has `deny *.env` first and `allow *` last, so `.env` is
+  readable. `fileRules` has the specific denies and `ask **` first and
+  `deny *` last, so every edit is denied and the tool is withheld.
+- Fix: restore blanket-first / specifics-after ordering, and fix the pattern
+  form instead:
+  - `read`: `(allow "read" "*")` first, then `*.env`, `*.env.*`, `*.age`,
+    `*.key`, `*secret*`, then `(allow "read" "*.env.example")` last.
+  - `edit`/`write`/`patch`: `(deny action "*")` first, then
+    `(ask action "**")` and `(ask action "${flakeRoot}/**")`, then the
+    generated-file denies in both relative and absolute form.
+  - Add a harness test that asserts `.env` is denied and a flake edit asks, so
+    an ordering inversion cannot ship again.
