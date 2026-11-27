@@ -235,7 +235,7 @@ cat >"$nix_settings_gui_dir/config.json" <<EOF
   "flake_path": "$CLONE_DIR",
   "terminal_command": "ghostty -e $terminal_shell -c",
   "rebuild_command": "ojuny rebuild",
-  "environment_reload_command": "dms kill && mmsg dispatch spawn_shell,dms run"
+  "environment_reload_command": "dms kill && mmsg dispatch spawn_shell,dms run --session"
 }
 EOF
 echo "==> wrote $nix_settings_gui_dir/config.json"

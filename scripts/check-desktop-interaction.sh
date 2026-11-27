@@ -58,7 +58,17 @@ set -euo pipefail
 printf '%s\n' "\$LSBLK_JSON"
 STUB
 
-chmod +x "$work/bin/mmsg" "$work/bin/ydotool" "$work/bin/udisksctl" "$work/bin/lsblk"
+cat >"$work/bin/findmnt" <<STUB
+#!${BASH:-/usr/bin/env bash}
+set -euo pipefail
+case "\$*" in
+  *"-S /dev/sdd1"*) printf 'rw,uid=%s\n' "$(id -u)" ;;
+  *"-S /dev/sdf1"*) printf 'rw,uid=9999\n' ;;
+  *) exit 1 ;;
+esac
+STUB
+
+chmod +x "$work/bin/mmsg" "$work/bin/ydotool" "$work/bin/udisksctl" "$work/bin/lsblk" "$work/bin/findmnt"
 export PATH="$work/bin:$PATH"
 export XDG_RUNTIME_DIR="$work/run"
 export MMSG_LOG="$work/mmsg.log"

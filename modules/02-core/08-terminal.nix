@@ -114,12 +114,12 @@
           # @table-item label = "reloaddux";
           reloaddux = {
             enable = true;
-            value = "dms kill && mmsg dispatch spawn_shell,dms run";
+            value = "dms kill && mmsg dispatch spawn_shell,dms run --session";
           };
           # @table-item label = "reloaddms";
           reloaddms = {
             enable = true;
-            value = "dms kill && mmsg dispatch spawn_shell,dms run";
+            value = "dms kill && mmsg dispatch spawn_shell,dms run --session";
           };
           # @table-item label = "find";
           find = {
