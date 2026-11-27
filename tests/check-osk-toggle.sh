@@ -71,11 +71,12 @@ grep -qF 'The on-screen keyboard is disabled. Enable it in Settings > Accessibil
 : >"$SYSTEMCTL_LOG"
 : >"$KILL_LOG"
 : >"$NOTIFY_LOG"
-SYSTEMCTL_SHOW_FAIL=1 bash "$toggle" 2>"$work/failed.err" ||
-  fail "a failed service query exited non-zero"
+if SYSTEMCTL_SHOW_FAIL=1 bash "$toggle" 2>"$work/failed.err"; then
+  fail "a failed service query exited zero"
+fi
 [ ! -s "$SYSTEMCTL_LOG" ] || fail "a missing unit was started after a failed query"
 [ ! -s "$KILL_LOG" ] || fail "a missing unit was signalled after a failed query"
-grep -qF 'The on-screen keyboard is disabled.' "$NOTIFY_LOG" ||
-  fail "a failed service query was not reported as disabled"
+grep -qF 'The on-screen keyboard service could not be queried.' "$NOTIFY_LOG" ||
+  fail "a failed service query was not reported"
 
 printf 'ok: the on-screen keyboard toggle starts, signals and reports a disabled keyboard\n'

@@ -33,6 +33,7 @@ def check(root):
     forbid(office, "craftAll", "03-office.nix", errors)
     require(office, "figcraft.enable = false", "03-office.nix", errors)
     require(office, "craft-anything.enable = false", "03-office.nix", errors)
+    require(office, 'itemType = "string"', "03-office.nix", errors)
     require(office, "apps.figcraft.enable", "03-office.nix", errors)
     require(office, "apps.craft-anything.enable", "03-office.nix", errors)
 
@@ -96,11 +97,12 @@ def check(root):
     require(chromium_storage, '"alreadyInstalled"', "seed-extension-storage.cc", errors)
     require(chromium_storage, '"userID"', "seed-extension-storage.cc", errors)
     accessibility = (root / "modules/07-system/08-accessibility.nix").read_text()
+    tray = (root / "scripts/ojuny-osk-tray.py").read_text()
     require(accessibility, "wvkbd-mobintl", "08-accessibility.nix", errors)
-    require(accessibility, '"--auto"', "08-accessibility.nix", errors)
+    require(accessibility, "args+=(--auto)", "08-accessibility.nix", errors)
     require(accessibility, '"--text-sp"', "08-accessibility.nix", errors)
     require(accessibility, "ojuny-osk-toggle", "08-accessibility.nix", errors)
-    require(accessibility, "input-keyboard-symbolic", "08-accessibility.nix", errors)
+    require(tray, "input-keyboard-symbolic", "ojuny-osk-tray.py", errors)
     require(accessibility, "ojuny.accessibility.onScreenKeyboard.enable = true;", "08-accessibility.nix", errors)
     require(
         accessibility_backend,

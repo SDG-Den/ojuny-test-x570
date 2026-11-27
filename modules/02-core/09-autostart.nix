@@ -30,7 +30,9 @@
       ];
 
       # @option widget = "list"; label = "Run on every reload"; group = "Session commands"; description = "Started after each mango config reload.";
-      desktop.ojuny.mango.exec = [ ];
+      desktop.ojuny.mango.exec = [
+        "sh -c 'date +%s%N > \"$XDG_RUNTIME_DIR/ojuny-shell-reloaded\"'"
+      ];
 
       # @option widget = "list"; label = "Extra config files"; group = "Session commands"; description = "Additional mango config files sourced after the generated one.";
       desktop.ojuny.mango.source = [ ];

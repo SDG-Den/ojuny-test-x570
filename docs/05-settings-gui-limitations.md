@@ -161,8 +161,12 @@ inside the backend module. Do not collect the gated logic into a list.
   standard name still falls back to `emblem-system-symbolic`; add a mapping in
   `src/widgets/dms_catalog.rs` or the menu/category catalog when a specific
   symbol is required.
-- Selecting text in GTK applications was caused by the old XEmbed OSK tray.
-  `xembedsniproxy` creates an override-redirect X11 window on wlroots and
-  steals pointer and keyboard focus, so selection and paste fail across apps.
-  The native StatusNotifierItem tray has no X11 window. Do not add a settings
-  GUI workaround.
+- Selecting text in GTK applications is a general GTK/Wayland issue, not a
+  settings GUI defect, and not related to the on-screen keyboard tray. The same
+  loss has occurred on other NixOS configurations. Its cause is not
+  established, and it resolved on this device without a known change. Do not
+  add a settings GUI workaround; if it returns, capture it at the shared layer.
+- The XEmbed OSK tray was replaced by a native StatusNotifierItem tray because
+  `xembedsniproxy` creates an override-redirect X11 window on wlroots that
+  interferes with pointer and keyboard focus. The native tray has no X11
+  window.

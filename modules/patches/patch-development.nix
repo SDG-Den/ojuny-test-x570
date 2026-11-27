@@ -994,7 +994,7 @@
                 for b in ${pkgs.vscodium}/bin/*; do
                   n=$(basename "$b")
                   if [ "$n" = codium ] || [ "$n" = vscodium ]; then
-                    makeWrapper "$b" "$out/bin/$n" --add-flags "--profile nix"
+                    makeWrapper "$b" "$out/bin/$n" --add-flags "--profile nix" --add-flags "--ozone-platform=wayland"
                   else
                     ln -s "$b" "$out/bin/$n"
                   fi

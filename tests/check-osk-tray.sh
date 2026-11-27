@@ -10,6 +10,14 @@ fail() {
   exit 1
 }
 
+cat >"$work/toggle" <<'SH'
+#!/usr/bin/env bash
+: >"$OJUNY_OSK_MARKER"
+SH
+chmod +x "$work/toggle"
+export OJUNY_OSK_MARKER="$work/activated"
+export OJUNY_OSK_TOGGLE="$work/toggle"
+
 cat >"$work/watcher.py" <<'PY'
 import sys
 
@@ -62,6 +70,22 @@ for _ in $(seq 1 40); do
   sleep 0.1
 done
 
+service="$(head -n 1 "$work/registered")"
+python3 - "$service" <<'PY'
+import sys
+
+from pydbus import SessionBus
+
+bus = SessionBus()
+item = bus.get(sys.argv[1], "/StatusNotifierItem")
+item.Activate(0, 0)
+PY
+for _ in $(seq 1 20); do
+  [ -f "$OJUNY_OSK_MARKER" ] && break
+  sleep 0.1
+done
+[ -f "$OJUNY_OSK_MARKER" ] || fail "the tray Activate did not run the toggle"
+
 kill "$tray_pid" 2>/dev/null || true
 kill "$watcher" 2>/dev/null || true
 wait "$tray_pid" 2>/dev/null || true
@@ -71,4 +95,4 @@ wait "$watcher" 2>/dev/null || true
 grep -q "org.kde.StatusNotifierItem" "$work/registered" ||
   fail "the tray registered the wrong service name"
 
-printf 'ok: the OSK tray registers a StatusNotifierItem\n'
+printf 'ok: the OSK tray registers a StatusNotifierItem and activates the toggle\n'

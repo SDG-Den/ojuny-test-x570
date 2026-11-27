@@ -17,7 +17,7 @@
 
       steamTheme = pkgs.writeShellApplication {
         name = "ojuny-steam-theme";
-        runtimeInputs = [ pkgs.coreutils ];
+        runtimeInputs = [ pkgs.coreutils pkgs.jq ];
         text = builtins.readFile ../../../scripts/ojuny-steam-theme.sh;
       };
 
