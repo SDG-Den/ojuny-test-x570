@@ -81,6 +81,7 @@ differs from the generator output.
 - `modules/07-system/00-host.nix`
 - `modules/07-system/00-imports.nix`
 - `modules/07-system/00-secureboot.nix`
+- `modules/07-system/00-ssh-test.nix`
 - `modules/07-system/01-configuration.nix`
 - `modules/07-system/02-networking.nix`
 - `modules/07-system/03-bluetooth.nix`
@@ -91,7 +92,6 @@ differs from the generator output.
 - `modules/07-system/08-accessibility.nix`
 - `modules/07-system/09-facter.nix`
 - `modules/07-system/10-mounts.nix`
-- `modules/07-system/_00-ssh-test.nix`
 - `modules/07-system/plymouth/_theme.nix`
 - `modules/07-system/plymouth/ojuny-logo.png`
 - `modules/07-system/plymouth/ojuny.plymouth`
@@ -163,6 +163,10 @@ differs from the generator output.
 - `modules/backend/05-applications/13-application-checks.nix`
 - `modules/backend/06-utility/00-dux-tools-backend.nix`
 
+## `modules/`
+
+- `modules/facter.json`
+
 ## `flake`
 
 - `modules/flake/apps.nix`
@@ -174,9 +178,12 @@ differs from the generator output.
 
 - `modules/patches/00-patches.nix`
 - `modules/patches/_gate.nix`
+- `modules/patches/patch-corsair-rgb.nix`
 - `modules/patches/patch-development.nix`
 - `modules/patches/patch-docker.nix`
 - `modules/patches/patch-flatpak.nix`
+- `modules/patches/patch-logitech-g13.nix`
 - `modules/patches/patch-nixshell.nix`
+- `modules/patches/patch-ojuny-agent.nix`
 - `modules/patches/patch-remote-desktop.nix`
 - `modules/patches/patch-virtualization.nix`
