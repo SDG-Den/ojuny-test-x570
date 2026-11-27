@@ -367,11 +367,24 @@
           [ -n "$(xdg-mime query default x-scheme-handler/obsidian 2>/dev/null)" ]
         }
 
+        vault_root() {
+          local nested
+          if [ -d "$SELECTED/.obsidian" ]; then
+            printf '%s\n' "$SELECTED"
+            return 0
+          fi
+          nested=$(find "$SELECTED" -maxdepth 3 -type d -name .obsidian -print -quit 2>/dev/null)
+          [ -n "$nested" ] || return 1
+          dirname "$nested"
+        }
+
         actions=("Open in editor" "Open terminal")
         if [ ${lib.boolToString projectsAgent} = true ] && command -v "$assistant" >/dev/null 2>&1; then
           actions+=("Start agent")
         fi
-        if obsidian_available; then
+        vault=""
+        if detected_vault=$(vault_root) && obsidian_available; then
+          vault="$detected_vault"
           actions+=("Open Obsidian vault")
         fi
         actions+=("Cancel")
@@ -408,7 +421,7 @@
             fi
             ;;
           "Open terminal")
-            if [ "$(basename "$terminal")" = "ghostty" ]; then
+            if [ "$(basename "$terminal")" = "ghostty" ] || [ "$(basename "$terminal")" = "ojuny-ghostty" ]; then
               run_in_devshell "$terminal" --working-directory="$SELECTED"
             else
               run_in_devshell "$terminal"
@@ -426,25 +439,8 @@
             fi
             ;;
           "Open Obsidian vault")
-<<<<<<< HEAD
-            vault_path="$SELECTED"
-            if command -v obsidian >/dev/null 2>&1 && obsidian vault="$vault_path" >/dev/null 2>&1; then
-              exit 0
-            fi
-            vault_path="''${vault_path// /%20}"
-            xdg-open "obsidian://open?path=$vault_path" >/dev/null 2>&1 &
-||||||| cbe239e
-            vault_path="$SELECTED"
-            vault_uri="obsidian://open?path=''${vault_path// /%20}"
-            if command -v obsidian >/dev/null 2>&1; then
-              obsidian --new-window "$vault_uri" >/dev/null 2>&1 &
-            else
-              xdg-open "$vault_uri" >/dev/null 2>&1 &
-            fi
-=======
             vault_uri="obsidian://open?path=$(printf '%s' "$vault" | jq -sRr 'split("/") | map(@uri) | join("/")')"
             xdg-open "$vault_uri" >/dev/null 2>&1 &
->>>>>>> origin/base
             ;;
         esac
       '';
