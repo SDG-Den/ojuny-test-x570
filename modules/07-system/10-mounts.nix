@@ -10,7 +10,12 @@
 { self, inputs, ... }: {
 
   flake.modules.nixos.system-mounts =
-    { config, lib, pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
 
     {
       options.ojuny.mounts.passwordless = lib.mkEnableOption "passwordless mounting of removable media";
@@ -21,7 +26,16 @@
 
       config = {
         # @option widget = "mounts"; label = "Additional mounts"; group = "Mounts"; groupOrder = 10; description = "Internal data disks and partitions. The generated nix uses UUIDs. The core filesystems stay in the generated hardware module.";
-        fileSystems = { };
+        fileSystems = {
+          "/mnt/sdc1" = {
+            device = "/dev/disk/by-uuid/9b04bc73-eb0e-4931-8c4f-e5830e2d2a5a";
+            fsType = "ext4";
+            options = [
+              "noatime"
+              "nofail"
+            ];
+          };
+        };
 
         # @option widget = "switch"; label = "Mount removable media automatically"; group = "External media"; groupOrder = 20; description = "Runs devmon, which mounts removable media when it is inserted.";
         services.devmon.enable = true;
@@ -57,7 +71,11 @@
           });
         '';
 
-        boot.supportedFilesystems = [ "exfat" "ntfs" "f2fs" ];
+        boot.supportedFilesystems = [
+          "exfat"
+          "ntfs"
+          "f2fs"
+        ];
 
         environment.systemPackages = with pkgs; [
           btrfs-progs
