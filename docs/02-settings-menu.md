@@ -195,6 +195,9 @@ current working set for review.
 - `05-controlcenter.nix` `[menu]`. Control center widgets and layout.
 - `06-menu.nix` `[menu]`. Nix managed application menu. The menu tree is a
   literal attribute set that the `menu` widget reads and writes as a whole.
+  Settings has an Accessibility page with an Auto-popup toggle for wvkbd. The
+  toggle sets `OJUNY_OSK_AUTO` in the user manager and restarts the OSK
+  service; the Nix option remains the default for the next login.
 - `07-dot.nix` `[menu]`. The standalone dot and free-floating island surfaces,
   their size, colours, screens, shortcut routing and notification behaviour.
   Both are off by default and never change the selected bar.
@@ -320,7 +323,8 @@ current working set for review.
   on-screen keyboard with focus auto show/hide and a tray toggle, colour
   profiles and the keyboard and mouse accessibility binds. The on-screen
   keyboard is enabled by default. Super+Alt+O starts or signals it, and the
-  tray icon toggles it. `--auto` only fires in clients that implement
+  tray icon toggles it. The tray is a small StatusNotifierItem process, so no
+  XEmbed proxy is installed. `--auto` only fires in clients that implement
   text-input-v3; terminals and other clients need the keybind.
 - `09-facter.nix` `[menu]`. Hardware profile selection through the `facter`
   widget, which reads `facter.json` and shows the detected model, profile,

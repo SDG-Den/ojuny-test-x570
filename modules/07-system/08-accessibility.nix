@@ -73,17 +73,20 @@
         (oskColor "defaultBackground" "ff")
         "--text-press-sp"
         (oskColor "defaultBackground" "ff")
-      ]
-      ++ lib.optional osk.auto "--auto";
+      ];
 
-      oskTray = pkgs.writeShellApplication {
-        name = "ojuny-osk-tray";
-        runtimeInputs = [
-          pkgs.yad
-          oskToggle
-        ];
+      oskTray = import ../../packages/osk-tray.nix { inherit pkgs oskToggle; };
+
+      oskRunner = pkgs.writeShellApplication {
+        name = "ojuny-osk-run";
+        runtimeInputs = [ pkgs.wvkbd ];
         text = ''
-          exec yad --notification --image=input-keyboard-symbolic --text="On-screen keyboard" --command="ojuny-osk-toggle" --menu="Toggle keyboard!ojuny-osk-toggle|Quit!quit"
+          auto="''${OJUNY_OSK_AUTO:-${if osk.auto then "1" else "0"}}"
+          args=( ${lib.escapeShellArgs oskArgs} )
+          if [ "$auto" = "1" ]; then
+            args+=(--auto)
+          fi
+          exec wvkbd-mobintl "''${args[@]}"
         '';
       };
 
@@ -317,22 +320,8 @@
           wantedBy = [ "mango-session.target" ];
           serviceConfig = {
             Type = "exec";
-            ExecStart = "${pkgs.wvkbd}/bin/wvkbd-mobintl ${lib.escapeShellArgs oskArgs}";
+            ExecStart = "${oskRunner}/bin/ojuny-osk-run";
             Restart = "no";
-          };
-        };
-
-        systemd.user.services.ojuny-osk-sni = lib.mkIf (osk.enable && osk.tray) {
-          description = "XEmbed to StatusNotifierItem proxy for the on-screen keyboard";
-          partOf = [ "mango-session.target" ];
-          wantedBy = [ "mango-session.target" ];
-          serviceConfig = {
-            ExecStart = "${pkgs.kdePackages.plasma-workspace}/bin/xembedsniproxy";
-            Environment = [
-              "GDK_BACKEND=x11"
-              "QT_QPA_PLATFORM=xcb"
-            ];
-            Restart = "on-failure";
           };
         };
 
@@ -340,11 +329,8 @@
           description = "Ojuny on-screen keyboard tray";
           partOf = [ "mango-session.target" ];
           wantedBy = [ "mango-session.target" ];
-          requires = [ "ojuny-osk-sni.service" ];
-          after = [ "ojuny-osk-sni.service" ];
           serviceConfig = {
             ExecStart = "${oskTray}/bin/ojuny-osk-tray";
-            Environment = [ "GDK_BACKEND=x11" ];
             Restart = "on-failure";
           };
         };

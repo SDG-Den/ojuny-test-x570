@@ -11,6 +11,12 @@
 
   flake.modules.nixos.desktop-menu =
     { config, lib, pkgs, ... }:
+    let
+      oskAuto = import ../../packages/osk-auto.nix {
+        inherit pkgs;
+        default = config.ojuny.accessibility.onScreenKeyboard.auto;
+      };
+    in
     {
     imports = [ self.modules.nixos.desktop-menu-backend ];
 
@@ -302,6 +308,16 @@
         icon = "settings";
         label = "System Settings";
         action = "nix-settings-gui";
+      };
+      "setup.accessibility" = {
+        icon = "accessibility";
+        label = "Accessibility";
+      };
+      "setup.accessibility.auto-popup" = {
+        icon = "keyboard";
+        label = "Auto-popup";
+        checked = "${oskAuto.status}/bin/ojuny-osk-auto-status";
+        action = "${oskAuto.toggle}/bin/ojuny-osk-auto-toggle";
       };
     };
 
