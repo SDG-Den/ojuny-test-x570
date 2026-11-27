@@ -95,7 +95,7 @@ auto-rotate is missing from the menu.
 
 round 5:
 
-
+obsidian vault names need to receive auto-quoting treatment.
 
 
 
