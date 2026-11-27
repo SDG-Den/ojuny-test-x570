@@ -41,9 +41,10 @@ Research was read-only across `ojuny-template`, `nix-settings-gui`, `raven`,
   and analysis documents are the exception: they travel in both directions
   through GitHub, the same way `notes-for-fixes.md` does.
 - Do not reintroduce `xembedsniproxy` or a `yad` XEmbed tray. The old tray
-  created an override-redirect X11 window on wlroots and stole pointer and
-  keyboard focus; it caused the GTK selection loss. See
-  `ojuny-template/docs/05-settings-gui-limitations.md:164-168`.
+  created an override-redirect X11 window on wlroots that interfered with
+  pointer and keyboard focus. The GTK selection loss is a separate general
+  GTK/Wayland issue and is not attributed to the tray. See
+  `ojuny-template/docs/05-settings-gui-limitations.md:164-172`.
 - Display toggling must use `toggle_monitor`, never `sleep_toggle_monitor`
   (`mango/docs/bindings/keys.md:213-216`).
 - `@option` comments bind only to assignments in a plain attribute set. Never
@@ -193,8 +194,11 @@ Evidence:
   focused by mango (`mango/src/manage/layer.c:44-53`, `:294-299`).
 - Mango implements layer-shell, virtual-keyboard, text-input-v3 and
   input-method-v2 (`mango/src/main.c:711`, `:818-821`, `:889-895`).
-- The old XEmbed tray caused this class of failure and is gone from `810d0ca`
-  (`docs/05-settings-gui-limitations.md:164-168`).
+- The GTK selection loss is a general GTK/Wayland issue, seen on other NixOS
+  configurations, with no established cause. It resolved on this device without
+  a known change and is not attributed to the tray.
+- The old XEmbed tray is gone from `810d0ca`
+  (`docs/05-settings-gui-limitations.md:164-172`).
 - The observation was made on `06aff67`, which still ran `yad` and
   `xembedsniproxy`.
 
