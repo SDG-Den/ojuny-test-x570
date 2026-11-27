@@ -17,8 +17,52 @@
         name = "paste.sh";
         path = ojunySrc + "/lib/scripts/paste.sh";
       };
+      middleClick = pkgs.writeShellApplication {
+        name = "ojuny-middle-click";
+        runtimeInputs = [
+          pkgs.coreutils
+          pkgs.jq
+          pkgs.util-linux
+          pkgs.ydotool
+        ];
+        text = builtins.readFile ../../scripts/ojuny-middle-click.sh;
+      };
+      displayToggle = pkgs.writeShellApplication {
+        name = "ojuny-display-toggle";
+        runtimeInputs = [
+          pkgs.coreutils
+          pkgs.jq
+        ];
+        text = builtins.readFile ../../scripts/ojuny-display-toggle.sh;
+      };
     in
     {
+
+      options.ojuny.mango.middleClick = {
+        floating = lib.mkOption {
+          type = lib.types.enum [ "maximize" "none" ];
+          default = "maximize";
+          description = "Layout action for a middle click on a floating window.";
+        };
+        tiling = lib.mkOption {
+          type = lib.types.enum [ "zoom" "maximize" "none" ];
+          default = "zoom";
+          description = "Layout action for a middle click on a tiled window.";
+        };
+      };
+
+      config = {
+
+      environment.systemPackages = [
+        middleClick
+        displayToggle
+      ];
+
+      # @option widget = "dropdown"; label = "Floating window action"; group = "Mouse"; groupOrder = 12; order = 10; choices = [ "maximize" "none" ]; description = "Layout action applied by a middle click on a floating window. The click is still passed to the window.";
+      ojuny.mango.middleClick.floating = "maximize";
+
+      # @option widget = "dropdown"; label = "Tiling window action"; group = "Mouse"; groupOrder = 12; order = 20; choices = [ "zoom" "maximize" "none" ]; description = "Layout action applied by a middle click on a tiled window. The click is still passed to the window.";
+      ojuny.mango.middleClick.tiling = "zoom";
 
       # @option widget = "keybinds"; label = "Default binds"; group = "Binds"; groupOrder = 10; order = 10;
       desktop.ojuny.mango.binds.default = {
@@ -438,6 +482,27 @@
           description = "Switch keyboard layout";
           group = "System";
           subcat = "Keyboard";
+        };
+        displayToggle = {
+          modifier = [ "SUPER" ];
+          keys = [ "O" ];
+          dispatcher = "spawn";
+          args = "${displayToggle}/bin/ojuny-display-toggle focused";
+          description = "Turn the focused display off or on";
+          group = "System";
+          subcat = "Display";
+        };
+        displayAll = {
+          modifier = [
+            "SUPER"
+            "SHIFT"
+          ];
+          keys = [ "O" ];
+          dispatcher = "spawn";
+          args = "${displayToggle}/bin/ojuny-display-toggle all";
+          description = "Turn every display off or on";
+          group = "System";
+          subcat = "Display";
         };
         overview = {
           modifier = [ "ALT" ];
@@ -1006,16 +1071,16 @@
       desktop.ojuny.mango.mousebind.default.move.group = "Mouse";
 
       # Maximize (middle click)
-      # @option widget = "list"; label = "Maximize (middle click): Modifiers"; group = "Mouse";
+      # @option widget = "list"; label = "Middle click: Modifiers"; group = "Mouse"; groupOrder = 12; order = 30;
       desktop.ojuny.mango.mousebind.default.maximize.modifier = [ ];
-      # @option widget = "text"; label = "Maximize (middle click): Button"; group = "Mouse";
+      # @option widget = "text"; label = "Middle click: Button"; group = "Mouse"; groupOrder = 12; order = 31;
       desktop.ojuny.mango.mousebind.default.maximize.keys = [ "btn_middle" ];
-      # @option widget = "text"; label = "Maximize (middle click): Dispatcher"; group = "Mouse"; hidden = true;
-      desktop.ojuny.mango.mousebind.default.maximize.dispatcher = "togglemaximizescreen";
-      # @option widget = "text"; label = "Maximize (middle click): Arguments"; group = "Mouse"; hidden = true;
-      desktop.ojuny.mango.mousebind.default.maximize.args = "0";
-      # @option widget = "text"; label = "Maximize (middle click): Description"; group = "Mouse"; hidden = true;
-      desktop.ojuny.mango.mousebind.default.maximize.description = "Maximize window";
+      # @option widget = "text"; label = "Middle click: Dispatcher"; group = "Mouse"; hidden = true;
+      desktop.ojuny.mango.mousebind.default.maximize.dispatcher = "spawn_shell";
+      # @option widget = "text"; label = "Middle click: Arguments"; group = "Mouse"; hidden = true;
+      desktop.ojuny.mango.mousebind.default.maximize.args = "ojuny-middle-click ${config.ojuny.mango.middleClick.floating} ${config.ojuny.mango.middleClick.tiling}";
+      # @option widget = "text"; label = "Middle click: Description"; group = "Mouse"; hidden = true;
+      desktop.ojuny.mango.mousebind.default.maximize.description = "Apply the layout action and pass the middle click through";
       desktop.ojuny.mango.mousebind.default.maximize.group = "Mouse";
 
       # Resize window (mouse)
@@ -1073,6 +1138,8 @@
       desktop.ojuny.mango.snap.topInset = 45;
       # @option widget = "spin"; label = "Bottom inset"; group = "Window snap"; groupOrder = 20; order = 60; min = 0; max = 200; unit = "px"; description = "Outer gap between the bottom screen edge and a snapped window.";
       desktop.ojuny.mango.snap.bottomInset = 5;
+
+      };
 
     };
 

@@ -91,6 +91,30 @@
           default = "SUPER+grave";
           description = "MOD+KEY chord. It must be unique.";
         };
+
+        width = lib.mkOption {
+          type = lib.types.nullOr lib.types.float;
+          default = null;
+          description = "Rule width as a fraction of the screen. Null uses the global scratchpad ratio.";
+        };
+
+        height = lib.mkOption {
+          type = lib.types.nullOr lib.types.float;
+          default = null;
+          description = "Rule height as a fraction of the screen. Null uses the global scratchpad ratio.";
+        };
+
+        offsetY = lib.mkOption {
+          type = lib.types.int;
+          default = 0;
+          description = "Vertical rule offset from screen center in percent. -100 is the top edge.";
+        };
+
+        isOverlay = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          description = "Place the rule in the overlay layer so it stays above the bar.";
+        };
       };
 
       scratchpadSpec = lib.types.submodule {
@@ -119,6 +143,10 @@
         title = "";
         command = "ghostty --class=org.ojuny.quake";
         chord = lib.concatStringsSep "+" (config.ojuny.quake.modifier ++ config.ojuny.quake.keys);
+        width = config.ojuny.quake.widthRatio;
+        height = config.ojuny.quake.heightRatio;
+        offsetY = -100;
+        isOverlay = true;
       };
 
       allScratchpads = scratchpadRows ++ lib.optional config.ojuny.quake.enable quakeScratchpadRow;
@@ -158,7 +186,11 @@
         row:
         { is_named_scratchpad = 1; }
         // lib.optionalAttrs (row.appId != "") { app_id = row.appId; }
-        // lib.optionalAttrs (row.title != "") { title = row.title; };
+        // lib.optionalAttrs (row.title != "") { title = row.title; }
+        // lib.optionalAttrs (row.width != null) { width = row.width; }
+        // lib.optionalAttrs (row.height != null) { height = row.height; }
+        // lib.optionalAttrs (row.offsetY != 0) { offset_y = row.offsetY; }
+        // lib.optionalAttrs row.isOverlay { is_overlay = 1; };
     in
     {
       options.ojuny.mango.flag = lib.mapAttrs (

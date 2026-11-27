@@ -17,6 +17,69 @@ def require(text, needle, path, errors):
         errors.append(f"{path}: missing {needle}")
 
 
+SYSMON_METRICS = [
+    ("cpu", ["usage", "temp", "clock"]),
+    ("memory", ["used", "swap"]),
+    ("disk:nvme0n1", ["space", "read", "write"]),
+    ("net", ["down", "up"]),
+    ("gpu:0000:01:00.0", ["usage", "temp", "vram", "power"]),
+]
+
+
+def check_sysmon(cards, errors):
+    match = re.search(r"\n {6}sysmon = \{(?P<body>.*?)\n {6}\};", cards, re.S)
+    if not match:
+        errors.append("04-dashboard.nix: dashCards.sysmon is missing")
+        return
+    sysmon = match.group("body")
+    config = re.search(r"\n {8}config = \{(?P<body>.*?)\n {8}\};", sysmon, re.S)
+    if not config:
+        errors.append("04-dashboard.nix: dashCards.sysmon.config is missing")
+        return
+    body = config.group("body")
+    for needle in [
+        'layout = "bars";',
+        "showHeader = false;",
+        'barOrientation = "horizontal";',
+        "barNames = true;",
+        'barStyle = "tiles";',
+    ]:
+        require(body, needle, "04-dashboard.nix sysmon.config", errors)
+
+    metrics = re.search(r"metrics = \[(?P<body>.*?)\n {10}\];", body, re.S)
+    if not metrics:
+        errors.append("04-dashboard.nix: sysmon.config.metrics is missing")
+        return
+    metrics_body = metrics.group("body")
+    if "@option" in metrics_body:
+        errors.append("04-dashboard.nix: @option inside sysmon.config.metrics")
+    found = re.findall(
+        r'device = "([^"]+)";\s*graph = (?:true|false);\s*on = (?:true|false);\s*'
+        r'vals = \[ ([^\]]*) \];',
+        metrics_body,
+    )
+    expected = [(device, " ".join(f'"{value}"' for value in vals)) for device, vals in SYSMON_METRICS]
+    if found != expected:
+        errors.append(
+            "04-dashboard.nix: sysmon.config.metrics is "
+            f"{found}, expected {expected}"
+        )
+    for device, vals in found:
+        kind = device.split(":", 1)[0]
+        allowed = {
+            "cpu": ["usage", "temp", "clock"],
+            "memory": ["used", "swap"],
+            "gpu": ["usage", "temp", "vram", "power"],
+            "disk": ["space", "read", "write"],
+            "net": ["down", "up"],
+        }.get(kind, [])
+        for value in re.findall(r'"([^"]+)"', vals):
+            if value not in allowed:
+                errors.append(
+                    f"04-dashboard.nix: {device} has unsupported value {value}"
+                )
+
+
 def check(root):
     root = pathlib.Path(root)
     errors = []
@@ -29,7 +92,19 @@ def check(root):
     require(bar, "islandHoverOpenDelay = 500", "01-bar.nix", errors)
     require(bar, "islandHoverCloseDelay = 300", "01-bar.nix", errors)
     require(dashboard, "dashTabs.overview.enabled = true", "04-dashboard.nix", errors)
-    require(dashboard, 'network = {', "04-dashboard.nix", errors)
+    require(
+        dashboard,
+        "dashOptions.overview.panelRows = 7",
+        "04-dashboard.nix",
+        errors,
+    )
+
+    cards = re.search(r"dashCards = \{(?P<body>.*?)\n    \};", dashboard, re.S)
+    if not cards:
+        errors.append("04-dashboard.nix: dashCards is missing")
+    else:
+        require(cards.group("body"), "network = {", "04-dashboard.nix dashCards", errors)
+        check_sysmon(cards.group("body"), errors)
 
     for match in re.finditer(r"col = (\d+);\s*row = \d+;\s*w = (\d+);", control):
         col, width = (int(group) for group in match.groups())

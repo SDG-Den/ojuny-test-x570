@@ -1,9 +1,19 @@
 { self, inputs, ... }: {
 
   flake.modules.nixos.desktop-display-backend =
-    { config, lib, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
 
     let
+      autoRotate = import ../../../packages/auto-rotate.nix { inherit pkgs; };
+      autoRotateOutputs = lib.attrNames (
+        lib.filterAttrs (_: output: output.autoRotation == "automatic") config.services.nix-settings-gui.monitors
+      );
+
       flagDefaults = {
         xwayland_ignore_scale = false;
       };
@@ -110,6 +120,19 @@
       ) enumSpecs;
 
       config = {
+
+        hardware.sensor.iio.enable = lib.mkIf (autoRotateOutputs != [ ]) true;
+
+        systemd.user.services.ojuny-auto-rotate = lib.mkIf (autoRotateOutputs != [ ]) {
+          description = "Rotate the display from the accelerometer";
+          partOf = [ "mango-session.target" ];
+          wantedBy = [ "mango-session.target" ];
+          after = [ "graphical-session-pre.target" ];
+          serviceConfig = {
+            ExecStart = "${autoRotate}/bin/ojuny-auto-rotate ${lib.escapeShellArgs autoRotateOutputs}";
+            Restart = "on-failure";
+          };
+        };
 
         desktop.ojuny.mango.rules.monitor_rule =
           lib.mapAttrsToList monitorRule config.services.nix-settings-gui.monitors;

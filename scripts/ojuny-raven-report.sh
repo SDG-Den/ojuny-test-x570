@@ -45,22 +45,16 @@ show_report() {
   shift
   preview="$(report_preview "$report")"
   while :; do
-    set +e
     timeout 300s yad --text="$preview" --no-markup --title="$title" --width=900 --height=600 --class=ojuny-raven-report --name=ojuny-raven-report --center --on-top \
       --button="Copy report:2" --button="Close:0" "$@"
     choice=$?
-    set -e
     if [ "$choice" -ne 2 ]; then
       return "$choice"
     fi
-    set +e
     wl-copy < "$report"
     copy_status=$?
-    set -e
     if [ "$copy_status" -eq 0 ]; then
-      set +e
       timeout 5s yad --text="Report copied to the clipboard." --no-markup --title="Raven report" --timeout=2 --no-buttons --class=ojuny-raven-report --name=ojuny-raven-report --center --on-top
-      set -e
     fi
   done
 }

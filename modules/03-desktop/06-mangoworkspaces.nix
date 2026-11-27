@@ -21,10 +21,10 @@
         # @option widget = "switch"; label = "Quake console"; group = "Quake"; description = "Enable the quake-style scratchpad terminal and its keybind.";
         ojuny.quake.enable = true;
 
-        # @option widget = "slider"; label = "Width ratio"; group = "Quake"; min = 0.1; max = 1.0; step = 0.05; description = "Width of the quake scratchpad as a fraction of the screen.";
+        # @option widget = "slider"; label = "Width ratio"; group = "Quake"; min = 0.1; max = 1.0; step = 0.05; description = "Width of the quake scratchpad as a fraction of the screen. Quake uses this value in its window rule; other named scratchpads use the global ratio.";
         ojuny.quake.widthRatio = 0.7;
 
-        # @option widget = "slider"; label = "Height ratio"; group = "Quake"; min = 0.1; max = 1.0; step = 0.05; description = "Height of the quake scratchpad as a fraction of the screen. This is global, so it also affects other named scratchpads.";
+        # @option widget = "slider"; label = "Height ratio"; group = "Quake"; min = 0.1; max = 1.0; step = 0.05; description = "Height of the quake scratchpad as a fraction of the screen. Quake uses this value in its window rule; other named scratchpads use the global ratio.";
         ojuny.quake.heightRatio = 0.55;
 
         # @option widget = "list"; label = "Modifiers"; group = "Quake"; itemLabel = "Modifier"; addLabel = "Add modifier"; description = "Modifier keys that open the quake console, for example SUPER.";
@@ -33,7 +33,7 @@
         # @option widget = "list"; label = "Keys"; group = "Quake"; itemLabel = "Key"; addLabel = "Add key"; description = "Keys that toggle the quake console with the modifiers above.";
         ojuny.quake.keys = [ "grave" ];
 
-        # @option widget = "table-attrset"; label = "Scratchpads"; group = "Scratchpads"; groupOrder = 15; columns = [ "enable" "appId" "title" "command" "chord" ]; columnTypes = [ "bool" "str" "str" "str" "str" ]; keyEditable = true; firstValueEditable = true; description = "One row per named scratchpad, keyed by a stable name. Set appId, title, or both to identify the window; an empty field is sent to Mango as none. command must launch the app with that class or title. chord is MOD+KEY and must be unique. A named scratchpad opens on the tag that is active when you toggle it; Mango has no per-tag pinning. Dimensions are global. Commands cannot contain commas because bind arguments and rule fields are comma-separated.";
+        # @option widget = "table-attrset"; label = "Scratchpads"; group = "Scratchpads"; groupOrder = 15; columns = [ "enable" "appId" "title" "command" "chord" ]; columnTypes = [ "bool" "str" "str" "str" "str" ]; keyEditable = true; firstValueEditable = true; description = "One row per named scratchpad, keyed by a stable name. Set appId, title, or both to identify the window; an empty field is sent to Mango as none. command must launch the app with that class or title. chord is MOD+KEY and must be unique. A named scratchpad opens on the tag that is active when you toggle it; Mango has no per-tag pinning. The quake row uses its own width, height, top offset and overlay layer; other rows use the global scratchpad ratios and stay below the bar. Commands cannot contain commas because bind arguments and rule fields are comma-separated.";
         ojuny.scratchpads = { };
 
         # @option widget = "switch"; label = "Only one scratchpad visible at a time"; group = "Scratchpads"; groupOrder = 15; order = 20; description = "Global Mango option. When on, showing a named scratchpad hides the normal scratchpad and every other named scratchpad. It applies to all scratchpads, not one row."; applyCommand = "mmsg dispatch setoption,single_scratchpad,$(case %%val%% in true) echo 1;; *) echo 0;; esac)";

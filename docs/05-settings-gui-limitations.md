@@ -152,3 +152,16 @@ inside the backend module. Do not collect the gated logic into a list.
 - Numeric controls must state their unit through `unit` or through the label.
   The settings check rejects a spin or slider that counts a quantity without
   one.
+- The dashboard sysmon group is edited by a dedicated card editor selected by
+  card id. `dashCards.<id>.config` contains a list of metric records, so an
+  `@option` comment cannot describe it; keep card defaults and choices in the
+  catalog or a dedicated widget, not inside `dashCards`.
+- The application wraps the selected icon theme so icon lookup inherits
+  Adwaita and hicolor. A theme that renames an icon instead of providing the
+  standard name still falls back to `emblem-system-symbolic`; add a mapping in
+  `src/widgets/dms_catalog.rs` or the menu/category catalog when a specific
+  symbol is required.
+- Selecting text in GTK applications is a shared session issue, not specific to
+  the settings GUI; it affects every GTK app. Do not add a settings GUI
+  workaround; the shared clipboard and pointer cause is investigated at the
+  template layer.

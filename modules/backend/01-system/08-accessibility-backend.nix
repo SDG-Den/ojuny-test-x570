@@ -47,7 +47,7 @@
           auto = lib.mkOption {
             type = lib.types.bool;
             default = true;
-            description = "Show the keyboard when a text field takes focus and hide it when focus leaves. Requires zwp_input_method_v2.";
+            description = "Show the keyboard when a text field takes focus and hide it when focus leaves. Requires zwp_input_method_v2 and a client that implements text-input-v3; other clients use the toggle keybind.";
           };
           tray = lib.mkOption {
             type = lib.types.bool;
