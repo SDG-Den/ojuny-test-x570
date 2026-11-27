@@ -132,13 +132,18 @@ bash "$here"/ojuny-display-toggle.sh all || fail "the all-displays toggle failed
 grep -qx 'dispatch toggle_monitor,eDP-1' "$MMSG_LOG" || fail "all-displays skipped eDP-1"
 grep -qx 'dispatch toggle_monitor,HDMI-A-1' "$MMSG_LOG" || fail "all-displays skipped HDMI-A-1"
 
-export LSBLK_JSON='{"blockdevices":[
-  {"name":"sda","path":"/dev/sda","type":"disk","tran":"sata","rm":false,"fstype":null,"mountpoints":[null]},
-  {"name":"sdb1","path":"/dev/sdb1","type":"part","tran":"usb","rm":true,"fstype":"exfat","mountpoints":[null]},
-  {"name":"sdc1","path":"/dev/sdc1","type":"part","tran":null,"rm":true,"fstype":"vfat","mountpoints":[null]},
-  {"name":"sdd1","path":"/dev/sdd1","type":"part","tran":"usb","rm":true,"fstype":"ext4","mountpoints":["/run/media/user/sdd1"]},
-  {"name":"sde1","path":"/dev/sde1","type":"part","tran":"usb","rm":true,"fstype":null,"mountpoints":[null]}
-]}'
+uid="$(id -u)"
+export LSBLK_JSON="{\"blockdevices\":[
+  {\"name\":\"sda\",\"path\":\"/dev/sda\",\"type\":\"disk\",\"tran\":\"sata\",\"rm\":false,\"fstype\":null,\"mountpoints\":[null],\"options\":null},
+  {\"name\":\"sdb1\",\"path\":\"/dev/sdb1\",\"type\":\"part\",\"tran\":\"usb\",\"rm\":true,\"fstype\":\"exfat\",\"mountpoints\":[null],\"options\":null},
+  {\"name\":\"sdc1\",\"path\":\"/dev/sdc1\",\"type\":\"part\",\"tran\":null,\"rm\":true,\"fstype\":\"vfat\",\"mountpoints\":[null],\"options\":null},
+  {\"name\":\"sdd1\",\"path\":\"/dev/sdd1\",\"type\":\"part\",\"tran\":\"usb\",\"rm\":true,\"fstype\":\"ext4\",\"mountpoints\":[\"/run/media/user/sdd1\"],\"options\":\"rw,uid=${uid}\"},
+  {\"name\":\"sdf1\",\"path\":\"/dev/sdf1\",\"type\":\"part\",\"tran\":\"usb\",\"rm\":true,\"fstype\":\"exfat\",\"mountpoints\":[\"/run/media/greeter/sdf1\"],\"options\":\"rw,uid=9999\"},
+  {\"name\":\"sdg\",\"path\":\"/dev/sdg\",\"type\":\"disk\",\"tran\":\"usb\",\"rm\":true,\"fstype\":null,\"mountpoints\":[null],\"options\":null,\"children\":[
+    {\"name\":\"sdg1\",\"path\":\"/dev/sdg1\",\"type\":\"part\",\"tran\":\"usb\",\"rm\":true,\"fstype\":\"exfat\",\"mountpoints\":[null],\"options\":null}
+  ]},
+  {\"name\":\"sde1\",\"path\":\"/dev/sde1\",\"type\":\"part\",\"tran\":\"usb\",\"rm\":true,\"fstype\":null,\"mountpoints\":[null],\"options\":null}
+]}"
 : >"$UDISKS_LOG"
 bash "$here"/ojuny-automount-present.sh || fail "the present-device automount failed"
 grep -qx 'mount -b /dev/sdb1 --no-user-interaction' "$UDISKS_LOG" ||
@@ -154,6 +159,12 @@ fi
 if grep -qx 'mount -b /dev/sde1 --no-user-interaction' "$UDISKS_LOG"; then
   fail "a partition without a filesystem was mounted"
 fi
+grep -qx 'unmount -b /dev/sdf1 --no-user-interaction' "$UDISKS_LOG" ||
+  fail "a partition mounted for another uid was not unmounted"
+grep -qx 'mount -b /dev/sdf1 --no-user-interaction' "$UDISKS_LOG" ||
+  fail "a partition mounted for another uid was not remounted"
+grep -qx 'mount -b /dev/sdg1 --no-user-interaction' "$UDISKS_LOG" ||
+  fail "a nested USB partition was not mounted"
 
 export LSBLK_JSON='{"blockdevices":[]}'
 : >"$UDISKS_LOG"
@@ -166,16 +177,28 @@ mkdir -p "$home" "$theme_source"
 printf '{"name":"Adwaita"}\n' >"$theme_source/skin.json"
 HOME="$home" bash "$here"/ojuny-steam-theme.sh "$theme_source" Adwaita ||
   fail "the Steam theme install failed"
-[ -L "$home/.steam/steam/millennium/themes/Adwaita" ] || fail "the Steam theme was not linked"
-[ "$(readlink "$home/.steam/steam/millennium/themes/Adwaita")" = "$theme_source" ] ||
+[ -L "$home/.local/share/Steam/millennium/themes/Adwaita" ] || fail "the Steam theme was not linked"
+[ "$(readlink "$home/.local/share/Steam/millennium/themes/Adwaita")" = "$theme_source" ] ||
   fail "the Steam theme link points at the wrong path"
-grep -q '"activeTheme":"Adwaita"' "$home/.config/millennium/config.json" ||
+jq -e '.themes.activeTheme == "Adwaita"' "$home/.config/millennium/config.json" ||
   fail "the Steam theme was not selected"
+
+printf '{"name":"millennium"}\n' >"$home/.config/millennium/config.json"
+HOME="$home" bash "$here"/ojuny-steam-theme.sh "$theme_source" Adwaita ||
+  fail "the Steam theme install without a themes key failed"
+jq -e '.themes.activeTheme == "Adwaita"' "$home/.config/millennium/config.json" ||
+  fail "the Steam theme was not selected without a themes key"
+
+printf '{"themes":{"activeTheme":"default"}}\n' >"$home/.config/millennium/config.json"
+HOME="$home" bash "$here"/ojuny-steam-theme.sh "$theme_source" Adwaita ||
+  fail "the Steam theme install with the default value failed"
+jq -e '.themes.activeTheme == "Adwaita"' "$home/.config/millennium/config.json" ||
+  fail "the Steam theme did not replace the default value"
 
 printf '{"themes":{"activeTheme":"Other"}}\n' >"$home/.config/millennium/config.json"
 HOME="$home" bash "$here"/ojuny-steam-theme.sh "$theme_source" Adwaita ||
   fail "the second Steam theme install failed"
-grep -q '"activeTheme":"Other"' "$home/.config/millennium/config.json" ||
+jq -e '.themes.activeTheme == "Other"' "$home/.config/millennium/config.json" ||
   fail "the Steam theme install overwrote an existing choice"
 
 printf 'ok: middle click, display toggle, automount and Steam theme scripts\n'

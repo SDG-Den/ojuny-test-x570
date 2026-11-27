@@ -74,7 +74,9 @@ grep -qF 'timeout 300s yad' "$source_script" || fail "the dialog is not bounded 
 grep -qF 'timeout 300s yad --title="Raven survey mode"' "$source_script" ||
   fail "the survey confirmation is not bounded by a timeout"
 grep -qF 'max=262144' "$source_script" || fail "the report cap is not declared"
-grep -qF 'fold -s -w 4000' "$source_script" || fail "the report is not folded"
+grep -qF 'fold -s -w 100' "$source_script" || fail "the report is not folded"
+grep -qF 'max_lines=24' "$source_script" || fail "the preview line cap is not declared"
+grep -qF 'max_bytes=2048' "$source_script" || fail "the preview byte cap is not declared"
 grep -qF 'wl-copy < "$report"' "$source_script" || fail "the copy action does not use wl-copy"
 if grep -qF -- '--text-info' "$source_script"; then
   fail "the report still uses the selectable text-info widget"
@@ -86,8 +88,8 @@ size="$(stat -c %s "$report")"
 [ "$size" -lt 262400 ] || fail "the report was not capped: $size bytes"
 grep -qF -- '--- report truncated at 262144 bytes ---' "$report" ||
   fail "the truncation marker is missing"
-if grep -qE '^.{4001}' "$report"; then
-  fail "the report still contains a line longer than 4000 characters"
+if grep -qE '^.{101}' "$report"; then
+  fail "the report still contains a line longer than 100 characters"
 fi
 
 for argument in \
@@ -108,7 +110,7 @@ small="$work/small.log"
 head -c 12000 /dev/zero | tr '\0' 'b' >"$small"
 printf '\n' >>"$small"
 YAD_MODE=close "$wrapper" "$small" "fake-app" "$work/bin/relaunch-wrapper" 7 2>"$work/small.err"
-if grep -qE '^.{4001}' "$small"; then
+if grep -qE '^.{101}' "$small"; then
   fail "a report under the cap was not folded"
 fi
 if grep -qF -- '--- report truncated at' "$small"; then

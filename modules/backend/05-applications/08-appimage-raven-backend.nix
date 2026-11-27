@@ -142,10 +142,26 @@
       ravenSandboxLog = ''
         prefix="''${RAVEN_PREFIX:-$HOME/.local/share/raven/default}"
         if [ -f "$prefix/sandbox.log" ]; then
+          app_name="$(basename -- "$host_file")"
+          launch="$(sed -n 's/^Time: //p' "$log" | head -n 1)"
+          launch="''${launch%%+*}"
+          launch="''${launch%%Z*}"
           {
             echo
             echo "--- sandbox refusals ---"
-            tail -n 100 "$prefix/sandbox.log"
+            awk -F '\t' -v app="$app_name" -v since_raw="$launch" '
+              function epoch(value, parts) {
+                gsub(/[-:T]/, " ", value)
+                split(value, parts, " ")
+                return mktime(parts[1] " " parts[2] " " parts[3] " " parts[4] " " parts[5] " " parts[6])
+              }
+              BEGIN { since = since_raw == "" ? 0 : epoch(since_raw) }
+              {
+                name = tolower($2)
+                sub(/.*\\/, "", name)
+                if (name == tolower(app) && epoch($1) >= since) print
+              }
+            ' "$prefix/sandbox.log"
           } >> "$report"
         fi
       '';
@@ -252,11 +268,13 @@
             echo
             echo "--- output ---"
           } > "$log"
+          running_log="$log_dir/$(date +%Y%m%d-%H%M%S)-running.log"
+          cp "$log" "$running_log"
 
           exec 3>"$exit_log"
           if [ -t 1 ] || [ -t 2 ]; then
             set +e
-            ${config.programs.raven.package}/bin/raven --run-process --execution=native --exit-code-fd=3 --timeout-ms=86400000 --desktop=wayland --directory="$win_dir" "$host_file" -- "$@" 2>&1 | tee -a "$log"
+            ${config.programs.raven.package}/bin/raven --run-process --execution=native --exit-code-fd=3 --timeout-ms=86400000 --desktop=wayland --directory="$win_dir" "$host_file" -- "$@" 2>&1 | tee -a "$log" "$running_log"
             status="''${PIPESTATUS[0]}"
             set -e
           else
@@ -266,14 +284,16 @@
             set -e
           fi
           exec 3>&-
-          guest_status="$(cat "$exit_log" 2>/dev/null || true)"
+          guest_status="$(od -An -tu4 -N4 "$exit_log" 2>/dev/null | tr -d ' \n' || true)"
+          guest_signed="$(od -An -td4 -N4 "$exit_log" 2>/dev/null | tr -d ' \n' || true)"
 
           if [ "$status" -eq 0 ]; then
+            rm -f "$running_log"
             ${ravenRefresh}/bin/ojuny-raven-refresh >/dev/null 2>&1 || true
             exit 0
           fi
           echo "Exit status: $status" >> "$log"
-          echo "Guest exit code: ''${guest_status:-unknown}" >> "$log"
+          echo "Guest exit code: ''${guest_status:-unknown} (signed ''${guest_signed:-unknown})" >> "$log"
           if [ -t 1 ] || [ -t 2 ]; then
             exit "$status"
           fi
@@ -294,7 +314,11 @@
         comment = "Optional experimental runtime for Windows .exe files. Not guaranteed to run a given program.";
         noDisplay = true;
         icon = "application-x-executable";
-        mimeTypes = [ "application/x-ms-dos-executable" ];
+        mimeTypes = [
+          "application/x-ms-dos-executable"
+          "application/vnd.microsoft.portable-executable"
+          "application/x-msdownload"
+        ];
         categories = [ "Utility" ];
       };
 
@@ -520,6 +544,8 @@
 
         xdg.mime.defaultApplications = lib.mkIf cfg.enable {
           "application/x-ms-dos-executable" = lib.mkDefault "ojuny-raven.desktop";
+          "application/vnd.microsoft.portable-executable" = lib.mkDefault "ojuny-raven.desktop";
+          "application/x-msdownload" = lib.mkDefault "ojuny-raven.desktop";
           "application/x-msi" = lib.mkDefault "ojuny-raven-msi.desktop";
           "application/x-bat" = lib.mkDefault "ojuny-raven-bat.desktop";
         };

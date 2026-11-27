@@ -324,8 +324,9 @@ current working set for review.
   profiles and the keyboard and mouse accessibility binds. The on-screen
   keyboard is enabled by default. Super+Alt+O starts or signals it, and the
   tray icon toggles it. The tray is a small StatusNotifierItem process, so no
-  XEmbed proxy is installed. `--auto` only fires in clients that implement
-  text-input-v3; terminals and other clients need the keybind.
+  XEmbed proxy is installed. `--auto` requires a client that enables
+  text-input-v3: terminals never trigger it, and GTK applications depend on
+  their input-method path, so use the keybind or the tray there.
 - `09-facter.nix` `[menu]`. Hardware profile selection through the `facter`
   widget, which reads `facter.json` and shows the detected model, profile,
   coverage state, effective GPU layout and its source. `auto` uses

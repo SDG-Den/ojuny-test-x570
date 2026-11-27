@@ -25,17 +25,26 @@ fold_report() {
     else
       cat "$file"
     fi
-  } | fold -s -w 4000 >"$tmp"
+  } | fold -s -w 100 >"$tmp"
   mv "$tmp" "$file"
 }
 fold_report "$report"
 
 report_preview() {
-  local file="$1" max=8192 size
-  size="$(stat -c %s "$file" 2>/dev/null || printf 0)"
+  local file="$1" max_bytes=2048 max_lines=24 section lines bytes
   printf 'Report: %s\n\n' "$file"
-  head -c "$max" "$file"
-  if [ "$size" -gt "$max" ]; then
+  section="$(awk '/^--- output ---$/{found=1} found' "$file")"
+  if [ -z "$section" ]; then
+    section="$(cat "$file")"
+  fi
+  printf '%s\n' "$section" |
+    awk -v max_lines="$max_lines" -v max_bytes="$max_bytes" '
+      NR > max_lines { exit }
+      { bytes += length($0) + 1; if (bytes > max_bytes) exit; print }
+    '
+  lines="$(printf '%s\n' "$section" | wc -l)"
+  bytes="$(printf '%s\n' "$section" | wc -c)"
+  if [ "$lines" -gt "$max_lines" ] || [ "$bytes" -gt "$max_bytes" ]; then
     printf '\n--- preview truncated; use Copy report for the full log ---\n'
   fi
 }
