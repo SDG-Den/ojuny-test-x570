@@ -121,7 +121,7 @@
         ojuny.accessibility.onScreenKeyboard.enable = true;
 
         # @option widget = "switch"; label = "Show on text fields"; group = "Keyboard"; groupOrder = 25; order = 20; visibleWhen.path = "ojuny.accessibility.onScreenKeyboard.enable"; visibleWhen.equals = true; description = "Use wvkbd --auto so the keyboard appears when a text field takes focus and hides when focus leaves. It requires a client that enables text-input-v3: terminals never trigger it, and GTK applications depend on their input-method path, so use Super+Alt+O or the tray there.";
-        ojuny.accessibility.onScreenKeyboard.auto = true;
+        ojuny.accessibility.onScreenKeyboard.auto = false;
 
         # @option widget = "switch"; label = "Tray toggle"; group = "Keyboard"; groupOrder = 25; order = 30; visibleWhen.path = "ojuny.accessibility.onScreenKeyboard.enable"; visibleWhen.equals = true; description = "Show a tray icon. Left click toggles the keyboard; right click opens the menu.";
         ojuny.accessibility.onScreenKeyboard.tray = true;
