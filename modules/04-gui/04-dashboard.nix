@@ -235,12 +235,12 @@
         h = 2;
       };
       calendar = {
+        weekends = true;
         _order = 40;
         col = 0;
         row = 1;
         w = 3;
         h = 3;
-        weekends = true;
       };
       media = {
         _order = 50;
@@ -250,18 +250,57 @@
         h = 1;
       };
       sysmon = {
-        _order = 60;
-        col = 3;
-        row = 1;
-        w = 3;
-        h = 3;
         config = {
           metrics = [
-            { device = "cpu"; graph = true; on = true; vals = [ "usage" "temp" "clock" ]; }
-            { device = "memory"; graph = true; on = true; vals = [ "used" "swap" ]; }
-            { device = "disk:nvme0n1"; graph = true; on = true; vals = [ "space" "read" "write" ]; }
-            { device = "net"; graph = false; on = true; vals = [ "down" "up" ]; }
-            { device = "gpu:0000:01:00.0"; graph = false; on = true; vals = [ "usage" "temp" "vram" "power" ]; }
+            {
+              device = "cpu";
+              graph = true;
+              on = true;
+              vals = [
+                "usage"
+                "temp"
+                "clock"
+              ];
+            }
+            {
+              device = "memory";
+              graph = true;
+              on = true;
+              vals = [
+                "used"
+                "swap"
+              ];
+            }
+            {
+              device = "disk:nvme0n1";
+              graph = true;
+              on = true;
+              vals = [
+                "space"
+                "read"
+                "write"
+              ];
+            }
+            {
+              device = "net";
+              graph = false;
+              on = true;
+              vals = [
+                "down"
+                "up"
+              ];
+            }
+            {
+              device = "gpu:0000:01:00.0";
+              graph = false;
+              on = true;
+              vals = [
+                "usage"
+                "temp"
+                "vram"
+                "power"
+              ];
+            }
           ];
           layout = "bars";
           showHeader = false;
@@ -269,11 +308,16 @@
           barNames = true;
           barStyle = "tiles";
         };
+        _order = 60;
+        col = 3;
+        row = 1;
+        w = 3;
+        h = 3;
       };
       network = {
         _order = 70;
         col = 3;
-        row = 2;
+        row = 7;
         w = 3;
         h = 1;
       };

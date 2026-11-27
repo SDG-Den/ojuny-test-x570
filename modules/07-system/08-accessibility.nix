@@ -118,7 +118,7 @@
         ojuny.accessibility.onScreenKeyboard.enable = true;
 
         # @option widget = "switch"; label = "Show on text fields"; group = "Keyboard"; groupOrder = 25; order = 20; visibleWhen.path = "ojuny.accessibility.onScreenKeyboard.enable"; visibleWhen.equals = true; description = "Use wvkbd --auto so the keyboard appears when a text field takes focus and hides when focus leaves. Only clients that implement text-input-v3, such as VSCodium and web apps, trigger it; use Super+Alt+O in terminals and other clients.";
-        ojuny.accessibility.onScreenKeyboard.auto = true;
+        ojuny.accessibility.onScreenKeyboard.auto = false;
 
         # @option widget = "switch"; label = "Tray toggle"; group = "Keyboard"; groupOrder = 25; order = 30; visibleWhen.path = "ojuny.accessibility.onScreenKeyboard.enable"; visibleWhen.equals = true; description = "Show a tray icon. Left click toggles the keyboard; right click opens the menu.";
         ojuny.accessibility.onScreenKeyboard.tray = true;

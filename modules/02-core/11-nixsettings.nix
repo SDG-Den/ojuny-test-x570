@@ -118,7 +118,7 @@
     nix.settings.max-jobs = "auto";
 
     # @option widget = "spin"; label = "Cores per job"; group = "Build"; groupOrder = 50; description = "Cores each build uses; 0 means all of them."; min = 0; max = 128; order = 200;
-    nix.settings.cores = 1;
+    nix.settings.cores = 0;
 
     # @option widget = "switch"; label = "Sandbox builds"; group = "Build"; groupOrder = 50; description = "Run builds in isolated namespaces."; order = 300;
     nix.settings.sandbox = true;
