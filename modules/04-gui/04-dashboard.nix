@@ -186,10 +186,10 @@
     desktop.ojuny.dux.settings.weatherEnabled = true;
 
     # @option widget = "text"; label = "Weather location"; group = "Date and weather"; groupOrder = 25; order = 53; description = "Display name shown for the weather location.";
-    desktop.ojuny.dux.session.weatherLocation = "New York, NY";
+    desktop.ojuny.dux.session.weatherLocation = "Utrecht, NL";
 
     # @option widget = "text"; label = "Weather coordinates"; group = "Date and weather"; groupOrder = 25; order = 54; description = "Latitude and longitude separated by a comma.";
-    desktop.ojuny.dux.session.weatherCoordinates = "40.7128,-74.0060";
+    desktop.ojuny.dux.session.weatherCoordinates = "52.092876,5.104480";
 
     # @option widget = "spin"; label = "Latitude"; group = "Date and weather"; groupOrder = 25; order = 55; min = -90; max = 90; description = "Location latitude used for sunrise and sunset.";
     desktop.ojuny.dux.session.latitude = 0.0;

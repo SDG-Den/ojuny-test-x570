@@ -78,18 +78,18 @@
 
         # @option widget = "list"; label = "Volume keys"; group = "Volume bar"; groupOrder = 40; order = 20; itemType = "string"; visibleWhen.path = "ojuny.patch.corsair-rgb.volumeBar.enable"; visibleWhen.equals = true; description = "Keys used for the volume bar, in low-to-high order.";
         ojuny.patch.corsair-rgb.volumeBar.keys = [
-          "\"f1\""
-          "\"f2\""
-          "\"f3\""
-          "\"f4\""
-          "\"f5\""
-          "\"f6\""
-          "\"f7\""
-          "\"f8\""
-          "\"f9\""
-          "\"f10\""
-          "\"f11\""
-          "\"f12\""
+          "\"\\\"f1\\\"\""
+          "\"\\\"f2\\\"\""
+          "\"\\\"f3\\\"\""
+          "\"\\\"f4\\\"\""
+          "\"\\\"f5\\\"\""
+          "\"\\\"f6\\\"\""
+          "\"\\\"f7\\\"\""
+          "\"\\\"f8\\\"\""
+          "\"\\\"f9\\\"\""
+          "\"\\\"f10\\\"\""
+          "\"\\\"f11\\\"\""
+          "\"\\\"f12\\\"\""
         ];
 
         # @option widget = "dropdown"; label = "Volume mode"; group = "Volume bar"; groupOrder = 40; order = 30; choices = [ "solid" "ramp" "heat" ]; visibleWhen.path = "ojuny.patch.corsair-rgb.volumeBar.enable"; visibleWhen.equals = true; description = "solid uses one color. ramp colors each lit key by position. heat colors the whole bar by level.";
