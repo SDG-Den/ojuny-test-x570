@@ -240,35 +240,40 @@
           log_dir="''${XDG_STATE_HOME:-$HOME/.local/state}/ojuny/raven"
           mkdir -p "$log_dir"
           log="$log_dir/last.log"
+          exit_log="$log_dir/last-exit.log"
           {
             echo "Raven launch"
             echo "Time: $(date -Is)"
             echo "Application: $host_file"
             echo "Wrapper: $0"
-            echo "Raven command: ${config.programs.raven.package}/bin/raven --run-process --execution=native --timeout-ms=86400000 --desktop=wayland --directory=$win_dir $host_file -- $*"
+            echo "Raven command: ${config.programs.raven.package}/bin/raven --run-process --execution=native --exit-code-fd=3 --timeout-ms=86400000 --desktop=wayland --directory=$win_dir $host_file -- $*"
             ${ravenDiagnostics}
             echo "Report this at https://github.com/mirkobrombin/raven/issues"
             echo
             echo "--- output ---"
           } > "$log"
 
+          exec 3>"$exit_log"
           if [ -t 1 ] || [ -t 2 ]; then
             set +e
-            ${config.programs.raven.package}/bin/raven --run-process --execution=native --timeout-ms=86400000 --desktop=wayland --directory="$win_dir" "$host_file" -- "$@" 2>&1 | tee -a "$log"
+            ${config.programs.raven.package}/bin/raven --run-process --execution=native --exit-code-fd=3 --timeout-ms=86400000 --desktop=wayland --directory="$win_dir" "$host_file" -- "$@" 2>&1 | tee -a "$log"
             status="''${PIPESTATUS[0]}"
             set -e
           else
             set +e
-            ${config.programs.raven.package}/bin/raven --run-process --execution=native --timeout-ms=86400000 --desktop=wayland --directory="$win_dir" "$host_file" -- "$@" >> "$log" 2>&1
+            ${config.programs.raven.package}/bin/raven --run-process --execution=native --exit-code-fd=3 --timeout-ms=86400000 --desktop=wayland --directory="$win_dir" "$host_file" -- "$@" >> "$log" 2>&1
             status=$?
             set -e
           fi
+          exec 3>&-
+          guest_status="$(cat "$exit_log" 2>/dev/null || true)"
 
           if [ "$status" -eq 0 ]; then
             ${ravenRefresh}/bin/ojuny-raven-refresh >/dev/null 2>&1 || true
             exit 0
           fi
           echo "Exit status: $status" >> "$log"
+          echo "Guest exit code: ''${guest_status:-unknown}" >> "$log"
           if [ -t 1 ] || [ -t 2 ]; then
             exit "$status"
           fi
@@ -335,35 +340,40 @@
           log_dir="''${XDG_STATE_HOME:-$HOME/.local/state}/ojuny/raven"
           mkdir -p "$log_dir"
           log="$log_dir/last-msi.log"
+          exit_log="$log_dir/last-msi-exit.log"
           {
             echo "Raven MSI launch"
             echo "Time: $(date -Is)"
             echo "Application: $host_file"
             echo "Wrapper: $0"
-            echo "Raven command: ${config.programs.raven.package}/bin/raven --run-process --execution=native --timeout-ms=86400000 --desktop=wayland --directory=$win_dir --grant-read=$host_dir ${config.programs.raven.package.unwrapped}/libexec/raven/msiexec.exe -- /i $win_file"
+            echo "Raven command: ${config.programs.raven.package}/bin/raven --run-process --execution=native --exit-code-fd=3 --timeout-ms=86400000 --desktop=wayland --directory=$win_dir --grant-read=$host_dir ${config.programs.raven.package.unwrapped}/libexec/raven/msiexec.exe -- /i $win_file"
             ${ravenDiagnostics}
             echo "Report this at https://github.com/mirkobrombin/raven/issues"
             echo
             echo "--- output ---"
           } > "$log"
 
+          exec 3>"$exit_log"
           if [ -t 1 ] || [ -t 2 ]; then
             set +e
-            ${config.programs.raven.package}/bin/raven --run-process --execution=native --timeout-ms=86400000 --desktop=wayland --directory="$win_dir" --grant-read="$host_dir" ${config.programs.raven.package.unwrapped}/libexec/raven/msiexec.exe -- /i "$win_file" 2>&1 | tee -a "$log"
+            ${config.programs.raven.package}/bin/raven --run-process --execution=native --exit-code-fd=3 --timeout-ms=86400000 --desktop=wayland --directory="$win_dir" --grant-read="$host_dir" ${config.programs.raven.package.unwrapped}/libexec/raven/msiexec.exe -- /i "$win_file" 2>&1 | tee -a "$log"
             status="''${PIPESTATUS[0]}"
             set -e
           else
             set +e
-            ${config.programs.raven.package}/bin/raven --run-process --execution=native --timeout-ms=86400000 --desktop=wayland --directory="$win_dir" --grant-read="$host_dir" ${config.programs.raven.package.unwrapped}/libexec/raven/msiexec.exe -- /i "$win_file" >> "$log" 2>&1
+            ${config.programs.raven.package}/bin/raven --run-process --execution=native --exit-code-fd=3 --timeout-ms=86400000 --desktop=wayland --directory="$win_dir" --grant-read="$host_dir" ${config.programs.raven.package.unwrapped}/libexec/raven/msiexec.exe -- /i "$win_file" >> "$log" 2>&1
             status=$?
             set -e
           fi
+          exec 3>&-
+          guest_status="$(cat "$exit_log" 2>/dev/null || true)"
 
           if [ "$status" -eq 0 ]; then
             ${ravenRefresh}/bin/ojuny-raven-refresh >/dev/null 2>&1 || true
             exit 0
           fi
           echo "Exit status: $status" >> "$log"
+          echo "Guest exit code: ''${guest_status:-unknown}" >> "$log"
           if [ -t 1 ] || [ -t 2 ]; then
             exit "$status"
           fi
@@ -410,35 +420,40 @@
           log_dir="''${XDG_STATE_HOME:-$HOME/.local/state}/ojuny/raven"
           mkdir -p "$log_dir"
           log="$log_dir/last-bat.log"
+          exit_log="$log_dir/last-bat-exit.log"
           {
             echo "Raven batch launch"
             echo "Time: $(date -Is)"
             echo "Application: $host_file"
             echo "Wrapper: $0"
-            echo "Raven command: ${config.programs.raven.package}/bin/raven --run-process --execution=native --timeout-ms=86400000 --desktop=wayland --directory=$win_dir --grant-write=$host_dir ${config.programs.raven.package.unwrapped}/libexec/raven/cmd.exe -- /c $win_file"
+            echo "Raven command: ${config.programs.raven.package}/bin/raven --run-process --execution=native --exit-code-fd=3 --timeout-ms=86400000 --desktop=wayland --directory=$win_dir --grant-write=$host_dir ${config.programs.raven.package.unwrapped}/libexec/raven/cmd.exe -- /c $win_file"
             ${ravenDiagnostics}
             echo "Report this at https://github.com/mirkobrombin/raven/issues"
             echo
             echo "--- output ---"
           } > "$log"
 
+          exec 3>"$exit_log"
           if [ -t 1 ] || [ -t 2 ]; then
             set +e
-            ${config.programs.raven.package}/bin/raven --run-process --execution=native --timeout-ms=86400000 --desktop=wayland --directory="$win_dir" --grant-write="$host_dir" ${config.programs.raven.package.unwrapped}/libexec/raven/cmd.exe -- /c "$win_file" 2>&1 | tee -a "$log"
+            ${config.programs.raven.package}/bin/raven --run-process --execution=native --exit-code-fd=3 --timeout-ms=86400000 --desktop=wayland --directory="$win_dir" --grant-write="$host_dir" ${config.programs.raven.package.unwrapped}/libexec/raven/cmd.exe -- /c "$win_file" 2>&1 | tee -a "$log"
             status="''${PIPESTATUS[0]}"
             set -e
           else
             set +e
-            ${config.programs.raven.package}/bin/raven --run-process --execution=native --timeout-ms=86400000 --desktop=wayland --directory="$win_dir" --grant-write="$host_dir" ${config.programs.raven.package.unwrapped}/libexec/raven/cmd.exe -- /c "$win_file" >> "$log" 2>&1
+            ${config.programs.raven.package}/bin/raven --run-process --execution=native --exit-code-fd=3 --timeout-ms=86400000 --desktop=wayland --directory="$win_dir" --grant-write="$host_dir" ${config.programs.raven.package.unwrapped}/libexec/raven/cmd.exe -- /c "$win_file" >> "$log" 2>&1
             status=$?
             set -e
           fi
+          exec 3>&-
+          guest_status="$(cat "$exit_log" 2>/dev/null || true)"
 
           if [ "$status" -eq 0 ]; then
             ${ravenRefresh}/bin/ojuny-raven-refresh >/dev/null 2>&1 || true
             exit 0
           fi
           echo "Exit status: $status" >> "$log"
+          echo "Guest exit code: ''${guest_status:-unknown}" >> "$log"
           if [ -t 1 ] || [ -t 2 ]; then
             exit "$status"
           fi

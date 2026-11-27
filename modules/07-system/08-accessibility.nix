@@ -115,7 +115,7 @@
         ojuny.accessibility.reduceMotion = false;
 
         # @option widget = "switch"; label = "On-screen keyboard (wvkbd)"; group = "Keyboard"; groupOrder = 25; order = 10; description = "Install wvkbd, start it with the session and theme it with the Stylix palette. It types through the wlroots virtual-keyboard and input-method protocols and works with touch.";
-        ojuny.accessibility.onScreenKeyboard.enable = false;
+        ojuny.accessibility.onScreenKeyboard.enable = true;
 
         # @option widget = "switch"; label = "Show on text fields"; group = "Keyboard"; groupOrder = 25; order = 20; visibleWhen.path = "ojuny.accessibility.onScreenKeyboard.enable"; visibleWhen.equals = true; description = "Use wvkbd --auto so the keyboard appears when a text field takes focus and hides when focus leaves. Mango implements zwp_input_method_v2.";
         ojuny.accessibility.onScreenKeyboard.auto = true;
@@ -135,7 +135,7 @@
         # @option widget = "spin"; label = "Label size"; group = "Keyboard"; groupOrder = 25; order = 70; min = 8; max = 48; unit = "pt"; visibleWhen.path = "ojuny.accessibility.onScreenKeyboard.enable"; visibleWhen.equals = true; description = "Size of the key labels in the sans-serif font.";
         ojuny.accessibility.onScreenKeyboard.fontSize = 20;
 
-        # @option widget = "keybinds"; label = "Common binds"; group = "Keybinds"; groupOrder = 40; order = 10; description = "Accessibility binds. The screen reader bind works when Orca is enabled, the on-screen keyboard bind starts or toggles wvkbd when the keyboard is enabled, and the mouse mode toggle is always active.";
+        # @option widget = "keybinds"; label = "Common binds"; group = "Keybinds"; groupOrder = 40; order = 10; description = "Accessibility binds. The screen reader bind works when Orca is enabled, the on-screen keyboard bind starts or toggles wvkbd and reports when the keyboard is disabled, and the mouse mode toggle is always active.";
         desktop.ojuny.mango.binds.common = {
           accessibilityScreenReader = {
             modifier = [

@@ -25,7 +25,9 @@ def check(root):
     screenshot = (root / "modules/05-applications/07-screenshot.nix").read_text()
     qr = (root / "scripts/ojuny-capture-qr").read_text()
     accessibility = (root / "modules/07-system/08-accessibility.nix").read_text()
+    accessibility_backend = (root / "modules/backend/01-system/08-accessibility-backend.nix").read_text()
     fastfetch = (root / "modules/backend/02-core/08-terminal-backend.nix").read_text()
+    raven = (root / "modules/backend/05-applications/08-appimage-raven-backend.nix").read_text()
     mangosettings = (root / "modules/03-desktop/02-mangosettings.nix").read_text()
 
     forbid(office, "craftAll", "03-office.nix", errors)
@@ -64,6 +66,14 @@ def check(root):
     require(fastfetch, "Local Repo", "08-terminal-backend.nix", errors)
     require(fastfetch, "Remote Repo", "08-terminal-backend.nix", errors)
     require(fastfetch, "Ojuny Base", "08-terminal-backend.nix", errors)
+    require(fastfetch, 'text = "git -C', "08-terminal-backend.nix", errors)
+    forbid(fastfetch, 'command = "git -C', "08-terminal-backend.nix", errors)
+    require(fastfetch, "cudaSupport = true", "08-terminal-backend.nix", errors)
+    require(fastfetch, 'show_gpu_info = "On"', "08-terminal-backend.nix", errors)
+    require(fastfetch, 'if [ "$EUID" -eq 0 ]', "08-terminal-backend.nix", errors)
+    require(fastfetch, 'exec ${pkgs.coreutils}/bin/rm "$@"', "08-terminal-backend.nix", errors)
+    require(fastfetch, 'rm = "${rmShim}/bin/rm";', "08-terminal-backend.nix", errors)
+    forbid(fastfetch, 'rm = "rmtrash";', "08-terminal-backend.nix", errors)
 
     require(mangosettings, 'itemType = "string"', "02-mangosettings.nix", errors)
     browser = (root / "modules/backend/02-core/06-browser-backend.nix").read_text()
@@ -91,6 +101,15 @@ def check(root):
     require(accessibility, '"--text-sp"', "08-accessibility.nix", errors)
     require(accessibility, "ojuny-osk-toggle", "08-accessibility.nix", errors)
     require(accessibility, "input-keyboard-symbolic", "08-accessibility.nix", errors)
+    require(accessibility, "ojuny.accessibility.onScreenKeyboard.enable = true;", "08-accessibility.nix", errors)
+    require(
+        accessibility_backend,
+        'default = true;\n            description = "Install and run the themed wvkbd on-screen keyboard.";',
+        "08-accessibility-backend.nix",
+        errors,
+    )
+    require(raven, "--execution=native --exit-code-fd=3", "08-appimage-raven-backend.nix", errors)
+    require(raven, "Guest exit code:", "08-appimage-raven-backend.nix", errors)
     if "dms ipc call virtualKeyboard toggle" in accessibility:
         errors.append("08-accessibility.nix: the DMS virtual keyboard bind is still present")
     return errors

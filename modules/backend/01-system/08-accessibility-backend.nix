@@ -41,7 +41,7 @@
         onScreenKeyboard = {
           enable = lib.mkOption {
             type = lib.types.bool;
-            default = false;
+            default = true;
             description = "Install and run the themed wvkbd on-screen keyboard.";
           };
           auto = lib.mkOption {

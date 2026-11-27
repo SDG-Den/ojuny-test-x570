@@ -9,6 +9,9 @@
     }:
     let
       rmShim = pkgs.writeShellScriptBin "rm" ''
+        if [ "$EUID" -eq 0 ]; then
+          exec ${pkgs.coreutils}/bin/rm "$@"
+        fi
         exec ${pkgs.rmtrash}/bin/rmtrash "$@"
       '';
     in
@@ -112,7 +115,7 @@
             }}";
           }
           // lib.optionalAttrs config.ojuny.apps.terminal.safeRm {
-            rm = "rmtrash";
+            rm = "${rmShim}/bin/rm";
           };
 
         environment.sessionVariables = lib.mkIf config.ojuny.apps.terminal.safeRm {
@@ -194,7 +197,7 @@
                 type = "command";
                 key = "├󰊤 Remote Repo";
                 keyColor = colors.variables.hex;
-                command = "git -C ${lib.escapeShellArg repoPath} remote get-url origin 2>/dev/null || printf unknown";
+                text = "git -C ${lib.escapeShellArg repoPath} remote get-url origin 2>/dev/null || printf unknown";
               }
               {
                 type = "custom";
@@ -346,6 +349,9 @@
             ];
           };
         };
+
+        programs.btop.package = pkgs.btop.override { cudaSupport = true; };
+        programs.btop.settings.show_gpu_info = "On";
       };
     };
 

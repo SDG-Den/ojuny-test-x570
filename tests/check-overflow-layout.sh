@@ -5,6 +5,23 @@ script="${1:?overflow script path is required}"
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 
+fail() {
+  printf 'FAIL: %s\n' "$*" >&2
+  exit 1
+}
+
+if grep -qF '.active_tags' "$script"; then
+  fail "the daemon reads active_tags, which mmsg watch all-tags never emits"
+fi
+grep -qF '.tags[] | select(.is_active) | .index' "$script" ||
+  fail "the daemon does not read the active tag from the watch payload's tags array"
+
+watch_shape='{"all_tags":[{"monitor":"eDP-1","tags":[{"index":1,"is_active":true,"client_count":4,"layout":"T"}]}]}'
+printf '%s' "$watch_shape" | jq -e '
+  (.all_tags[0] | has("monitor") and has("tags") and (has("active_tags") | not))
+  and (.all_tags[0].tags[0] | has("index") and has("is_active") and has("layout"))
+' >/dev/null || fail "the watch fixture does not match the production all-tags shape"
+
 mkdir -p "$tmp/bin" "$tmp/run"
 
 cat > "$tmp/bin/mmsg" <<'MOCK'
@@ -40,7 +57,7 @@ case "$1 $2" in
   "watch all-tags")
     symbol="$(cat "${OJUNY_TEST_STATE}" 2>/dev/null || printf '%s' "${OJUNY_TEST_SYMBOL}")"
     for _ in $(seq 1 "${OJUNY_TEST_WATCH_EVENTS:-1}"); do
-      printf '{"all_tags":[{"monitor":"eDP-1","active_tags":[1],"tags":[{"index":1,"is_active":true,"client_count":%s,"layout":"%s"}]}]}\n' \
+      printf '{"all_tags":[{"monitor":"eDP-1","tags":[{"index":1,"is_active":true,"client_count":%s,"layout":"%s"}]}]}\n' \
         "${OJUNY_TEST_COUNT}" "$symbol"
     done
     ;;
