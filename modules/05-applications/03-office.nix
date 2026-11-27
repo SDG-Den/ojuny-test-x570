@@ -132,7 +132,7 @@
         ojuny.apps.obsidian.enable = true;
 
         # @option widget = "list"; label = "Vault names"; group = "Obsidian"; groupOrder = 10; order = 20; visibleWhen.path = "ojuny.apps.obsidian.enable"; visibleWhen.equals = true; description = "Exact vault names to theme. A vault created after the last rebuild is not themed until its name is added.";
-        ojuny.apps.obsidian.vaults = [ ];
+        ojuny.apps.obsidian.vaults = [ /home/den/repos/portfolio/projects ];
 
         environment.systemPackages = lib.optionals config.ojuny.apps.obsidian.enable [ pkgs.obsidian ];
 

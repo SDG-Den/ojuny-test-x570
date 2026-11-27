@@ -1,4 +1,4 @@
-round 2 (theoretically implemented, must be tested):
+needs testing: 
 
 
 development patch projects menu does not work correctly for agent, obsidian or terminal. it ends up in home. both terminal and vscodium end up inside the devshell which is good, both open zsh which is correct. obsidian will also open previously-opened windows, which we do not want. 
@@ -46,11 +46,6 @@ local repo (path to local repository) > works
 remote repo (path to remote repository) > not in
 ojuny base (the template type it was made from, in this case it would be just Ojuny, but for ojuny pro this would list Ojuny Pro) > works
 
-
-
-
-round 3:
-
 overflow layout does not work at all.
 
 nix-settings-gui resets scroll on flake inputs page for every update check it does, so you cannot scroll down to see it progress while it is going. 
@@ -87,9 +82,6 @@ ojuny rebuild does not pause at the end, so the terminal closes immediately once
 ojuny-manual lists theme selection and keybinds, neither of which are correct for the w3m version. 
 
 
-
-round 4:
-
 ojuny patches - list looks terrible because of poor spacing.
 
 NSG - most icons are entirely missing when not on the default papirus theme. 
@@ -99,6 +91,12 @@ copy-pasting from vscodium to a terminal is not possible, the data shows up on t
 OSK - auto show/hide only works with vscodium, not with firefox, ghostty or libreoffice writer, manual show/hide with the keybind does not work, tray icon does not work, cannot actually use the OSK
 
 auto-rotate is missing from the menu.
+
+
+round 5:
+
+
+
 
 
 
