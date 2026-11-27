@@ -1638,11 +1638,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1795791654,
-        "narHash": "sha256-YyAnXXDj2Ee5Bn/GTh73TE7I2sWWrTlB3pbYz6rXD5I=",
+        "lastModified": 1795792525,
+        "narHash": "sha256-OH4NhLiKoL1Yas+bIL2S0rtxmo5YPdM5Xjy5kGx4+Ew=",
         "owner": "ojuny-project",
         "repo": "ojuny-patches",
-        "rev": "abcb248607e1d1577fc1f0922156a801d7df9bc1",
+        "rev": "d1a7e8a1da5fe013ff5dfa1f08ef2240e169d6fe",
         "type": "github"
       },
       "original": {
