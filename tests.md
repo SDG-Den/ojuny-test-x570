@@ -243,3 +243,47 @@ Append results under a `## Results` section:
 - Verdict: pass | fail | inconclusive
 - Log excerpt:
 ```
+
+## Results
+
+### T0. Agent permissions
+- Date: 2026-11-28
+- Generation / build: system-166 (`/nix/store/mmnw8h9c...-nixos-system-ojuny`), build `2110fe9`.
+- Commands:
+  - `write modules/notes-scratch.md` (absolute path)
+  - `edit flake.lock`
+  - `read .env`
+  - `shell: sudo -n true`
+  - `shell: git status -sb`
+  - `write repos/nix-flake/modules/notes-scratch.md` (relative path)
+- Observed:
+  - 1. Edit prompt: immediate `permission.rejected` ("Permission denied: edit"), no prompt.
+  - 2. Generated file: denied, no prompt (expected).
+  - 3. Secret read: denied, no prompt (expected).
+  - 4. Shell deny: denied, no prompt (expected).
+  - 5. Read-only shell: allowed, no prompt (expected).
+  - 6. Relative path: immediate `permission.rejected`, no prompt.
+- Expected: steps 1, 5 and 6 prompt or allow; steps 2, 3 and 4 deny.
+- Verdict: fail (steps 1 and 6).
+- Log excerpt: opencode 2.3.0 does not write `message=evaluated permission=` lines in
+  `~/.local/share/opencode/log/opencode.log`; the newest such lines are from
+  2026-09-27 and use a different build. The evaluated pattern for steps 1, 2, 4
+  and 6 therefore cannot be recorded from this build.
+
+### T0. Notes for the fix pass
+- The installed `modules/patches/patch-ojuny-agent.nix:341-351` still starts with
+  `(deny action "*")`, and that file is **not** present in `origin/base`
+  (`git diff --stat HEAD origin/base -- modules/patches/patch-ojuny-agent.nix`
+  shows the whole file deleted), so the template merge cannot fix it. The fix
+  has to come from the `ojuny-patches` registry (reinstall `patch-ojuny-agent`)
+  or a device-side edit.
+- Reordering alone is probably not enough. The read step proves the evaluator is
+  not first-match: `read .env` is denied although `(allow "read" "*")` is first,
+  so the later/specific rule wins. For edits the ask rule is
+  `${flakeRoot}/**`, and the only consistent explanation for a denial is that
+  the evaluated path is not absolute (or `**` does not match it), so the ask
+  never fires. The September log shows relative patterns
+  (`pattern=devnotes/filestructure.md`). Make the ask match the form the harness
+  actually evaluates (relative), then keep the generated-file denies specific.
+- T2, T3, T5, T6, T7, T8, T9 and T11 were not run: T0 is the stated
+  prerequisite and results cannot be recorded through the normal edit path.
