@@ -27,6 +27,12 @@
         # @option widget = "switch"; label = "Autostart on boot"; group = "Steam"; groupOrder = 10; order = 2; visibleWhen.path = "programs.steam.enable"; visibleWhen.equals = true; description = "Start Steam minimized when the desktop session opens.";
         ojuny.steam.autostart = false;
 
+        # @option widget = "switch"; label = "Theme Steam"; group = "Steam"; groupOrder = 10; order = 3; visibleWhen.path = "programs.steam.enable"; visibleWhen.equals = true; description = "Install Millennium and the bundled Adwaita-for-Steam skin, and select it on first launch.";
+        ojuny.steam.theme = true;
+
+        # @option widget = "text"; label = "Steam theme name"; group = "Steam"; groupOrder = 10; order = 4; visibleWhen.path = "ojuny.steam.theme"; visibleWhen.equals = true; description = "Millennium theme directory name and the active theme key written on first launch.";
+        ojuny.steam.themeName = "Adwaita";
+
         desktop.ojuny.mango.execOnce = lib.mkIf config.ojuny.steam.autostart (
           lib.mkAfter [ "steam -silent" ]
         );

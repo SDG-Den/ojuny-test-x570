@@ -155,6 +155,9 @@
     # @option widget = "switch"; label = "Wallpaper filename"; group = "Cards"; groupOrder = 20; order = 87;
     desktop.ojuny.dux.dashOptions.wallpaper.filename = true;
 
+    # @option widget = "spin"; label = "Overview panel rows"; group = "Cards"; groupOrder = 20; order = 90; min = 1; max = 64; description = "Number of placement rows the Overview dashboard grid exposes.";
+    desktop.ojuny.dux.dashOptions.overview.panelRows = 7;
+
     # @option widget = "text"; label = "Clock date format"; group = "Date and weather"; groupOrder = 25; order = 10; description = "Qt format for the clock/bar date; empty = system default. Presets: ddd d, ddd MMM d, MMM d, M/d, d/M, ddd d MMM yyyy, yyyy-MM-dd, dddd, MMMM d."; applyCommand = "dms ipc call settings set clockDateFormat %%val%%";
     desktop.ojuny.dux.settings.clockDateFormat = "";
 
@@ -227,7 +230,7 @@
       notifications = {
         _order = 30;
         col = 0;
-        row = 4;
+        row = 5;
         w = 6;
         h = 2;
       };
@@ -238,12 +241,13 @@
         row = 1;
         w = 3;
         h = 3;
+        weekends = true;
       };
       media = {
         _order = 50;
-        col = 3;
-        row = 3;
-        w = 3;
+        col = 0;
+        row = 4;
+        w = 6;
         h = 1;
       };
       sysmon = {
@@ -251,7 +255,21 @@
         col = 3;
         row = 1;
         w = 3;
-        h = 1;
+        h = 3;
+        config = {
+          metrics = [
+            { device = "cpu"; graph = true; on = true; vals = [ "usage" "temp" "clock" ]; }
+            { device = "memory"; graph = true; on = true; vals = [ "used" "swap" ]; }
+            { device = "disk:nvme0n1"; graph = true; on = true; vals = [ "space" "read" "write" ]; }
+            { device = "net"; graph = false; on = true; vals = [ "down" "up" ]; }
+            { device = "gpu:0000:01:00.0"; graph = false; on = true; vals = [ "usage" "temp" "vram" "power" ]; }
+          ];
+          layout = "bars";
+          showHeader = false;
+          barOrientation = "horizontal";
+          barNames = true;
+          barStyle = "tiles";
+        };
       };
       network = {
         _order = 70;
@@ -274,6 +292,7 @@
     # @option widget = "grid-configuration"; label = "Weather widgets"; group = "Weather widgets"; groupOrder = 40; order = 10; gridColumns = 4;
     desktop.ojuny.dux.dashOptions.weather.widgets = {
       conditions = {
+        _order = 10;
         col = 0;
         row = 2;
         w = 2;
@@ -282,7 +301,18 @@
         # @option widget = "dropdown"; label = "Conditions tone"; group = "Weather widgets"; groupOrder = 40; order = 18; choices = [ "" "primary" "secondary" "tertiary" ]; description = "Empty uses the surface tone.";
         tone = "primary";
       };
+      daily = {
+        _order = 20;
+        col = 0;
+        row = 0;
+        w = 4;
+        h = 2;
+        forecast = "chart";
+        # @option widget = "dropdown"; label = "Daily tone"; group = "Weather widgets"; groupOrder = 40; order = 20; choices = [ "" "primary" "secondary" "tertiary" ]; description = "Empty uses the surface tone.";
+        tone = "primary";
+      };
       hourly = {
+        _order = 30;
         col = 2;
         row = 2;
         w = 2;
@@ -292,6 +322,7 @@
         tone = "primary";
       };
       humidity = {
+        _order = 40;
         col = 2;
         row = 4;
         w = 1;
@@ -300,25 +331,17 @@
         # @option widget = "dropdown"; label = "Humidity tone"; group = "Weather widgets"; groupOrder = 40; order = 26; choices = [ "" "primary" "secondary" "tertiary" ]; description = "Empty uses the surface tone.";
         tone = "";
       };
-      wind = {
-        col = 3;
-        row = 4;
+      moon = {
+        _order = 50;
+        col = 0;
+        row = 6;
         w = 1;
         h = 2;
-        graphics = true;
-        # @option widget = "dropdown"; label = "Wind tone"; group = "Weather widgets"; groupOrder = 40; order = 27; choices = [ "" "primary" "secondary" "tertiary" ]; description = "Empty uses the surface tone.";
-        tone = "";
-      };
-      daily = {
-        col = 0;
-        row = 0;
-        w = 4;
-        h = 2;
-        forecast = "chart";
-        # @option widget = "dropdown"; label = "Daily tone"; group = "Weather widgets"; groupOrder = 40; order = 20; choices = [ "" "primary" "secondary" "tertiary" ]; description = "Empty uses the surface tone.";
+        # @option widget = "dropdown"; label = "Moon tone"; group = "Weather widgets"; groupOrder = 40; order = 22; choices = [ "" "primary" "secondary" "tertiary" ]; description = "Empty uses the surface tone.";
         tone = "primary";
       };
       precipitation = {
+        _order = 60;
         col = 1;
         row = 4;
         w = 1;
@@ -327,32 +350,8 @@
         # @option widget = "dropdown"; label = "Precipitation tone"; group = "Weather widgets"; groupOrder = 40; order = 28; choices = [ "" "primary" "secondary" "tertiary" ]; description = "Empty uses the surface tone.";
         tone = "";
       };
-      uv = {
-        col = 0;
-        row = 4;
-        w = 1;
-        h = 2;
-        graphics = true;
-        # @option widget = "dropdown"; label = "UV tone"; group = "Weather widgets"; groupOrder = 40; order = 29; choices = [ "" "primary" "secondary" "tertiary" ]; description = "Empty uses the surface tone.";
-        tone = "";
-      };
-      moon = {
-        col = 0;
-        row = 6;
-        w = 1;
-        h = 2;
-        # @option widget = "dropdown"; label = "Moon tone"; group = "Weather widgets"; groupOrder = 40; order = 22; choices = [ "" "primary" "secondary" "tertiary" ]; description = "Empty uses the surface tone.";
-        tone = "primary";
-      };
-      sun = {
-        col = 1;
-        row = 6;
-        w = 1;
-        h = 2;
-        # @option widget = "dropdown"; label = "Sun tone"; group = "Weather widgets"; groupOrder = 40; order = 23; choices = [ "" "primary" "secondary" "tertiary" ]; description = "Empty uses the surface tone.";
-        tone = "primary";
-      };
       readings = {
+        _order = 70;
         col = 2;
         row = 6;
         w = 2;
@@ -361,6 +360,35 @@
         graphics = true;
         # @option widget = "dropdown"; label = "Readings tone"; group = "Weather widgets"; groupOrder = 40; order = 25; choices = [ "" "primary" "secondary" "tertiary" ]; description = "Empty uses the surface tone.";
         tone = "primary";
+      };
+      sun = {
+        _order = 80;
+        col = 1;
+        row = 6;
+        w = 1;
+        h = 2;
+        # @option widget = "dropdown"; label = "Sun tone"; group = "Weather widgets"; groupOrder = 40; order = 23; choices = [ "" "primary" "secondary" "tertiary" ]; description = "Empty uses the surface tone.";
+        tone = "primary";
+      };
+      uv = {
+        _order = 90;
+        col = 0;
+        row = 4;
+        w = 1;
+        h = 2;
+        graphics = true;
+        # @option widget = "dropdown"; label = "UV tone"; group = "Weather widgets"; groupOrder = 40; order = 29; choices = [ "" "primary" "secondary" "tertiary" ]; description = "Empty uses the surface tone.";
+        tone = "";
+      };
+      wind = {
+        _order = 100;
+        col = 3;
+        row = 4;
+        w = 1;
+        h = 2;
+        graphics = true;
+        # @option widget = "dropdown"; label = "Wind tone"; group = "Weather widgets"; groupOrder = 40; order = 27; choices = [ "" "primary" "secondary" "tertiary" ]; description = "Empty uses the surface tone.";
+        tone = "";
       };
     };
 

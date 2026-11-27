@@ -80,12 +80,16 @@ current working set for review.
   Mango owns primary-output selection and the left-to-right fallback when the
   configuration has no primary. The template does not prune disconnected
   outputs and does not pick a primary; deleting a stale output is a user
-  action.
+  action. Auto rotation uses `iio-sensor-proxy` and applies the transform with
+  `wlr-randr`; it has no effect on a machine without an accelerometer.
 - `02-input.nix` `[menu]`. Keyboard, mouse, trackpad, touch and Fcitx5 input
   methods.
 - `03-binds.nix` `[menu]`. Key, mouse, axis and gesture bindings, plus the
   Window snap group that tunes the Super+H `ojuny-snap` bind. The snap
-  behavior itself is documented in ojuny-desktop.
+  behavior itself is documented in ojuny-desktop. The middle-click bind applies
+  maximize on floating windows and zoom on tiled windows, then re-emits the
+  click; a fullscreen window receives only the click. SUPER+O toggles the
+  focused display and SUPER+SHIFT+O toggles all displays without sleeping them.
 - `04-gestures.nix` `[menu]`. Touchpad swipe gestures and swipe tuning.
 - `05-theme.nix` `[menu]`. Palette, polarity, popup opacity and wallpaper.
 - `05-typography.nix` `[menu]`. Fonts, shell text rendering, icon themes and
@@ -104,13 +108,15 @@ current working set for review.
   open its first-run help page.
 - `07-git.nix` `[menu]`. Git and version control defaults.
 - `08-terminal.nix` `[menu]`. Terminal emulator, zsh, aliases, command line
-  tools and the btop, lazygit and yazi TUIs. `rmtrash` and `trash-cli` are
+  tools and the btop, lazygit and yazi TUIs. btop is built with CUDA support so
+  it can read NVIDIA GPU data. Fastfetch lists the local repository, the remote
+  repository and the Ojuny base. `rmtrash` and `trash-cli` are
   installed. The Safe rm switch aliases `rm` to `rmtrash` and prepends an `rm`
   shim to the session PATH, so external `rm` calls in scripts started from a
-  user session also move files to the freedesktop trash. `trash-list`,
-  `trash-restore` and `trash-empty` manage the trash. The shim does not cover
-  system services, `sudo` commands, absolute-path `rm`, or direct deletion
-  APIs such as `os.remove` and `find -delete`.
+  user session also move files to the freedesktop trash. Root keeps the real
+  `rm`. `trash-list`, `trash-restore` and `trash-empty` manage the trash. The
+  shim does not cover system services, `sudo` commands, absolute-path `rm`, or
+  direct deletion APIs such as `os.remove` and `find -delete`.
 - `09-autostart.nix` `[menu]`. Commands run at login and on reload.
 - `10-updates.nix` `[menu]`. Update tooling, the repo-sync checker and a disabled updater.
 - `11-nixsettings.nix` `[menu]`. Nix tooling, `nix-shell-gui`, `nix-regedit`
@@ -144,7 +150,8 @@ current working set for review.
 - `05-scroller.nix` `[menu]`. Horizontal scrolling window layout.
 - `06-mangoworkspaces.nix` `[menu]`. Workspace and tag settings, the special
   workspace, default and per-workspace layouts, and the overflow layout
-  daemon. Overflow switches a workspace to a chosen layout at a window count
+  daemon. The quake scratchpad uses a dedicated top placement above the bar.
+  Overflow switches a workspace to a chosen layout at a window count
   and restores the previous layout when the count drops. Floating windows are
   not counted. Upstream mango has no watch that fires on window spawn and close
   without also firing on focus, so the daemon streams raw `mmsg watch all-tags`
@@ -155,7 +162,11 @@ current working set for review.
   notices are created in KAlarm and Nix seeds no alarms; battery alerts remain
   on the Power page, and weather is a KAlarm command alarm that displays a
   weather command's output.
-- `08-clipboard.nix` `[menu]`. Clipboard history settings.
+- `08-clipboard.nix` `[menu]`. Clipboard history settings. The page installs
+  `ojuny-clipboard-doctor`, which prints the session type, clipboard owners,
+  Wayland and X11 previews, cliphist state, the running VSCodium and Ghostty
+  processes and their protocol. Run it once per copy direction and once per
+  start order before changing the autostart clipboard commands.
 - `10-sounds.nix` `[menu]`. System sound effects for login, notifications,
   volume, charger events and media, plus the advanced audio and media controls.
   The shell plays its bundled cues unless "Use system sound theme" is on; the
@@ -176,7 +187,11 @@ current working set for review.
 - `02-dock.nix` `[menu]`. Dock appearance and behaviour.
 - `03-launcher.nix` `[menu]`. App launcher style, behaviour and plugin
   triggers.
-- `04-dashboard.nix` `[menu]`. Dashboard cards, tabs and their placement.
+- `04-dashboard.nix` `[menu]`. Dashboard cards, tabs and their placement. The
+  default dashboard is the exported sysmon group layout: a single sysmon card
+  with CPU, memory, disk, net and GPU metrics, the separate network card, and
+  the weather widget set. The sysmon metrics are edited through the card
+  settings, not through `@option` comments on the nested list.
 - `05-controlcenter.nix` `[menu]`. Control center widgets and layout.
 - `06-menu.nix` `[menu]`. Nix managed application menu. The menu tree is a
   literal attribute set that the `menu` widget reads and writes as a whole.
@@ -213,7 +228,8 @@ current working set for review.
   Obsidian notes.
 - `04-vesktop.nix` `[menu]`. Discord client.
 - `05-steam.nix` `[menu]`. Steam, Proton GE, DW-Proton with DXVK-Sarek,
-  Xbox controller support and gaming (D12).
+  Xbox controller support and gaming (D12). Steam is themed by default through
+  Millennium and Adwaita-for-Steam; a switch turns the theming off.
 - `06-kdeconnect.nix` `[menu]`, hidden. Phone notifications, file transfer
   and remote input. The page has no switch of its own: Valent and
   `programs.kdeconnect` follow `desktop.ojuny.dux.plugins.dankKDEConnect.enable`
@@ -302,7 +318,10 @@ current working set for review.
   effect. The supported combinations are listed in `hardware-matrix.md`.
 - `08-accessibility.nix` `[menu]`. Orca screen reader, braille, the themed wvkbd
   on-screen keyboard with focus auto show/hide and a tray toggle, colour
-  profiles and the keyboard and mouse accessibility binds.
+  profiles and the keyboard and mouse accessibility binds. The on-screen
+  keyboard is enabled by default. Super+Alt+O starts or signals it, and the
+  tray icon toggles it. `--auto` only fires in clients that implement
+  text-input-v3; terminals and other clients need the keybind.
 - `09-facter.nix` `[menu]`. Hardware profile selection through the `facter`
   widget, which reads `facter.json` and shows the detected model, profile,
   coverage state, effective GPU layout and its source. `auto` uses
@@ -312,7 +331,8 @@ current working set for review.
 - `07-plymouth.nix` `[menu]`. Stylix-coloured Plymouth boot splash with the Ojuny logo.
 - `10-mounts.nix` `[menu]`. Additional internal mounts, external media and
   filesystem maintenance. devmon, udisks2 and gvfs automount removable media,
-  and mounting is passwordless for active local sessions. Two switches make a
+  and mounting is passwordless for active local sessions. A session-start pass
+  also mounts removable devices that were already present at boot. Two switches make a
   USB copy safe to unplug: synchronous writes and the drive write-cache
   disable. See [13-external-media.md](13-external-media.md) for the guarantee
   and its limits.

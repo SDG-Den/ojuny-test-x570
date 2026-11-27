@@ -8,6 +8,19 @@
       ...
     }:
     let
+      adwaitaForSteam = pkgs.fetchFromGitHub {
+        owner = "tkashkin";
+        repo = "Adwaita-for-Steam";
+        rev = "e119cbdcdec6cd868a9c4afa47e6a5d6d348f342";
+        hash = "sha256-BflUVdtuAEDhtoEkF9w0JntaKVUNud3prxMGDST+Tkk=";
+      };
+
+      steamTheme = pkgs.writeShellApplication {
+        name = "ojuny-steam-theme";
+        runtimeInputs = [ pkgs.coreutils ];
+        text = builtins.readFile ../../../scripts/ojuny-steam-theme.sh;
+      };
+
       steam-gamescope = pkgs.writeShellScriptBin "steam-gamescope" ''
         if [ -z "''${XDG_SESSION_ID:-}" ]; then
           echo "steam-gamescope: XDG_SESSION_ID is not set" >&2
@@ -59,11 +72,31 @@
         extest = lib.mkEnableOption "the extest library for Steam Input on Wayland";
 
         autostart = lib.mkEnableOption "starting Steam at login";
+
+        theme = lib.mkOption {
+          type = lib.types.bool;
+          default = true;
+          description = "Install Millennium and the bundled Adwaita-for-Steam theme.";
+        };
+
+        themeName = lib.mkOption {
+          type = lib.types.strMatching "[A-Za-z0-9._-]+";
+          default = "Adwaita";
+          description = "Millennium theme directory and active theme key.";
+        };
       };
 
       options.ojuny.hardware.xpadneo = lib.mkEnableOption "the xpadneo driver for Xbox One and Series wireless controllers";
 
       config = {
+        programs.steam.package = lib.mkIf config.ojuny.steam.theme (
+          pkgs.steamWithMillennium.override {
+            extraProfile = ''
+              ${steamTheme}/bin/ojuny-steam-theme ${adwaitaForSteam} ${lib.escapeShellArg config.ojuny.steam.themeName}
+            '';
+          }
+        );
+
         programs.steam.extest.enable = config.ojuny.steam.extest;
 
         # Derived, no @option: feeds Steam's compatibility tool list.

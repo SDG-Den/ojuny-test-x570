@@ -1,4 +1,4 @@
-{ ... }:
+{ self, ... }:
 {
   perSystem =
     { pkgs, ... }:
@@ -10,8 +10,60 @@
         runtimeInputs = [ pkgs.coreutils ];
         text = builtins.readFile ../../../scripts/ojuny-raven-report.sh;
       };
+
+      withKeyboard = self.nixosConfigurations.fixture.extendModules {
+        modules = [ { ojuny.accessibility.onScreenKeyboard.enable = pkgs.lib.mkForce true; } ];
+      };
+
+      withoutKeyboard = self.nixosConfigurations.fixture.extendModules {
+        modules = [ { ojuny.accessibility.onScreenKeyboard.enable = pkgs.lib.mkForce false; } ];
+      };
+
+      oskServices = pkgs.writeText "osk-services.json" (
+        builtins.toJSON {
+          keyboard = withKeyboard.config.systemd.user.services ? ojuny-osk;
+          tray = withKeyboard.config.systemd.user.services ? ojuny-osk-tray;
+          wantedBy = withKeyboard.config.systemd.user.services.ojuny-osk.wantedBy;
+          partOf = withKeyboard.config.systemd.user.services.ojuny-osk.partOf;
+          keyboardArgs =
+            withKeyboard.config.desktop.ojuny.mango.binds.common.accessibilityKeyboard.args;
+          trayExecStart =
+            withKeyboard.config.systemd.user.services.ojuny-osk-tray.serviceConfig.ExecStart;
+          sni = withKeyboard.config.systemd.user.services ? ojuny-osk-sni;
+          sniExecStart =
+            withKeyboard.config.systemd.user.services.ojuny-osk-sni.serviceConfig.ExecStart;
+          trayAfter = withKeyboard.config.systemd.user.services.ojuny-osk-tray.after;
+          trayEnvironment =
+            withKeyboard.config.systemd.user.services.ojuny-osk-tray.serviceConfig.Environment;
+          disabledKeyboard = withoutKeyboard.config.systemd.user.services ? ojuny-osk;
+          disabledTray = withoutKeyboard.config.systemd.user.services ? ojuny-osk-tray;
+        }
+      );
     in
     {
+      checks.osk-service =
+        pkgs.runCommand "check-osk-service"
+          {
+            nativeBuildInputs = [ pkgs.jq ];
+          }
+          ''
+            jq -e '
+              .keyboard == true and
+              .tray == true and
+              .wantedBy == [ "mango-session.target" ] and
+              .partOf == [ "mango-session.target" ] and
+              (.keyboardArgs | endswith("/bin/ojuny-osk-toggle")) and
+              (.trayExecStart | endswith("/bin/ojuny-osk-tray")) and
+              .sni == true and
+              (.sniExecStart | endswith("/bin/xembedsniproxy")) and
+              (.trayAfter | index("ojuny-osk-sni.service") != null) and
+              (.trayEnvironment | index("GDK_BACKEND=x11") != null) and
+              .disabledKeyboard == false and
+              .disabledTray == false
+            ' ${oskServices} >/dev/null
+            touch $out
+          '';
+
       checks.qr-capture =
         pkgs.runCommand "check-qr-capture"
           {
@@ -37,6 +89,7 @@
             nativeBuildInputs = [
               pkgs.bash
               pkgs.coreutils
+              pkgs.diffutils
               pkgs.gnugrep
             ];
           }

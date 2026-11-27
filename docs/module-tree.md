@@ -147,6 +147,7 @@ differs from the generator output.
 - `modules/backend/03-desktop/13-monocle-deck-backend.nix`
 - `modules/backend/03-desktop/15-overflow-layout.nix`
 - `modules/backend/03-desktop/16-overflow-check.nix`
+- `modules/backend/03-desktop/17-desktop-interaction-check.nix`
 - `modules/backend/03-desktop/overflow-layout.sh`
 - `modules/backend/04-gui/06-menu-backend.nix`
 - `modules/backend/04-gui/07-dot-backend.nix`

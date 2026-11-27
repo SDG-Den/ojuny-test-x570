@@ -43,7 +43,8 @@ handle_state() {
   [ -n "$monitor" ] || return 0
 
   tag="$(printf '%s' "$state" | jq -r --arg monitor "$monitor" '
-    .all_tags[] | select(.monitor == $monitor) | .active_tags[0] // empty
+    .all_tags[] | select(.monitor == $monitor)
+    | (.tags[] | select(.is_active) | .index) // empty
   ' | head -n 1)"
   [ -n "$tag" ] || return 0
 

@@ -117,7 +117,7 @@
         # @option widget = "switch"; label = "On-screen keyboard (wvkbd)"; group = "Keyboard"; groupOrder = 25; order = 10; description = "Install wvkbd, start it with the session and theme it with the Stylix palette. It types through the wlroots virtual-keyboard and input-method protocols and works with touch.";
         ojuny.accessibility.onScreenKeyboard.enable = true;
 
-        # @option widget = "switch"; label = "Show on text fields"; group = "Keyboard"; groupOrder = 25; order = 20; visibleWhen.path = "ojuny.accessibility.onScreenKeyboard.enable"; visibleWhen.equals = true; description = "Use wvkbd --auto so the keyboard appears when a text field takes focus and hides when focus leaves. Mango implements zwp_input_method_v2.";
+        # @option widget = "switch"; label = "Show on text fields"; group = "Keyboard"; groupOrder = 25; order = 20; visibleWhen.path = "ojuny.accessibility.onScreenKeyboard.enable"; visibleWhen.equals = true; description = "Use wvkbd --auto so the keyboard appears when a text field takes focus and hides when focus leaves. Only clients that implement text-input-v3, such as VSCodium and web apps, trigger it; use Super+Alt+O in terminals and other clients.";
         ojuny.accessibility.onScreenKeyboard.auto = true;
 
         # @option widget = "switch"; label = "Tray toggle"; group = "Keyboard"; groupOrder = 25; order = 30; visibleWhen.path = "ojuny.accessibility.onScreenKeyboard.enable"; visibleWhen.equals = true; description = "Show a tray icon. Left click toggles the keyboard; right click opens the menu.";
@@ -135,7 +135,7 @@
         # @option widget = "spin"; label = "Label size"; group = "Keyboard"; groupOrder = 25; order = 70; min = 8; max = 48; unit = "pt"; visibleWhen.path = "ojuny.accessibility.onScreenKeyboard.enable"; visibleWhen.equals = true; description = "Size of the key labels in the sans-serif font.";
         ojuny.accessibility.onScreenKeyboard.fontSize = 20;
 
-        # @option widget = "keybinds"; label = "Common binds"; group = "Keybinds"; groupOrder = 40; order = 10; description = "Accessibility binds. The screen reader bind works when Orca is enabled, the on-screen keyboard bind starts or toggles wvkbd when the keyboard is enabled, and the mouse mode toggle is always active.";
+        # @option widget = "keybinds"; label = "Common binds"; group = "Keybinds"; groupOrder = 40; order = 10; description = "Accessibility binds. The screen reader bind works when Orca is enabled, the on-screen keyboard bind starts or toggles wvkbd and reports when the keyboard is disabled, and the mouse mode toggle is always active.";
         desktop.ojuny.mango.binds.common = {
           accessibilityScreenReader = {
             modifier = [
@@ -156,7 +156,7 @@
             ];
             keys = [ "o" ];
             dispatcher = "spawn";
-            args = "${oskToggle}";
+            args = "${oskToggle}/bin/ojuny-osk-toggle";
             description = "Toggle the on-screen keyboard (Super+Alt+O)";
             group = "Accessibility";
             subcat = "Keyboard";
@@ -322,12 +322,29 @@
           };
         };
 
+        systemd.user.services.ojuny-osk-sni = lib.mkIf (osk.enable && osk.tray) {
+          description = "XEmbed to StatusNotifierItem proxy for the on-screen keyboard";
+          partOf = [ "mango-session.target" ];
+          wantedBy = [ "mango-session.target" ];
+          serviceConfig = {
+            ExecStart = "${pkgs.kdePackages.plasma-workspace}/bin/xembedsniproxy";
+            Environment = [
+              "GDK_BACKEND=x11"
+              "QT_QPA_PLATFORM=xcb"
+            ];
+            Restart = "on-failure";
+          };
+        };
+
         systemd.user.services.ojuny-osk-tray = lib.mkIf (osk.enable && osk.tray) {
           description = "Ojuny on-screen keyboard tray";
           partOf = [ "mango-session.target" ];
           wantedBy = [ "mango-session.target" ];
+          requires = [ "ojuny-osk-sni.service" ];
+          after = [ "ojuny-osk-sni.service" ];
           serviceConfig = {
             ExecStart = "${oskTray}/bin/ojuny-osk-tray";
+            Environment = [ "GDK_BACKEND=x11" ];
             Restart = "on-failure";
           };
         };

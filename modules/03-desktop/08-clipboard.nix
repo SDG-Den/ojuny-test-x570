@@ -11,6 +11,10 @@
 
   flake.modules.nixos.desktop-clipboard = { config, pkgs, ... }: {
 
+    environment.systemPackages = [
+      (import ../../packages/clipboard-doctor.nix { inherit pkgs; })
+    ];
+
     # @option widget = "switch"; label = "Keep history"; group = "Clipboard"; groupOrder = 20; order = 10;
     desktop.ojuny.dux.clipboardSettings.disableHistory = false;
 

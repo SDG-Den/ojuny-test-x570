@@ -320,6 +320,7 @@
               coreutils
               git
               gnugrep
+              jq
               xdg-utils
             ]
           )
@@ -414,19 +415,36 @@
             fi
             ;;
           "Start agent")
+            agent_args=("$assistant")
             if [ "$(basename "$assistant")" = "opencode" ]; then
-              run_in_devshell "$assistant" "$SELECTED"
+              agent_args+=("$SELECTED")
+            fi
+            if [ "$(basename "$terminal")" = "ghostty" ] || [ "$(basename "$terminal")" = "ojuny-ghostty" ]; then
+              run_in_devshell "$terminal" --working-directory="$SELECTED" -e "''${agent_args[@]}"
             else
-              run_in_devshell "$assistant"
+              run_in_devshell "$terminal" -e "''${agent_args[@]}"
             fi
             ;;
           "Open Obsidian vault")
+<<<<<<< HEAD
             vault_path="$SELECTED"
             if command -v obsidian >/dev/null 2>&1 && obsidian vault="$vault_path" >/dev/null 2>&1; then
               exit 0
             fi
             vault_path="''${vault_path// /%20}"
             xdg-open "obsidian://open?path=$vault_path" >/dev/null 2>&1 &
+||||||| cbe239e
+            vault_path="$SELECTED"
+            vault_uri="obsidian://open?path=''${vault_path// /%20}"
+            if command -v obsidian >/dev/null 2>&1; then
+              obsidian --new-window "$vault_uri" >/dev/null 2>&1 &
+            else
+              xdg-open "$vault_uri" >/dev/null 2>&1 &
+            fi
+=======
+            vault_uri="obsidian://open?path=$(printf '%s' "$vault" | jq -sRr 'split("/") | map(@uri) | join("/")')"
+            xdg-open "$vault_uri" >/dev/null 2>&1 &
+>>>>>>> origin/base
             ;;
         esac
       '';

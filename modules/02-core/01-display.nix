@@ -18,7 +18,7 @@
       config = {
 
         # Monitors
-        # @option widget = "monitors"; label = "Monitors"; group = "Monitors"; groupOrder = 10; disabledFeatures = [ "match" "mirror" "priority" "modeline" "power" "reflection" "focusAtStartup" "brightness" "autoRotation" "autoHdr" "color.profile" "color.wideGamut" "color.bitDepth" "hdr.sdrBrightness" "hdr.sdrSaturation" "hdr.sdrMinLuminance" "hdr.sdrMaxLuminance" "hdr.sdrEotf" "sync.allowTearing" "sync.maxRenderTime" "render" "signal" "reserved" "hotCorners" "background" ]; description = "Drag monitors to set their position. The output name is the identity; replace a monitor by removing the old row and adding the new one.";
+        # @option widget = "monitors"; label = "Monitors"; group = "Monitors"; groupOrder = 10; disabledFeatures = [ "match" "mirror" "priority" "modeline" "power" "reflection" "focusAtStartup" "brightness" "autoHdr" "color.profile" "color.wideGamut" "color.bitDepth" "hdr.sdrBrightness" "hdr.sdrSaturation" "hdr.sdrMinLuminance" "hdr.sdrMaxLuminance" "hdr.sdrEotf" "sync.allowTearing" "sync.maxRenderTime" "render" "signal" "reserved" "hotCorners" "background" ]; description = "Drag monitors to set their position. The output name is the identity; replace a monitor by removing the old row and adding the new one. Auto rotation uses iio-sensor-proxy on a convertible and does nothing without an accelerometer.";
         services.nix-settings-gui.monitors = {
           "DP-2" = {
             width = 1920;
