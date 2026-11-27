@@ -72,13 +72,13 @@
         stylix.icons.enable = true;
 
         # @option widget = "icon-theme"; label = "Icon theme (dark)"; packageOption = "stylix.icons.package"; variant = "dark"; group = "Icons and cursor"; groupOrder = 30; order = 20; applyCommand = "gsettings set org.gnome.desktop.interface icon-theme %%val%%";
-        stylix.icons.dark = "Tela-dark";
+        stylix.icons.dark = "Papirus-Dark";
 
         # @option widget = "icon-theme"; label = "Icon theme (light)"; packageOption = "stylix.icons.package"; variant = "light"; group = "Icons and cursor"; groupOrder = 30; order = 30; applyCommand = "gsettings set org.gnome.desktop.interface icon-theme %%val%%";
-        stylix.icons.light = "Tela-light";
+        stylix.icons.light = "Papirus-Light";
 
         # @option widget = "package"; label = "Icon theme package"; group = "Icons and cursor"; hidden = true; groupOrder = 30; order = 40;
-        stylix.icons.package = pkgs.tela-icon-theme;
+        stylix.icons.package = pkgs.papirus-icon-theme;
 
         # @option widget = "cursor-theme"; label = "Cursor theme"; packageOption = "stylix.cursor.package"; group = "Icons and cursor"; groupOrder = 30; order = 50; applyCommand = "gsettings set org.gnome.desktop.interface cursor-theme %%val%%; mmsg dispatch setoption,cursor_theme,%%val%%";
         stylix.cursor.name = "Bibata-Modern-Classic";
