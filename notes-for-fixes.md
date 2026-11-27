@@ -22,7 +22,7 @@ flatpak applications (flatseal and thunderbird) take very long to load. > still 
 nix-settings-gui flake inputs: "scan commits" does nothing, commit hash pin is a free text field. > works, but not useful, should show a date stamp as well.
 
 
-steam settings in ojuny: steam is not themed by default when installed, it should be with a toggle to turn it off > uses millenium now, which is good, but theme is not applied by default.
+steam settings in ojuny: steam is not themed by default when installed, it should be with a toggle to turn it off > uses millenium now, which is good, but theme is not applied by default. > millenium settings are no longer accessible, but millenium is still used.
 
 quake terminal is positioned centered on the screen, rather than near the top. it is also behind the bar instead of above. > works on initial spawn, but re-triggers reset it once you trigger it on a different monitor once.
 
@@ -57,4 +57,10 @@ nix settings gui: new sysmon card item needs its settings menu popout thingie to
 raven: the error log window on crash can expand past screen bounds instead of becoming scrollable. trying to use the office deployment tool from microsoft causes raven to never even launch now. 
 
 
+
+round 6:
+
+when clicking on the terminal when it is rebuilding from NSG, it acts like a constant stream of text is being typed. ^[[26~ on repeat. this happens as long as the window is focused. it also lists "dependency graph" multiple times. this may either be to do with how the window is spawned, or NOM cache discovery bugging out. > seems to be something causing ~ to be held down, pressing ` again stops it. clicking in ghostty restarts it. 
+
+sometimes, it becomes impossible to select text in opencode using the mouse.
 
