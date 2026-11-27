@@ -483,6 +483,12 @@
       config = {
         programs.raven.enable = cfg.enable;
 
+        programs.raven.package = lib.mkIf (cfg.enable && (cfg.printers || cfg.vst3))
+          (inputs.raven.packages.${pkgs.stdenv.hostPlatform.system}.raven.override {
+            withPrinters = cfg.printers;
+            withVst3 = cfg.vst3;
+          });
+
         desktop.ojuny.mango.rules.window_rule = lib.mkIf cfg.enable [
           {
             app_id = "ojuny-raven-report";
