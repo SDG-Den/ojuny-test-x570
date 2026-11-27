@@ -246,69 +246,151 @@ Append results under a `## Results` section:
 
 ## Results
 
-### T0. Agent permissions
-- Date: 2026-11-28
-- Generation / build: system-166 (`/nix/store/mmnw8h9c...-nixos-system-ojuny`), build `2110fe9`.
-- Commands:
-  - `write modules/notes-scratch.md` (absolute path)
-  - `edit flake.lock`
-  - `read .env`
-  - `shell: sudo -n true`
-  - `shell: git status -sb`
-  - `write repos/nix-flake/modules/notes-scratch.md` (relative path)
-- Observed:
-  - 1. Edit prompt: immediate `permission.rejected` ("Permission denied: edit"), no prompt.
-  - 2. Generated file: denied, no prompt (expected).
-  - 3. Secret read: denied, no prompt (expected).
-  - 4. Shell deny: denied, no prompt (expected).
-  - 5. Read-only shell: allowed, no prompt (expected).
-  - 6. Relative path: immediate `permission.rejected`, no prompt.
-- Expected: steps 1, 5 and 6 prompt or allow; steps 2, 3 and 4 deny.
-- Verdict: fail (steps 1 and 6).
-- Log excerpt: opencode 2.3.0 does not write `message=evaluated permission=` lines in
-  `~/.local/share/opencode/log/opencode.log`; the newest such lines are from
-  2026-09-27 and use a different build. The evaluated pattern for steps 1, 2, 4
-  and 6 therefore cannot be recorded from this build.
+Run 2026-11-28 on system-166 (`/nix/store/mmnw8h9c...-nixos-system-ojuny`),
+build `2110fe9` plus the `355ade1` lock bump. Owner-executed steps are marked.
 
-### T0. Notes for the fix pass
-- The installed `modules/patches/patch-ojuny-agent.nix:341-351` still starts with
-  `(deny action "*")`, and that file is **not** present in `origin/base`
-  (`git diff --stat HEAD origin/base -- modules/patches/patch-ojuny-agent.nix`
-  shows the whole file deleted), so the template merge cannot fix it. The fix
-  has to come from the `ojuny-patches` registry (reinstall `patch-ojuny-agent`)
-  or a device-side edit.
-- Reordering alone is probably not enough. The read step proves the evaluator is
-  not first-match: `read .env` is denied although `(allow "read" "*")` is first,
-  so the later/specific rule wins. For edits the ask rule is
-  `${flakeRoot}/**`, and the only consistent explanation for a denial is that
-  the evaluated path is not absolute (or `**` does not match it), so the ask
-  never fires. The September log shows relative patterns
-  (`pattern=devnotes/filestructure.md`). Make the ask match the form the harness
-  actually evaluates (relative), then keep the generated-file denies specific.
-- T2, T3, T5, T6, T7, T8, T9 and T11 were not run: T0 is the stated
-  prerequisite and results cannot be recorded through the normal edit path.
+Two earlier notes in this file are superseded and should not be acted on:
 
-### T0. Correction after the 00:08 render
-- Date: 2026-11-28
-- Render: `~/.config/opencode/opencode.json` -> `/nix/store/nhn15cyn...-opencode.json`
-  (00:08:53). Generator: `modules/patches/patch-ojuny-agent.nix`.
-- Observed after the reorder:
-  - The `edit`/`write`/`patch` tools are **not exposed to the agent session at
-    all**; only `read`, `shell`, `grep`, `glob` and the rest are offered. A T0
-    step 1 edit prompt therefore cannot be produced.
-  - `read /home/den/repos/nix-flake/.env` now returns
-    `tool.execution: File not found`, i.e. the read was **allowed**. Under the
-    previous rule order the same call returned `permission.rejected`.
-- Conclusion: the evaluator is **last-match-wins**, not first-match.
-  `readRules` now has `deny *.env` first and `allow *` last, so `.env` is
-  readable. `fileRules` has the specific denies and `ask **` first and
-  `deny *` last, so every edit is denied and the tool is withheld.
-- Fix: restore blanket-first / specifics-after ordering, and fix the pattern
-  form instead:
-  - `read`: `(allow "read" "*")` first, then `*.env`, `*.env.*`, `*.age`,
-    `*.key`, `*secret*`, then `(allow "read" "*.env.example")` last.
-  - `edit`/`write`/`patch`: `(deny action "*")` first, then
-    `(ask action "**")` and `(ask action "${flakeRoot}/**")`, then the
-    generated-file denies in both relative and absolute form.
-  - Add a harness test that asserts `.env` is denied and a flake edit asks, so
-    an ordering inversion cannot ship again.
+- the 00:08 permission render (`nhn15cyn`) inverted the rule order, removed the
+  Edit tool and made `.env` readable; the 00:15 render (`v0jw2xwy`) fixed both;
+- the first T11 conclusion ("marker has no consumer") was read from stale
+  sources; the deployed CLI and splash-ready script both consume the stamp.
+
+### T0. Agent permissions — pass, one design decision
+
+- 1. absolute flake edit: prompted, applied.
+- 2. `flake.lock`: denied, no prompt.
+- 3. `.env` read: denied, no prompt.
+- 4. `sudo -n true`: denied, no prompt.
+- 5. `git status -sb`: allowed, no prompt.
+- 6. relative path edit (`repos/nix-flake/tests.md`): prompted, applied.
+
+Open decision: the owner states the intended policy is **allow inside the
+flake** so the role is fully agentic. The installed `docs/11-agent.md:51`, the
+patch system prompt (`patch-ojuny-agent.nix:256-262`) and this test file all
+say `ask`. The patch is device-only (absent from `origin/base`), so the choice
+must be made in the registry and the docs updated to match.
+
+Instrumentation gap: opencode 2.3.0 writes no `message=evaluated permission=`
+lines, so the evaluated pattern cannot be recorded.
+
+### T1. NSG divergence dialog — root cause identified
+
+- Dialog: `/home/den/repos/nix-flake: git pull refused by origin/main:
+  git pull --no-edit --ff-only: fatal: cannot fast-forward to multiple branches`
+- That is the new `RemoteState::Current` branch of `pull_error`, so the fetch
+  and classifier run and agree the repo is current; git itself refused.
+- Reproduced in a scratch repo: the error needs **two** `branch.main.merge`
+  refs. With one ref, the GUI's exact `fetch` then
+  `pull --no-edit --ff-only` sequence succeeds, including with a dirty tree and
+  with `origin/base` present.
+- Repo at capture: one merge ref, config mtime 2026-11-25, no `MERGE_HEAD`;
+  `.git/FETCH_HEAD` has `main` for-merge and `base` not-for-merge.
+- Next: capture `git config --get-all branch.main.merge` while the dialog is
+  up. Proposal: include that output and the resolved `@{u}` in the message.
+
+### T2. OSK — keybind and tray pass, typing fails
+
+- Super+Alt+O and the tray icon toggle the keyboard.
+- Typing does not reach the application, and the keyboard does not react to
+  clicks at all.
+- Unit active/running, wvkbd `-H 300 -L 200`, journal clean.
+- Owner confirms the keyboard **is visible on screen** when toggled. So it is
+  not a hidden surface; the primary defect is that pointer input never reaches
+  it, and typing fails because no key is ever emitted.
+- `mmsg get all-layers` with the keyboard **hidden** showed 21 surfaces and no
+  wvkbd. With it **open** it shows 22 and includes `wvkbd`:
+  `{"monitor":"HDMI-A-1","layer":"overlay","name":"wvkbd"}`.
+- mango reserves its space: the focused ghostty on HDMI-A-1 is 1912x838 while
+  the output work area is 1912x1038, i.e. exactly the 200 px landscape height.
+  So the surface is mapped, sized and known to the compositor.
+- The keyboard is an `overlay` layer on **HDMI-A-1 only**, so it does not
+  follow the focused output.
+- Two DMS overlay surfaces are listed after wvkbd on the same output:
+  `dms:tooltip` and `dms:context-menu`. mango composites layers with
+  `wlr_scene` (`manage/layer.c:485`), so those nodes are above the keyboard; a
+  closed-but-mapped DMS overlay with a non-empty input region is the remaining
+  candidate for the swallowed clicks.
+- Decisive test (owner): `dms kill`, then click the keyboard. If clicks land,
+  the DMS overlay stack is the cause; if not, it is wvkbd's input region.
+- Also record whether keys highlight on hover, which separates "no pointer at
+  all" from "pointer arrives but not dispatched".
+
+### T3. Raven ODT — launches, decode fixed; copy dialog broken
+
+- Double-click launches Raven; no freeze.
+- `20261128-002233-failure.log` and `20261128-002535-failure.log` show
+  `Guest exit code: 4294967295 (signed -1)`. The `od` decode and the
+  `--- output ---` section both work. Raven is `0-unstable-2026-11-27`
+  (`e0427278`).
+- Bug: `scripts/ojuny-raven-report.sh:66` opens
+  `yad --text="Report copied to the clipboard." --timeout=2 --no-buttons`,
+  which has no way to close, and it replaces the report window. Proposal:
+  `notify-send`, or an OK button, and never replace the report dialog.
+- The Office deployment tool itself exits -1; treat it as unsupported input.
+
+### T4. Flatpak — app-side
+
+- Sandbox `sh -c true`: Thunderbird 150 ms, Flatseal 892 ms.
+- Real Thunderbird launch: 8 s (owner).
+- The delay is inside the application, not the sandbox or portals.
+
+### T5. Auto-rotate
+
+- `ojuny-auto-rotate`: `not-found` (correct; no output is `automatic`).
+- `monitors.*.autoRotation`: DP-1, DP-2, HDMI-A-1 all `never`.
+- GUI output-card check still open.
+
+### T6. Opencode selection — pass
+
+- Selection works again.
+
+### T7. VSCodium paste — fail
+
+- The wrapper now passes `--ozone-platform=wayland`, and the main process has
+  `DISPLAY` unset, but pasting into a terminal still fails.
+- The cmdline reads `--profile --ozone-platform=wayland -n nix`, i.e. the flag
+  lands between `--profile` and its value. Check the wrapper argument order.
+
+### T8. G13 stick — no action
+
+- The stick does nothing.
+- `allow_shortcuts_inhibit = 1`; G13 present (`event26`, `js0`);
+  `G13 Filtered` absent; `g13-filter.py` running.
+- Needs a retest with the filter stopped, plus a decision on intended behaviour.
+
+### T9/T10. Wallpaper — long-standing, not a lock-bump regression
+
+- Observed: no previews, live-apply does nothing, no wallpaper applied, DMS
+  default shown.
+- Owner: broken since deployment, so **not** caused by the recent lock bump;
+  do not revert on that basis. Possible origin: the attempt to remove the
+  separate auto-themed entry (the preset-vs-`null` split).
+- Concrete defect: `modules/02-core/05-theme.nix:39`
+  `applyCommand = "case %%val%% in */*) dms ipc call wallpaper set %%val%% ;; esac"`
+  never runs for a preset name, because a preset has no `/`.
+- Backend sets `desktop.ojuny.wallpaper.image = null` with
+  `preset = "retro"` (`modules/backend/02-core/05-theme-backend.nix:52-53`);
+  whatever consumes `desktop.ojuny.wallpaper` must resolve the preset to a
+  path.
+
+### T11. Splash — both halves implemented
+
+- The deployed `ojuny-login-splash-ready` reads
+  `$XDG_RUNTIME_DIR/ojuny-shell-reloaded` and quits on a stamp change.
+- `ojuny-cli` waits on the same stamp (`lib/subtrees/rebuild.sh:17,35`).
+- The splash unit no longer has `ConditionPathExists` or `ExecStartPre`.
+- Login start at 00:14 ran the ready unit to its 59 s deadline because a login
+  has no reload; that is separate from the rebuild path.
+- The rebuild test with `showOnRebuild` off and then on is still open.
+
+### Open for the dev agent
+
+1. Decide the permission policy (ask vs allow inside the flake) in the registry
+   and align `docs/11-agent.md`, the patch system prompt and this file.
+2. T1: add `branch.main.merge`/`@{u}` to the pull error and keep the new
+   wording.
+3. T3: replace the copy confirmation dialog (`ojuny-raven-report.sh:66`).
+4. T9/T10: make the wallpaper apply path handle presets and resolve
+   `preset` to a path.
+5. T2, T7, T8, T11: need the retests listed above.
