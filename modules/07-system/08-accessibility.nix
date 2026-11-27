@@ -115,7 +115,7 @@
         ojuny.accessibility.reduceMotion = false;
 
         # @option widget = "switch"; label = "On-screen keyboard (wvkbd)"; group = "Keyboard"; groupOrder = 25; order = 10; description = "Install wvkbd, start it with the session and theme it with the Stylix palette. It types through the wlroots virtual-keyboard and input-method protocols and works with touch.";
-        ojuny.accessibility.onScreenKeyboard.enable = false;
+        ojuny.accessibility.onScreenKeyboard.enable = true;
 
         # @option widget = "switch"; label = "Show on text fields"; group = "Keyboard"; groupOrder = 25; order = 20; visibleWhen.path = "ojuny.accessibility.onScreenKeyboard.enable"; visibleWhen.equals = true; description = "Use wvkbd --auto so the keyboard appears when a text field takes focus and hides when focus leaves. Mango implements zwp_input_method_v2.";
         ojuny.accessibility.onScreenKeyboard.auto = true;
