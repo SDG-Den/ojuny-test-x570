@@ -96,3 +96,9 @@ NSG - most icons are entirely missing when not on the default papirus theme.
 
 copy-pasting from vscodium to a terminal is not possible, the data shows up on the clipboard but cannot be pasted into a terminal.
 
+OSK - auto show/hide only works with vscodium, not with firefox, ghostty or libreoffice writer, manual show/hide with the keybind does not work, tray icon does not work, cannot actually use the OSK
+
+auto-rotate is missing from the menu.
+
+
+
