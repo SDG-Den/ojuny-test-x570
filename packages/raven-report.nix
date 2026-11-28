@@ -3,6 +3,7 @@ pkgs.writeShellApplication {
   name = "ojuny-raven-report";
   runtimeInputs = [
     pkgs.coreutils
+    pkgs.libnotify
     pkgs.wl-clipboard
     pkgs.yad
   ];

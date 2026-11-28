@@ -100,10 +100,10 @@
               "SUPER"
               "SHIFT"
             ];
-            keys = [ "O" ];
+            keys = [ "T" ];
             dispatcher = "spawn";
             args = [ "ojuny-capture-text" ];
-            description = "OCR capture and copy text (Super+Shift+O)";
+            description = "OCR capture and copy text (Super+Shift+T)";
             group = "System";
             subcat = "Screenshots";
           };

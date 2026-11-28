@@ -49,6 +49,8 @@
         (toString osk.landscapeHeight)
         "-R"
         (toString osk.rounding)
+        "--wayland-layer"
+        "top"
         "--fn"
         "${config.stylix.fonts.sansSerif.name} ${toString osk.fontSize}"
         "--bg"

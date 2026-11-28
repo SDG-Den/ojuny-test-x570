@@ -48,9 +48,8 @@ The boundary is the flake:
 - The user owns the rebuild.
 
 OpenCode V2 path-scoped permissions enforce the edit boundary. The agent's
-`edit` permission is deny by default and ask only inside the flake root. The
-generated files are denied even inside the flake. `ojuny-assist` denies `edit`
-entirely.
+`edit` permission is allow inside the flake root. The generated files are
+denied even inside the flake. `ojuny-assist` denies `edit` entirely.
 
 The agent never gets unrestricted shell access. The default is ask. Read-only
 commands are allowed, and destructive commands such as `sudo`, `rm`,

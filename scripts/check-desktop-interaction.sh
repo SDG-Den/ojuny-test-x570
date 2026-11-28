@@ -58,7 +58,17 @@ set -euo pipefail
 printf '%s\n' "\$LSBLK_JSON"
 STUB
 
-chmod +x "$work/bin/mmsg" "$work/bin/ydotool" "$work/bin/udisksctl" "$work/bin/lsblk"
+cat >"$work/bin/findmnt" <<STUB
+#!${BASH:-/usr/bin/env bash}
+set -euo pipefail
+case "\$*" in
+  *"-S /dev/sdd1"*) printf 'rw,uid=%s\n' "$(id -u)" ;;
+  *"-S /dev/sdf1"*) printf 'rw,uid=9999\n' ;;
+  *) exit 1 ;;
+esac
+STUB
+
+chmod +x "$work/bin/mmsg" "$work/bin/ydotool" "$work/bin/udisksctl" "$work/bin/lsblk" "$work/bin/findmnt"
 export PATH="$work/bin:$PATH"
 export XDG_RUNTIME_DIR="$work/run"
 export MMSG_LOG="$work/mmsg.log"
@@ -121,16 +131,34 @@ fi
 if grep -q 'sleep_toggle_monitor' "$MMSG_LOG"; then
   fail "the display toggle used sleep_toggle_monitor"
 fi
+if grep -qx 'dispatch reload_config' "$MMSG_LOG"; then
+  fail "turning a display off reloaded the layout"
+fi
 
 : >"$MMSG_LOG"
 bash "$here"/ojuny-display-toggle.sh focused || fail "the second focused display toggle failed"
 grep -qx 'dispatch toggle_monitor,eDP-1' "$MMSG_LOG" ||
   fail "the second focused press did not re-enable the same display"
+grep -qx 'dispatch reload_config' "$MMSG_LOG" ||
+  fail "re-enabling a display did not reload the layout"
 
 : >"$MMSG_LOG"
 bash "$here"/ojuny-display-toggle.sh all || fail "the all-displays toggle failed"
-grep -qx 'dispatch toggle_monitor,eDP-1' "$MMSG_LOG" || fail "all-displays skipped eDP-1"
-grep -qx 'dispatch toggle_monitor,HDMI-A-1' "$MMSG_LOG" || fail "all-displays skipped HDMI-A-1"
+grep -qx 'dispatch toggle_monitor,eDP-1' "$MMSG_LOG" || fail "all-displays skipped the active display"
+if grep -qx 'dispatch toggle_monitor,HDMI-A-1' "$MMSG_LOG"; then
+  fail "all-displays toggled an already disabled display"
+fi
+if grep -qx 'dispatch reload_config' "$MMSG_LOG"; then
+  fail "turning displays off reloaded the layout"
+fi
+
+export MMSG_MONITORS='{"monitors":[{"name":"eDP-1","active":false},{"name":"HDMI-A-1","active":false}]}'
+: >"$MMSG_LOG"
+bash "$here"/ojuny-display-toggle.sh all || fail "the all-displays re-enable failed"
+grep -qx 'dispatch toggle_monitor,eDP-1' "$MMSG_LOG" || fail "all-displays skipped eDP-1 when re-enabling"
+grep -qx 'dispatch toggle_monitor,HDMI-A-1' "$MMSG_LOG" || fail "all-displays skipped HDMI-A-1 when re-enabling"
+grep -qx 'dispatch reload_config' "$MMSG_LOG" ||
+  fail "re-enabling displays did not reload the layout"
 
 uid="$(id -u)"
 export LSBLK_JSON="{\"blockdevices\":[

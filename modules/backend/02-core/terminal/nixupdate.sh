@@ -15,5 +15,5 @@ fi
 
 if mmsg get cursorpos; then
     dms kill
-    mmsg dispatch spawn_shell,dms run
+    mmsg dispatch spawn_shell,dms run --session
 fi
