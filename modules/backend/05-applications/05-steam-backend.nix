@@ -1,11 +1,10 @@
-{ ... }: {
+{ self, ... }: {
 
   flake.modules.nixos.applications-steam-backend =
     {
       config,
       lib,
       pkgs,
-      self,
       ...
     }:
     let
