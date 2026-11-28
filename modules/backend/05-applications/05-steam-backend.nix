@@ -1,4 +1,4 @@
-{ self, ... }: {
+{ ... }: {
 
   flake.modules.nixos.applications-steam-backend =
     {
@@ -92,8 +92,9 @@
         programs.steam.package =
           lib.mkIf (config.programs.steam.enable && config.ojuny.steam.theme) (
             let
-              stylixColors = self.colors config.lib.stylix.colors;
-              stylixColor = name: stylixColors.${name}.hex;
+              stylixColor = name:
+                let value = config.lib.stylix.colors.${name};
+                in if lib.hasPrefix "#" value then value else "#" + value;
               steamStylixCss = pkgs.writeText "ojuny-steam-stylix.css" ''
                 :root {
                   --adw-color-scheme: dark !important;
