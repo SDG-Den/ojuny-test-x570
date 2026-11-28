@@ -47,6 +47,12 @@ cat >"\$WL_COPY_LOG"
 STUB
 chmod +x "$work/bin/wl-copy"
 
+cat >"$work/bin/notify-send" <<STUB
+#!${BASH:-/usr/bin/env bash}
+printf '%s\n' "\$*" >>"\$NOTIFY_LOG"
+STUB
+chmod +x "$work/bin/notify-send"
+
 cat >"$work/bin/relaunch-wrapper" <<STUB
 #!${BASH:-/usr/bin/env bash}
 printf '%s\n' "\$*" >>"\$WRAPPER_LOG"
@@ -57,6 +63,7 @@ chmod +x "$work/bin/relaunch-wrapper"
 export YAD_LOG="$work/yad.log"
 export WRAPPER_LOG="$work/wrapper.log"
 export WL_COPY_LOG="$work/wl-copy.log"
+export NOTIFY_LOG="$work/notify.log"
 export YAD_COPY_ONCE="$work/copy-once"
 export DISPLAY=:0
 unset WAYLAND_DISPLAY
@@ -64,6 +71,7 @@ unset WAYLAND_DISPLAY
 : >"$YAD_LOG"
 : >"$WRAPPER_LOG"
 : >"$WL_COPY_LOG"
+: >"$NOTIFY_LOG"
 
 report="$work/report.log"
 head -c 300000 /dev/zero | tr '\0' 'a' >"$report"
@@ -120,7 +128,7 @@ fi
 : >"$WL_COPY_LOG"
 YAD_MODE=copy "$wrapper" "$report" "fake-app" "$work/bin/relaunch-wrapper" 7 2>"$work/copy.err"
 cmp -s "$WL_COPY_LOG" "$report" || fail "the Copy report action did not copy the full report"
-grep -qF 'Report copied to the clipboard.' "$YAD_LOG" || fail "the copy action showed no confirmation"
+grep -qF 'Report copied to the clipboard.' "$NOTIFY_LOG" || fail "the copy action showed no confirmation"
 
 : >"$YAD_LOG"
 : >"$WRAPPER_LOG"

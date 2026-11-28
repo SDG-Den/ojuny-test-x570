@@ -63,7 +63,11 @@ show_report() {
     wl-copy < "$report"
     copy_status=$?
     if [ "$copy_status" -eq 0 ]; then
-      timeout 5s yad --text="Report copied to the clipboard." --no-markup --title="Raven report" --timeout=2 --no-buttons --class=ojuny-raven-report --name=ojuny-raven-report --center --on-top
+      if command -v notify-send >/dev/null 2>&1; then
+        notify-send -a "Raven report" "Report copied to the clipboard." || true
+      else
+        timeout 5s yad --text="Report copied to the clipboard." --no-markup --title="Raven report" --timeout=2 --button="OK:0" --class=ojuny-raven-report --name=ojuny-raven-report --center --on-top || true
+      fi
     fi
   done
 }

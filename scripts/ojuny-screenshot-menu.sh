@@ -12,7 +12,7 @@ trap 'rm -rf "$TMP"' EXIT
   printf 'Annotate region\0icon\x1fdraw\x1fmeta\x1fSuper+Shift+Print\x1finfo\x1fedit-region\n'
   printf 'Annotate window\0icon\x1fdraw\x1fmeta\x1fSuper+Shift+Ctrl+Print\x1finfo\x1fedit-window\n'
   printf 'Scroll capture\0icon\x1fswipe_vertical\x1fmeta\x1fSuper+Shift+X\x1finfo\x1fscroll\n'
-  printf 'Copy text (OCR)\0icon\x1ftext_fields\x1fmeta\x1fSuper+Shift+O\x1finfo\x1ftext\n'
+  printf 'Copy text (OCR)\0icon\x1ftext_fields\x1fmeta\x1fSuper+Shift+T\x1finfo\x1ftext\n'
   printf 'Scan QR code\0icon\x1fqr_code_2\x1fmeta\x1fSuper+Alt+Q\x1finfo\x1fqr\n'
 } > "$TMP/items"
 
