@@ -15,3 +15,5 @@ round 8:
 - auto-rotate toggle is still either missing from the nix-settings-gui menu or cannot be found with the word "rotate" in the search bar. 
 - NSG: the card layout somehow started showing the old network monitor tile even though it no longer exists.
 
+round 9:
+
