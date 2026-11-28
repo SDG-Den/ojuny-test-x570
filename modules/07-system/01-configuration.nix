@@ -139,14 +139,14 @@
         console.keyMap = "us";
 
         boot.zswap = {
-          # @option widget = "switch"; label = "Enable zswap"; description = "use zswap as a compressed swap cache"
+          # @option widget = "switch"; label = "Enable zswap"; description = "use zswap as a compressed swap cache"; group = "zswap"; groupOrder = 30;
           enable = false;
 
           compressor = lib.mkIf config.boot.zswap.enable "zstd";
           shrinkerEnabled = lib.mkIf config.boot.zswap.enable true;
           acceptThresholdPercent = 90;
 
-          # @option widget = "slider"; label = "ZSwap pool size"; min = 1; max = 50; description = "maximum amount of RAM to use for zswap"; step = 1; unit = "%";
+          # @option widget = "slider"; label = "ZSwap pool size"; min = 1; max = 50; description = "maximum amount of RAM to use for zswap"; step = 1; unit = "%"; group = "zswap"; groupOrder = 30;
           maxPoolPercent = 25;
         };
 
