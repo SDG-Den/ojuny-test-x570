@@ -26,6 +26,14 @@ case "$pid" in
     notify-send -a "On-screen keyboard" "$message" 2>/dev/null || true
     exit 1
   fi
+  for _ in 1 2 3 4 5 6 7 8 9 10; do
+    pid="$(systemctl --user show -p MainPID --value ojuny-osk.service 2>/dev/null || true)"
+    [ "$pid" != "" ] && [ "$pid" != "0" ] && break
+    sleep 0.1
+  done
+  if [ "$pid" != "" ] && [ "$pid" != "0" ]; then
+    exec kill -s USR2 "$pid"
+  fi
   ;;
 *)
   exec kill -s RTMIN "$pid"

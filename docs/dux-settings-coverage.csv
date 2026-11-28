@@ -384,10 +384,6 @@ dank_dash,,dashCards.memory.col,int,,settings,advanced,covered,desktop.ojuny.dux
 dank_dash,,dashCards.memory.h,int,1,settings,advanced,covered,desktop.ojuny.dux.dashCards.memory.h,,Grid editor control on the dashboard.
 dank_dash,,dashCards.memory.row,int,,settings,advanced,covered,desktop.ojuny.dux.dashCards.memory.row,,Grid editor control on the dashboard.
 dank_dash,,dashCards.memory.w,int,1,settings,advanced,covered,desktop.ojuny.dux.dashCards.memory.w,,Grid editor control on the dashboard.
-dank_dash,,dashCards.network.col,int,,settings,advanced,covered,desktop.ojuny.dux.dashCards.network.col,,Grid editor control on the dashboard.
-dank_dash,,dashCards.network.h,int,1,settings,advanced,covered,desktop.ojuny.dux.dashCards.network.h,,Grid editor control on the dashboard.
-dank_dash,,dashCards.network.row,int,,settings,advanced,covered,desktop.ojuny.dux.dashCards.network.row,,Grid editor control on the dashboard.
-dank_dash,,dashCards.network.w,int,2,settings,advanced,covered,desktop.ojuny.dux.dashCards.network.w,,Grid editor control on the dashboard.
 dank_dash,,dashCards.notifications.col,int,,settings,advanced,covered,desktop.ojuny.dux.dashCards.notifications.col,,Grid editor control on the dashboard.
 dank_dash,,dashCards.notifications.h,int,5,settings,advanced,covered,desktop.ojuny.dux.dashCards.notifications.h,,Grid editor control on the dashboard.
 dank_dash,,dashCards.notifications.row,int,,settings,advanced,covered,desktop.ojuny.dux.dashCards.notifications.row,,Grid editor control on the dashboard.
@@ -439,8 +435,6 @@ dank_dash,,dashOptions.media.waveProgress,bool,true,settings,advanced,covered,de
 dank_dash,,dashOptions.memory.swap,bool,true,settings,advanced,covered,desktop.ojuny.dux.dashOptions.memory.swap,,Direct desktop.ojuny.dux option.
 dank_dash,,dashOptions.memory.tone,string,primary,settings,advanced,covered,desktop.ojuny.dux.dashOptions.memory.tone,,Direct desktop.ojuny.dux option.
 dank_dash,,dashOptions.memory.trend,bool,true,settings,advanced,covered,desktop.ojuny.dux.dashOptions.memory.trend,,Direct desktop.ojuny.dux option.
-dank_dash,,dashOptions.network.tone,string,primary,settings,advanced,covered,desktop.ojuny.dux.dashOptions.network.tone,,Direct desktop.ojuny.dux option.
-dank_dash,,dashOptions.network.trend,bool,true,settings,advanced,covered,desktop.ojuny.dux.dashOptions.network.trend,,Direct desktop.ojuny.dux option.
 dank_dash,,dashOptions.sysmon.temperature,bool,true,settings,advanced,covered,desktop.ojuny.dux.dashOptions.sysmon.temperature,,Direct desktop.ojuny.dux option.
 dank_dash,,dashOptions.sysmon.tone,string,primary,settings,advanced,covered,desktop.ojuny.dux.dashOptions.sysmon.tone,,Direct desktop.ojuny.dux option.
 dank_dash,,dashOptions.user.badge,bool,true,settings,advanced,covered,desktop.ojuny.dux.dashOptions.user.badge,,Direct desktop.ojuny.dux option.

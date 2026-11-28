@@ -3,6 +3,7 @@ set -euo pipefail
 
 theme_source="${1:?theme source path is required}"
 theme_name="${2:?theme name is required}"
+stylix_css="${3:-}"
 home="${HOME:?HOME is required}"
 
 config_home="${XDG_CONFIG_HOME:-$home/.config}"
@@ -28,4 +29,9 @@ if [ -f "$config_file" ] && jq -e . "$config_file" >/dev/null 2>&1; then
   fi
 else
   printf '{"themes":{"activeTheme":"%s"}}\n' "$theme_name" >"$config_file"
+fi
+
+if [ -n "$stylix_css" ] && [ -r "$stylix_css" ]; then
+  install -d -m 0755 "$config_dir"
+  install -m 0644 "$stylix_css" "$config_dir/quick.css"
 fi

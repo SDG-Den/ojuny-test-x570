@@ -43,6 +43,7 @@
       oskColors = self.colors config.lib.stylix.colors;
       oskColor = name: alpha: lib.removePrefix "#" oskColors.${name}.hex + alpha;
       oskArgs = [
+        "--hidden"
         "-H"
         (toString osk.portraitHeight)
         "-L"

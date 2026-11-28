@@ -14,15 +14,22 @@ devices="$(lsblk --json -o NAME,PATH,TYPE,TRAN,RM,FSTYPE,MOUNTPOINTS)" || exit 1
 
 printf '%s' "$devices" |
   jq -r '
+    def walk($tran; $rm):
+      . as $dev
+      | (if (($dev.tran // "") | tostring) == "" then $tran else $dev.tran end) as $t
+      | (if $dev.rm == true then true else $rm end) as $r
+      | { dev: $dev, tran: $t, rm: $r },
+        (($dev.children // [])[] | walk($t; $r));
     .blockdevices[]
-    | recurse(.children[]?)
-    | select(.type == "part" or .type == "disk")
+    | walk(""; false)
+    | select(.dev.type == "part" or .dev.type == "disk")
     | select((.tran // "") == "usb" or .rm == true)
-    | select((.fstype // "") != "")
-    | "\(.path)\t\((.mountpoints // [])[0] // "")"
+    | select((.dev.fstype // "") != "")
+    | "\(.dev.path)\t\(.tran)\t\(.rm)\t\((.dev.mountpoints // [])[0] // "")"
   ' |
-  while IFS=$'\t' read -r device mountpoint; do
+  while IFS=$'\t' read -r device tran rm mountpoint; do
     [ -n "$device" ] || continue
+    printf 'ojuny-automount-present: %s tran=%s rm=%s mount=%s\n' "$device" "$tran" "$rm" "${mountpoint:-none}" >&2
     if [ -n "$mountpoint" ]; then
       options="$(findmnt -n -o OPTIONS -S "$device" 2>/dev/null || true)"
       case "$options" in

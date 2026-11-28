@@ -5,6 +5,7 @@
       config,
       lib,
       pkgs,
+      self,
       ...
     }:
     let
@@ -89,13 +90,60 @@
       options.ojuny.hardware.xpadneo = lib.mkEnableOption "the xpadneo driver for Xbox One and Series wireless controllers";
 
       config = {
-        programs.steam.package = lib.mkIf config.ojuny.steam.theme (
-          pkgs.steamWithMillennium.override {
-            extraProfile = ''
-              ${steamTheme}/bin/ojuny-steam-theme ${adwaitaForSteam} ${lib.escapeShellArg config.ojuny.steam.themeName}
-            '';
-          }
-        );
+        programs.steam.package =
+          lib.mkIf (config.programs.steam.enable && config.ojuny.steam.theme) (
+            let
+              stylixColors = self.colors config.lib.stylix.colors;
+              stylixColor = name: stylixColors.${name}.hex;
+              steamStylixCss = pkgs.writeText "ojuny-steam-stylix.css" ''
+                :root {
+                  --adw-color-scheme: dark !important;
+                  --adw-accent-bg-light: ${stylixColor "base0D"} !important;
+                  --adw-accent-bg-dark: ${stylixColor "base0D"} !important;
+                  --adw-accent-fg: ${stylixColor "base00"} !important;
+                  --adw-destructive-bg-light: ${stylixColor "base08"} !important;
+                  --adw-destructive-bg-dark: ${stylixColor "base08"} !important;
+                  --adw-success-bg-light: ${stylixColor "base0B"} !important;
+                  --adw-success-bg-dark: ${stylixColor "base0B"} !important;
+                  --adw-warning-bg-light: ${stylixColor "base0A"} !important;
+                  --adw-warning-bg-dark: ${stylixColor "base0A"} !important;
+                  --adw-error-bg-light: ${stylixColor "base08"} !important;
+                  --adw-error-bg-dark: ${stylixColor "base08"} !important;
+                  --adw-window-bg: ${stylixColor "base00"} !important;
+                  --adw-window-fg: ${stylixColor "base05"} !important;
+                  --adw-view-bg: ${stylixColor "base01"} !important;
+                  --adw-view-fg: ${stylixColor "base05"} !important;
+                  --adw-headerbar-bg: ${stylixColor "base01"} !important;
+                  --adw-headerbar-fg: ${stylixColor "base05"} !important;
+                  --adw-headerbar-backdrop: ${stylixColor "base00"} !important;
+                  --adw-sidebar-bg: ${stylixColor "base01"} !important;
+                  --adw-sidebar-fg: ${stylixColor "base05"} !important;
+                  --adw-sidebar-backdrop: ${stylixColor "base00"} !important;
+                  --adw-secondary-sidebar-bg: ${stylixColor "base01"} !important;
+                  --adw-secondary-sidebar-fg: ${stylixColor "base05"} !important;
+                  --adw-secondary-sidebar-backdrop: ${stylixColor "base00"} !important;
+                  --adw-card-bg: ${stylixColor "base01"} !important;
+                  --adw-card-fg: ${stylixColor "base05"} !important;
+                  --adw-dialog-bg: ${stylixColor "base02"} !important;
+                  --adw-dialog-fg: ${stylixColor "base05"} !important;
+                  --adw-popover-bg: ${stylixColor "base02"} !important;
+                  --adw-popover-fg: ${stylixColor "base05"} !important;
+                  --adw-thumbnail-bg: ${stylixColor "base01"} !important;
+                  --adw-thumbnail-fg: ${stylixColor "base05"} !important;
+                  --adw-shade: rgba(0, 0, 0, 0.36) !important;
+                  --adw-banner: ${stylixColor "base03"} !important;
+                  --adw-user-offline: ${stylixColor "base03"} !important;
+                  --adw-user-online: ${stylixColor "base0B"} !important;
+                  --adw-user-ingame: ${stylixColor "base0A"} !important;
+                }
+              '';
+            in
+            pkgs.steamWithMillennium.override {
+              extraProfile = ''
+                ${steamTheme}/bin/ojuny-steam-theme ${adwaitaForSteam} ${lib.escapeShellArg config.ojuny.steam.themeName} ${steamStylixCss}
+              '';
+            }
+          );
 
         programs.steam.extest.enable = config.ojuny.steam.extest;
 

@@ -1,7 +1,7 @@
 { self, inputs, ... }: {
 
   flake.modules.nixos.desktop-mangoworkspaces-backend =
-    { config, lib, ... }:
+    { config, lib, pkgs, ... }:
 
     let
       # mango stores booleans as the integers 0 and 1, so these are exposed as
@@ -12,6 +12,12 @@
         tag_carousel = false;
         scratchpad_cross_monitor = true;
         single_scratchpad = false;
+      };
+
+      quakeToggle = pkgs.writeShellApplication {
+        name = "ojuny-quake-toggle";
+        runtimeInputs = [ pkgs.coreutils pkgs.jq ];
+        text = builtins.readFile ../../../scripts/ojuny-quake-toggle.sh;
       };
 
       layoutChoices = [
@@ -168,8 +174,12 @@
         row:
         {
           inherit (splitChord row.chord) modifier keys;
-          dispatcher = "toggle_named_scratchpad";
-          args = "${if row.appId != "" then row.appId else "none"},${if row.title != "" then row.title else "none"},${row.command}";
+          dispatcher = if row.name == "quake" then "spawn" else "toggle_named_scratchpad";
+          args =
+            if row.name == "quake" then
+              "${quakeToggle}/bin/ojuny-quake-toggle ${row.appId} ${if row.title != "" then row.title else "none"} ${row.command}"
+            else
+              "${if row.appId != "" then row.appId else "none"},${if row.title != "" then row.title else "none"},${row.command}";
           description = "Toggle ${row.name} scratchpad";
           group = "Windows";
           subcat = "Scratchpad";
