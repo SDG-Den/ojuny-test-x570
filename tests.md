@@ -281,3 +281,71 @@ button (`undef1` versus `MISC_TOGGLE`); NSG scroll, commit dates and wallpaper
 retest; the manual live-terminal test.
 
 Accepted results: T6 selection pass; T4 Flatpak app-side.
+
+## Results
+
+### T0. Agent permissions — pass on the stated steps, one boundary hole
+- Date: 2026-11-28
+- Generation / build: system-169 (`mbvhw29k...`), build `3c93cde`.
+- 1. Absolute edit (`modules/notes-scratch.md`): created, no prompt. Pass.
+- 2. `flake.lock`: denied, no prompt. Pass.
+- 3. `.env` read: denied. Pass.
+- 4. `sudo -n true`: denied. Pass.
+- 5. `git status -sb`: allowed, no prompt. Pass.
+- 6. Relative edit (`repos/nix-flake/modules/notes-scratch.md`): applied, no
+  prompt. Pass.
+- 7. `/tmp/notes-outside.md`: denied (`external_directory`). Pass.
+- **Boundary hole:** `write /home/den/notes-outside.md` **succeeded**. That path
+  is outside the flake but inside the session directory (`/home/den`), and
+  `(allow action "**")` covers it. The "never edit outside the flake" rule is
+  therefore enforced only for paths the harness classifies as external. The
+  test's step 7 uses `/tmp`, which is external, so it does not catch this.
+- Root cause (owner): the agent was launched with `cwd=~`, and opencode treats
+  the CWD as the project root, so everything under `~` counts as inside and the
+  relative `allow "**"` matches it. The rules are not wrong for a session rooted
+  at the flake; the launcher is.
+- Fix: start `ojuny-agent` with the flake as the session directory (or a
+  `--directory`/session-move to `$FLAKE`), then `**` and `external_directory`
+  both bound the flake. Fallback if the launcher cannot be changed: drop the
+  broad `allow "**"`, normalise edit paths to absolute before matching, and add
+  a test step that targets a path inside the CWD but outside the flake.
+- Note: the session cwd is `/home/den`, not the flake, so the relative-path
+  step exercises `repos/nix-flake/...`, not `modules/...`.
+
+### Static checks on the round-7 expectations
+- T1: the deployed GUI (`m265fsl7...`) contains `merge refs` (2 hits). The
+  instance running before the 10:46 update predates it; reopen Settings before
+  T1. The dialog wording fix is in place.
+- T11: `ojuny-login-splash-ready` is `Type=simple`. Matches.
+- T12: `environment_reload_command` is still
+  `dms kill && mmsg dispatch spawn_shell,dms run`; it does **not** end with
+  `dms run --session`. This is device user state in
+  `~/.config/nix-settings-gui/config.json`; it needs updating on the device
+  before T12 can pass.
+- T13: `ojuny.toml` has `SUPER+SHIFT+O` -> `ojuny-display-toggle all` and
+  `SUPER+SHIFT+T` -> `ojuny-capture-text`. Matches.
+- T14: `ojuny-manual` supports `--path`, `--tty`, `--list`, `--serve`. Matches.
+- T8: `ojuny-g13-stick` is not in `PATH` by design; binds call the store path
+  directly (`patch-logitech-g13.nix:2282`). `/run/user/1000/ojuny-g13-stick.last`
+  does not exist yet because the stick has not been used since the update.
+
+### T5. Auto-rotate — read-only half pass
+- `ojuny-auto-rotate`: `not-found` (correct; no output is `automatic`).
+- `monitors.*.autoRotation`: DP-1, DP-2, HDMI-A-1 all `never`.
+- GUI output-card check pending (owner).
+
+### T9/T10. Wallpaper — presets exist, session carries the wrong one
+- All eight preset paths exist: abstract, city, default, floyd, logo, retro,
+  stripes, waves.
+- Config: `image = null`, `preset = "retro"`.
+- `~/.local/state/dms/session.json` (00:40) has
+  `wallpaperPath = /nix/store/34di220.../lib/wallpapers/preset-abstract.png`,
+  i.e. **abstract**, not the configured `retro`. The session does not carry the
+  configured preset.
+- One `dms` process pair (108107 main, 108127 `qs` child).
+- GUI tile strip and live-apply checks pending (owner).
+
+### T14. Manual — path and list pass
+- `ojuny-manual --path` -> `/nix/store/al0gcnd.../share/ojuny-manual/md`.
+- `--list` prints the chapter titles (Ojuny Manual, Attended ISO, ...).
+- `--tty` fzf/bat interaction pending (owner).
