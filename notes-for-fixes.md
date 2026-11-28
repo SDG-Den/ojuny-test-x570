@@ -1,9 +1,4 @@
 round 8:
-
-- wallpaper: works now, sort of. running `dms kill && mmsg dispatch spawn_shell,dms run` causes it to select *the wrong wallpaper*, selected: Default, showing: Retro.
-- ojuny login splash: only shows for half a second on login, instantly ends now. does not end at all when triggered by rebuild. 
-- WVKBD: still shows immediately on login. cannot type on it still even with DMS disabled.
-- nsg: still "/home/den/repos/nix-flake: git puill refused by origin/.main: git pull --no-edit --ff-only: fatal: cannot fast-forward to multiple branches. (merge refs: refs/heads/man)"
 - nsg: environment reload command still does not run at all.
 - flatpak applications still take long to start. but this is per-app. thunderbird - 8 seconds, kitties - 5 seconds, memerist - 2 seconds, flatseal - 6 seconds, unity hub - 9 seconds. may be a general "flatpaks are slow because sandboxing" issue. 
 - steam: millenium settings are back, but still not auto-themed by stylix.
@@ -16,4 +11,9 @@ round 8:
 - NSG: the card layout somehow started showing the old network monitor tile even though it no longer exists.
 
 round 9:
+
+- after pressing save and rebuild when updating the patches, it showed a warning that work tree was clean. 
+- NOM cache discovery + nix-cache-discovery - 127.0.0.1:5055 is shown when downloading from fallback cache, should show fallback cache URL (just like it shows local device when pulling from the local device)
+- ojuny-login-splash now does not end at all for either rebuild nor boot. major regression, revert functionality to previous, simpler functionality: starts on login, mango has exec= line that runs --quit with a short delay conditional on DMS being available as checked by mmsg get all-layers. this guarantees that on mango reload, it will quit the splash x seconds later, while mango's initial load will be before DMS is active, so it will not trigger the splash kill. this is the exact method that was used initially, and they significantly more complex current system is a major regression and makes it impossible to troubleshoot.
+- wvkbd no longer shows on-boot, but still has 0 actual functionality, making it effectively useless. 
 

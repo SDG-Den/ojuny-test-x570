@@ -143,7 +143,7 @@
 
         boot.zswap = {
           # @option widget = "switch"; label = "Enable zswap"; description = "use zswap as a compressed swap cache"; group = "zswap"; groupOrder = 30;
-          enable = false;
+          enable = true;
 
           compressor = lib.mkIf config.boot.zswap.enable "zstd";
           shrinkerEnabled = lib.mkIf config.boot.zswap.enable true;
