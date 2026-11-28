@@ -189,8 +189,7 @@ current working set for review.
   triggers.
 - `04-dashboard.nix` `[menu]`. Dashboard cards, tabs and their placement. The
   default dashboard is the exported sysmon group layout: a single sysmon card
-  with CPU, memory, disk, net and GPU metrics, the separate network card, and
-  the weather widget set. The sysmon metrics are edited through the card
+  with CPU, memory, disk, net and GPU metrics, and the weather widget set. The sysmon metrics are edited through the card
   settings, not through `@option` comments on the nested list.
 - `05-controlcenter.nix` `[menu]`. Control center widgets and layout.
 - `06-menu.nix` `[menu]`. Nix managed application menu. The menu tree is a

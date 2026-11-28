@@ -86,6 +86,21 @@
             touch $out
           '';
 
+      checks.quake-toggle =
+        pkgs.runCommand "check-quake-toggle"
+          {
+            nativeBuildInputs = [
+              pkgs.bash
+              pkgs.coreutils
+              pkgs.gnugrep
+              pkgs.jq
+            ];
+          }
+          ''
+            bash ${source}/tests/check-quake-toggle.sh ${source}/scripts/ojuny-quake-toggle.sh
+            touch $out
+          '';
+
       checks.auto-rotate-scripts =
         pkgs.runCommand "check-auto-rotate"
           {

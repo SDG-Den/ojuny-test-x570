@@ -14,11 +14,16 @@ fail() {
 
 cat >"$work/bin/systemctl" <<STUB
 #!${BASH:-/usr/bin/env bash}
+if [ "\$1" = "--user" ] && [ "\$2" = "start" ]; then
+  printf '%s\n' "\$*" >>"\$SYSTEMCTL_LOG"
+  : >"\$SYSTEMCTL_STARTED"
+  exit 0
+fi
 if [ "\$1" = "--user" ] && [ "\$2" = "show" ]; then
   [ "\${SYSTEMCTL_SHOW_FAIL:-0}" = "0" ] || exit 1
   case "\$*" in
     *LoadState*) printf '%s\n' "\${SYSTEMCTL_LOAD_STATE:-loaded}" ;;
-    *) printf '%s\n' "\${SYSTEMCTL_PID:-0}" ;;
+    *) if [ -f "\$SYSTEMCTL_STARTED" ]; then printf '%s\n' "\${SYSTEMCTL_START_PID:-0}"; else printf '%s\n' "\${SYSTEMCTL_PID:-0}"; fi ;;
   esac
   exit 0
 fi
@@ -39,6 +44,7 @@ STUB
 chmod +x "$work/bin/notify-send"
 
 export SYSTEMCTL_LOG="$work/systemctl.log"
+export SYSTEMCTL_STARTED="$work/started"
 export KILL_LOG="$work/kill.log"
 export NOTIFY_LOG="$work/notify.log"
 : >"$SYSTEMCTL_LOG"
@@ -51,10 +57,18 @@ grep -qx -- '-s RTMIN 4242' "$KILL_LOG" || fail "a running keyboard was not togg
 
 : >"$SYSTEMCTL_LOG"
 : >"$KILL_LOG"
+rm -f "$SYSTEMCTL_STARTED"
 SYSTEMCTL_PID=0 bash "$toggle"
 grep -qx -- '--user start ojuny-osk.service' "$SYSTEMCTL_LOG" ||
   fail "an inactive keyboard service was not started"
-[ ! -s "$KILL_LOG" ] || fail "an inactive keyboard service was signalled"
+[ ! -s "$KILL_LOG" ] || fail "an inactive keyboard service was signalled without a pid"
+
+: >"$SYSTEMCTL_LOG"
+: >"$KILL_LOG"
+rm -f "$SYSTEMCTL_STARTED"
+SYSTEMCTL_PID=0 SYSTEMCTL_START_PID=5555 bash "$toggle"
+grep -qx -- '-s USR2 5555' "$KILL_LOG" ||
+  fail "a started keyboard was not shown"
 
 : >"$SYSTEMCTL_LOG"
 : >"$KILL_LOG"

@@ -86,12 +86,6 @@
     # @option widget = "switch"; label = "Other GPU temperature"; group = "Cards"; groupOrder = 20; order = 89; description = "Read temperature from non-NVIDIA GPUs.";
     desktop.ojuny.dux.session.nonNvidiaGpuTempEnabled = false;
 
-    # @option widget = "switch"; label = "Network trend"; group = "Cards"; groupOrder = 20; order = 65;
-    desktop.ojuny.dux.dashOptions.network.trend = true;
-
-    # @option widget = "dropdown"; label = "Network tone"; group = "Cards"; groupOrder = 20; order = 66; choices = [ "" "primary" "secondary" "tertiary" ]; description = "Empty uses the surface tone.";
-    desktop.ojuny.dux.dashOptions.network.tone = "primary";
-
     # @option widget = "dropdown"; label = "Battery style"; group = "Cards"; groupOrder = 20; order = 67; choices = [ "solid" "outline" "ring" ]; description = "Battery card gauge style.";
     desktop.ojuny.dux.dashOptions.battery.style = "solid";
 
@@ -313,13 +307,6 @@
         row = 1;
         w = 3;
         h = 3;
-      };
-      network = {
-        _order = 70;
-        col = 3;
-        row = 7;
-        w = 3;
-        h = 1;
       };
       user = {
         _order = 80;

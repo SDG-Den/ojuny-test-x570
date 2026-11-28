@@ -103,7 +103,8 @@ def check(root):
     if not cards:
         errors.append("04-dashboard.nix: dashCards is missing")
     else:
-        require(cards.group("body"), "network = {", "04-dashboard.nix dashCards", errors)
+        if "network = {" in cards.group("body"):
+            errors.append("04-dashboard.nix dashCards: the removed network card is still present")
         check_sysmon(cards.group("body"), errors)
 
     for match in re.finditer(r"col = (\d+);\s*row = \d+;\s*w = (\d+);", control):

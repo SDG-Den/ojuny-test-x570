@@ -32,6 +32,7 @@
         runtimeInputs = [
           pkgs.coreutils
           pkgs.jq
+          pkgs.wlr-randr
         ];
         text = builtins.readFile ../../scripts/ojuny-display-toggle.sh;
       };
