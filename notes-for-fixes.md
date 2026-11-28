@@ -12,7 +12,6 @@ round 8:
 
 round 9:
 
-- after pressing save and rebuild when updating the patches, it showed a warning that work tree was clean. 
 - NOM cache discovery + nix-cache-discovery - 127.0.0.1:5055 is shown when downloading from fallback cache, should show fallback cache URL (just like it shows local device when pulling from the local device)
 - ojuny-login-splash now does not end at all for either rebuild nor boot. major regression, revert functionality to previous, simpler functionality: starts on login, mango has exec= line that runs --quit with a short delay conditional on DMS being available as checked by mmsg get all-layers. this guarantees that on mango reload, it will quit the splash x seconds later, while mango's initial load will be before DMS is active, so it will not trigger the splash kill. this is the exact method that was used initially, and they significantly more complex current system is a major regression and makes it impossible to troubleshoot.
 - wvkbd no longer shows on-boot, but still has 0 actual functionality, making it effectively useless. 

@@ -17,7 +17,7 @@
       options.ojuny.patch.docker.enable = lib.mkEnableOption "the Docker patch";
 
       # @option widget = "switch"; label = "Docker patch"; group = "Patches"; description = "Enable Docker, rootless mode, pruning and declarative containers.";
-      config.ojuny.patch.docker.enable = lib.mkDefault false;
+      config.ojuny.patch.docker.enable = true;
 
       imports = [ self.modules.nixos.docker-backend ];
     };
