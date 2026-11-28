@@ -10,7 +10,7 @@
 { self, inputs, ... }: {
 
   flake.modules.nixos.system-configuration =
-    { ... }:
+    { lib, config, ... }:
     {
       imports = [ self.modules.nixos.patches self.modules.nixos.system-configuration-backend ];
 
@@ -137,6 +137,18 @@
 
         # @option widget = "dropdown"; label = "Console keymap"; group = "Keyboard"; description = "Used on the TTY; the Wayland layout is on the Display page."; choices = [ "us" "uk" "de" "fr" "latam" "es" "nl" "dvorak" ]; applyCommand = "localectl set-keymap %%val%%";
         console.keyMap = "us";
+
+        boot.zswap = {
+          # @option widget = "switch"; label = "Enable zswap"; description = "use zswap as a compressed swap cache"
+          enable = false;
+
+          compressor = lib.mkIf config.boot.zswap.enable "zstd";
+          shrinkerEnabled = lib.mkIf config.boot.zswap.enable true;
+          acceptThresholdPercent = 90;
+
+          # @option widget = "slider"; label = "ZSwap pool size"; min = 1; max = 50; description = "maximum amount of RAM to use for zswap"; step = 1; unit = "%";
+          maxPoolPercent = 25;
+        };
 
         # DO NOT CHANGE, this value is for the *initial* state and should not be changed.
         system.stateVersion = "26.11";
